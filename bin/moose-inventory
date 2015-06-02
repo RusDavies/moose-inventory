@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+begin
+  require 'moose-inventory-cli'
+rescue
+  require 'rubygems'
+  require 'moose-inventory-cli'
+end
+
+Moose::Inventory::Cli::start(ARGV) if __FILE__ == $0
+
+

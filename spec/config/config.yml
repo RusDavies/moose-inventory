@@ -1,0 +1,12 @@
+---
+general:
+  defaultenv: test
+
+test:
+  db:
+    adapter: "sqlite3"
+    file:    "./tmp/test.db"
+
+rspectest:
+  result: "true"
+    
