@@ -1,13 +1,12 @@
 require 'spec_helper'
 
-RSpec.describe "Moose::Inventory::Config" do
-
+RSpec.describe 'Moose::Inventory::Config' do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(TestHelpers.specdir, 'config/config.yml'),
-      format:  "yaml",
-      env:     "test"
+      config:  File.join(spec_root, 'config/config.yml'),
+      format:  'yaml',
+      env:     'test'
     }
 
     @mockargs = []
@@ -17,18 +16,18 @@ RSpec.describe "Moose::Inventory::Config" do
     end
 
     @config = Moose::Inventory::Config
-  end 
+  end
 
   # .init()
-  describe ".init()" do
+  describe '.init()' do
     it 'should be responsive' do
       result = @config.respond_to?(:init)
       expect(result).to eq(true)
     end
   end
-  
+
   # ._configopts
-  describe "._configopts" do
+  describe '._configopts' do
     it 'should be responsive' do
       result = @config.respond_to?(:_confopts)
       expect(result).to eq(true)
@@ -40,29 +39,29 @@ RSpec.describe "Moose::Inventory::Config" do
     end
 
     it 'should default "--format" to json' do
-      @config.init( [] )
-       expect(@config._confopts[:format]).to eq('json')
+      @config.init([])
+      expect(@config._confopts[:format]).to eq('json')
     end
-     
+
     it 'should pick up "--format" from its argument list' do
-      @config.init(@mockargs) 
+      @config.init(@mockargs)
       expect(@config._confopts[:format]).to eq('yaml')
     end
 
     it 'should default "--env" to ""' do
-      @config.init( [] ) 
+      @config.init([])
       expect(@config._confopts[:env]).to eq('')
     end
-    
+
     it 'should pick up "--env" from its argument list' do
-      tmpargs = ["--env", "rspectest", "--config", @mockarg_parts[:config]]
+      tmpargs = ['--env', 'rspectest', '--config', @mockarg_parts[:config]]
       @config.init(tmpargs)
       expect(@config._confopts[:env]).to eq('rspectest')
     end
   end
 
   # ._settings
-  describe "._settings" do
+  describe '._settings' do
     it 'should be responsive' do
       result = @config.respond_to?(:_settings)
       expect(result).to eq(true)
@@ -78,5 +77,4 @@ RSpec.describe "Moose::Inventory::Config" do
       expect(@config._settings[:config][:db]).not_to be_nil
     end
   end
-  
 end

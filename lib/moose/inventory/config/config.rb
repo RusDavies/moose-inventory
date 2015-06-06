@@ -7,7 +7,9 @@ module Moose
     ##
     # This Modules manages application-wide configuration options
     module Config
+      # rubocop:disable Style/ModuleFunction
       extend self
+      # rubocop:enable Style/ModuleFunction
 
       @_argv     = []
       @_confopts = {}
@@ -37,9 +39,11 @@ module Moose
         # --format FORMAT=> See formatter for supported types.
         #                   Defaults to json.
 
-        @_confopts = { env: '', format: 'json' }
+        @_confopts = { env: '', format: 'json', trace: false }
 
-        # Crappy O(n^m) approach.  TODO: O(n) version?
+        # The following are a O(n^m) approach.  TODO: O(n) version?
+          
+        # Check for two-part flags   
         %w(env config format).each do |var|
           @_argv.each_with_index do |val, index|
             next if val != "--#{var}"
@@ -48,10 +52,21 @@ module Moose
             break
           end
         end
+        
+        # Check for one-part flags
+        %w(trace).each do |var|
+          @_argv.each_with_index do |val, index|
+            next if val != "--#{var}"
+            @_confopts[var.to_sym] = true
+            @_argv.delete_at(index)
+            break
+          end
+        end
+        
       end
 
       #----------------------
-      def self.ansible_args
+      def self.ansible_args  # rubocop:disable Metrics/AbcSize
         # Handle Ansible flags
         # --hosts           => list all hosts
         # --hosts HOSTNAME  => get host name
@@ -78,7 +93,7 @@ module Moose
       end
 
       #----------------------
-      def self.resolve_config_file
+      def self.resolve_config_file # rubocop:disable Metrics/AbcSize
         if ! @_confopts[:config].nil?
           path = File.expand_path(@_confopts[:config])
           if File.exist?(path)
@@ -105,6 +120,7 @@ module Moose
 
       #----------------------
       def self.symbolize_keys(hash)
+        # rubocop:disable Style/EachWithObject
         hash.inject({}) do |result, (key, value)|
           new_key = case key
                     when String then key.to_sym
@@ -117,9 +133,12 @@ module Moose
           result[new_key] = new_value
           result
         end
+        # rubocop:enable Style/EachWithObject
       end
 
       #----------------------
+      # rubocop:disable PerceivedComplexity
+      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
       def self.load
         newsets = symbolize_keys(YAML.load_file(@_confopts[:config]))
 
@@ -144,6 +163,7 @@ module Moose
 
         # And now we should have a valid config stuffed into @_options[:config]
       end
+      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
     end
   end
 end

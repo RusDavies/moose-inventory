@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe "Moose::Inventory::DB - models" do
+RSpec.describe 'models' do
   #=============================
   # Initialization
   #
@@ -8,9 +8,9 @@ RSpec.describe "Moose::Inventory::DB - models" do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(TestHelpers.specdir, 'config/config.yml'),
-      format:  "yaml",
-      env:     "test"
+      config:  File.join(spec_root, 'config/config.yml'),
+      format:  'yaml',
+      env:     'test'
     }
 
     @mockargs = []
@@ -36,33 +36,33 @@ RSpec.describe "Moose::Inventory::DB - models" do
   describe 'Hostvars model' do
     it 'should be be functional per Sequel' do
       name = 'hostvar-test'
-      val = "1"
+      val = '1'
 
-      Moose::Inventory::DB::Hostvar.create( name: name , value: val )
+      @db.models[:hostvar].create(name: name, value: val)
 
-      hostvar = Moose::Inventory::DB::Hostvar.find( name: name )
+      hostvar = @db.models[:hostvar].find(name: name)
 
       expect(hostvar).not_to be_nil
-      expect(hostvar[:name]).to eq( name )
-      expect(hostvar[:value]).to eq( val )
+      expect(hostvar[:name]).to eq(name)
+      expect(hostvar[:value]).to eq(val)
     end
   end
 
   describe 'Host model' do
     it 'should be be functional per Sequel' do
-      Moose::Inventory::DB::Host.create(name: 'Host-test')
-      host = Moose::Inventory::DB::Host.find(name: 'Host-test')
+      @db.models[:host].create(name: 'Host-test')
+      host = @db.models[:host].find(name: 'Host-test')
       expect(host).not_to be_nil
       expect(host[:name]).to eq('Host-test')
     end
 
     it 'should have relationships with Groups' do
-      host = Moose::Inventory::DB::Host.create(name: 'Host-test')
-      group = Moose::Inventory::DB::Group.create(name: 'Group-test')
+      host = @db.models[:host].create(name: 'Host-test')
+      group = @db.models[:group].create(name: 'Group-test')
 
       host.add_group(group)
 
-      host = Moose::Inventory::DB::Host.find(name: 'Host-test')
+      host = @db.models[:host].find(name: 'Host-test')
       groups = host.groups_dataset
 
       expect(groups).not_to be_nil
@@ -71,24 +71,23 @@ RSpec.describe "Moose::Inventory::DB - models" do
     end
 
     it 'should have relationships with Hostvars' do
-      hostname = 'host-test'
-      hostvarname = 'hostvar-test'
-      hostvarval = '1'
+      name = 'host-test'
+      varname = 'hostvar-test'
+      varval = '1'
 
-      host = Moose::Inventory::DB::Host.create(name: hostname)
-      hostvar = Moose::Inventory::DB::Hostvar.create(name: hostvarname, value: hostvarval)
+      host = @db.models[:host].create(name: name)
+      hostvar = @db.models[:hostvar].create(name: varname, value: varval)
 
       host.add_hostvar(hostvar)
 
-      host = Moose::Inventory::DB::Host.find(name: hostname)
+      host = @db.models[:host].find(name: name)
       hostvars = host.hostvars_dataset
 
       expect(hostvars).not_to be_nil
       expect(hostvars.count).to eq(1)
-      expect(hostvars.first[:name]).to eq(hostvarname)
-      expect(hostvars.first[:value]).to eq(hostvarval)
+      expect(hostvars.first[:name]).to eq(varname)
+      expect(hostvars.first[:value]).to eq(varval)
     end
-
   end
 
   describe 'Groupvars model' do
@@ -96,31 +95,31 @@ RSpec.describe "Moose::Inventory::DB - models" do
       name = 'groupvar-test'
       val = '1'
 
-      Moose::Inventory::DB::Groupvar.create(name: name, value: val)
+      @db.models[:groupvar].create(name: name, value: val)
 
-      groupvar = Moose::Inventory::DB::Groupvar.find(name: name)
+      groupvar = @db.models[:groupvar].find(name: name)
 
       expect(groupvar).not_to be_nil
-      expect(groupvar[:name]).to eq( name )
-      expect(groupvar[:value]).to eq( val )
+      expect(groupvar[:name]).to eq(name)
+      expect(groupvar[:value]).to eq(val)
     end
   end
 
   describe 'Group model' do
     it 'should be be functional per Sequel' do
-      Moose::Inventory::DB::Group.create(name: 'Group-test')
-      group = Moose::Inventory::DB::Group.find(name: 'Group-test')
+      @db.models[:group].create(name: 'Group-test')
+      group = @db.models[:group].find(name: 'Group-test')
       expect(group).not_to be_nil
       expect(group[:name]).to eq('Group-test')
     end
 
     it 'should have relationships with Hosts' do
-      group = Moose::Inventory::DB::Group.create(name: 'Group-test')
-      host = Moose::Inventory::DB::Host.create(name: 'Host-test')
+      group = @db.models[:group].create(name: 'Group-test')
+      host = @db.models[:host].create(name: 'Host-test')
 
       group.add_host(host)
 
-      group = Moose::Inventory::DB::Group.find(name: 'Group-test')
+      group = @db.models[:group].find(name: 'Group-test')
       hosts = group.hosts_dataset
 
       expect(hosts).not_to be_nil
@@ -134,12 +133,13 @@ RSpec.describe "Moose::Inventory::DB - models" do
     groupvarname = 'groupvar-test'
     groupvarval = '1'
 
-    group = Moose::Inventory::DB::Group.create(name: groupname)
-    groupvar = Moose::Inventory::DB::Groupvar.create(name: groupvarname, value: groupvarval)
+    group = @db.models[:group].create(name: groupname)
+    groupvar = @db.models[:groupvar].create(name: groupvarname,
+                                            value: groupvarval)
 
     group.add_groupvar(groupvar)
 
-    group = Moose::Inventory::DB::Group.find(name: groupname)
+    group = @db.models[:group].find(name: groupname)
     groupvars = group.groupvars_dataset
 
     expect(groupvars).not_to be_nil
@@ -147,5 +147,4 @@ RSpec.describe "Moose::Inventory::DB - models" do
     expect(groupvars.first[:name]).to eq(groupvarname)
     expect(groupvars.first[:value]).to eq(groupvarval)
   end
-
 end

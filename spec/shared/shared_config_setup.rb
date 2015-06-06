@@ -1,10 +1,10 @@
 
-RSpec.shared_context "shared config init", :a => :b do
+RSpec.shared_context 'shared config init', a: :b do
   before(:all) do
     @mockarg_parts = {
-      config:  File.join(TestHelpers.specdir, 'config/config.yml'),
-      format:  "yaml",
-      env:     "test"
+      config:  File.join(spec_dir, 'config/config.yml'),
+      format:  'yaml',
+      env:     'test'
     }
 
     @mockargs = []
@@ -17,6 +17,5 @@ RSpec.shared_context "shared config init", :a => :b do
     @config.init(@mockargs)
 
     @db      = Moose::Inventory::DB
-
   end
 end
