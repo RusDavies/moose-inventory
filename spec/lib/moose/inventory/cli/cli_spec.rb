@@ -1,15 +1,26 @@
-# require 'spec_helper'
+ require 'spec_helper'
+
+ RSpec.describe Moose::Inventory::Cli::Application do
+  before do
+    @app = Moose::Inventory::Cli::Application
+  end
+
+  describe ".version" do
+    # --------------------
+    it 'method should be responsive' do
+      result = @app.instance_methods(false).include?(:version)
+      expect(result).to eq(true)
+    end
+    
+    # --------------------
+#    it 'should output version information' do
+#      actual = runner { @app.version }
 #
-# RSpec.describe Moose::Inventory::Cli::Group do
-#  before do
-#    # Set up the configuration object
-#    mockargs = "--format yaml --env testing --config ./test.config"
-#    Moose::Inventory::Config
-#  end
+#      desired = {}
+#      desired[:STDERR] = "Version #{Moose::Inventory::VERSION}"
 #
-#  describe ".add" do
-#    it '"add test" should add a group called test' do
-#      expect(["group","add","test").to_eq(2)
-#    end
-#  end
-# end
+#      expected(actual, desired)
+#    end 
+    
+  end
+ end

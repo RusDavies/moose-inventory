@@ -1,9 +1,6 @@
 require 'spec_helper'
 
-# TODO: the usual respond_to? method doesn't seem to work on Thor objects.
-# Why not? For now, we'll check against instance_methods.
-
-RSpec.describe Moose::Inventory::Cli::Host do
+RSpec.describe Moose::Inventory::Cli::Group do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
@@ -24,7 +21,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @db = Moose::Inventory::DB
     @db.init if @db.db.nil?
 
-    @host = Moose::Inventory::Cli::Host
+    @group = Moose::Inventory::Cli::Group
     @app = Moose::Inventory::Cli::Application
   end
 
@@ -36,15 +33,14 @@ RSpec.describe Moose::Inventory::Cli::Host do
   describe 'list' do
     #---------------------
     it 'should be responsive' do
-      result = @host.instance_methods(false).include?(:list)
+      result = @group.instance_methods(false).include?(:list)
       expect(result).to eq(true)
     end
 
     #---------------------
     it 'should return an empty set when no results' do
       # no items in the db
-      name = 'not-in-db'
-      actual = runner { @app.start(%W(host list)) }
+      actual = runner { @app.start(%W(group list)) }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = {}.to_yaml
@@ -53,31 +49,31 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #---------------------
-    it 'should get a list of hosts from the db' do
+    it 'should get a list of group from the db' do
       var = 'foo=bar'
-      
+      host_name = 'test_host'
+
       mock = {}
-      hosts = %w(host1 host2 host3)
-      hosts.each do |name|
-        runner { @app.start(%W(host add #{name})) }
-        runner { @app.start(%W(host addvar #{ name } foo=bar)) }
+      groups = %w(group1 group2 group3)
+      groups.each do |name|
+        runner { @app.start(%W(group add #{name})) }
+        runner { @app.start(%W(group addvar #{ name } #{var})) }
         mock[name.to_sym] = {}
-        mock[name.to_sym][:groups] = ['ungrouped']
-        mock[name.to_sym][:hostvars] = {foo: 'bar'}
+        mock[name.to_sym][:groupvars] = {foo: 'bar'}
       end
 
       # items should now be in the db
-      actual = runner{ @app.start(%w(host list)) }
+      actual = runner{ @app.start(%w(group list)) }
         
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml
 
       expected(actual, desired)
     end
-    #---------------------
-    #it 'host list ... should display hostvars, if any are set' do
-    # Covered by 'should get a list of hosts from the db'
-    #end
+#    #---------------------
+#    it 'host list ... should display hostvars, if any are set' do
+#       Covered by 'should get a list of hosts from the db'
+#    end
     
   end
 end

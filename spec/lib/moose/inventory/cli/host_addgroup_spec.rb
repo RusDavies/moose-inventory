@@ -106,14 +106,14 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
-    it 'host addgroup HOST \'ungrouped\' ... should abort with an error' do
+    it 'HOST \'ungrouped\' ... should abort with an error' do
       
       name = 'test1'
-      groupname = 'ungrouped'
+      group_name = 'ungrouped'
     
       runner { @app.start(%W(host add #{name})) }
     
-      actual = runner { @app.start(%W(host addgroup #{name} #{groupname} )) }
+      actual = runner { @app.start(%W(host addgroup #{name} #{group_name} )) }
     
       desired = { aborted: true}
       desired[:STDERR] = 
@@ -122,64 +122,79 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end 
     
     #------------------------
-    it 'host addgroup HOST GROUP ... should add the host to an group, creating the group if necessary' do
+    it 'HOST GROUP ... should add the host to an group, creating the group if necessary' do
       name = 'test1'
-      groupname = 'testgroup1'
+      group_name = 'testgroup1'
 
       runner { @app.start(%W(host add #{name})) }
 
       # DON'T CREATE THE GROUP! That's the point of the test. ;o)
 
-      actual = runner { @app.start(%W(host addgroup #{name} #{groupname} )) }
+      actual = runner { @app.start(%W(host addgroup #{name} #{group_name} )) }
 
       # Check output
       desired = { aborted: false}
       desired[:STDOUT] = 
-        "Retrieving host \'#{name}\'... OK\n"\
-        "Adding association {host:#{name} <-> group:#{groupname}}... OK\n"\
-        "Removing automatic association {host:#{name} <-> group:ungrouped}... OK\n"\
-        "Success\n"
+        "Associate host '#{name}' with groups '#{group_name}':\n"\
+        "  - Retrieve host '#{name}'...\n"\
+        "    - OK\n"\
+        "  - Add association {host:#{name} <-> group:#{group_name}}...\n"\
+        "    - Group does not exist, creating now...\n"\
+        "      - OK\n"\
+        "    - OK\n"\
+        "  - Remove automatic association {host:#{name} <-> group:ungrouped}...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded\n"
+      desired[:STDERR] =
+        "WARNING: Group '#{group_name}' does not exist and will be created." 
       expected(actual, desired)
 
       # Check db          
       host = @db.models[:host].find(name: name)
       groups = host.groups_dataset
       expect(groups.count).to eq(1)
-      expect(groups[name: groupname]).not_to be_nil
+      expect(groups[name: group_name]).not_to be_nil
       expect(groups[name: 'ungrouped']).to be_nil # redundant, but for clarity!      
     end
     
     #------------------------
-     it 'host addgroup HOST GROUP ... should ignore the case where the '\
-       'association already exists' do
+     it 'HOST GROUP ... should skip associations that already '\
+       ' exist, but raise a warning.' do
        name = 'test1'
-       groupname = 'testgroup1'
+       group_name = 'testgroup1'
     
        runner { @app.start(%W(host add #{name})) }
     
        # DON'T CREATE THE GROUP! That's the point of the test. ;o)
     
        # Run once to make the association
-       runner { @app.start(%W(host addgroup #{name} #{groupname} )) }
+       runner { @app.start(%W(host addgroup #{name} #{group_name} )) }
          
        # Run again, to prove expected result
-       actual = runner { @app.start(%W(host addgroup #{name} #{groupname} )) }
+       actual = runner { @app.start(%W(host addgroup #{name} #{group_name} )) }
     
        # Check output
        # Note: This time, we don't expect to see any messages about 
        # dissociation from 'ungrouped'
        desired = { aborted: false}
        desired[:STDOUT] = 
-         "Retrieving host \'#{name}\'... OK\n"\
-         "Adding association {host:#{name} <-> group:#{groupname}}... OK\n"\
-         "Success\n"
+         "Associate host '#{name}' with groups '#{group_name}':\n"\
+         "  - Retrieve host \'#{name}\'...\n"\
+         "    - OK\n"\
+         "  - Add association {host:#{name} <-> group:#{group_name}}...\n"\
+         "    - Already exists, skipping.\n"\
+         "    - OK\n"\
+         "  - All OK\n"\
+         "Succeeded\n"
+       desired[:STDERR] = "WARNING: Association {host:#{name} <-> group:#{group_name}} already exists, skipping."
        expected(actual, desired)
     
        # Check db          
        host = @db.models[:host].find(name: name)
        groups = host.groups_dataset
        expect(groups.count).to eq(1)
-       expect(groups[name: groupname]).not_to be_nil
+       expect(groups[name: group_name]).not_to be_nil
        expect(groups[name: 'ungrouped']).to be_nil # redundant, but for clarity!      
      end    
 
@@ -194,15 +209,26 @@ RSpec.describe Moose::Inventory::Cli::Host do
       actual = runner { @app.start(%W(host addgroup #{name}) + group_names) }
 
       # Check output
-      desired = { aborted: false}
-      desired[:STDOUT] = "Retrieving host \'#{name}\'... OK\n"
+      desired = { aborted: false, STDERR: ''}
+      desired[:STDOUT] =
+        "Associate host '#{name}' with groups '#{group_names.join(',')}':\n"\
+        "  - Retrieve host '#{name}'...\n"\
+        "    - OK\n"
       group_names.each do |group|
         desired[:STDOUT] = desired[:STDOUT] + 
-        "Adding association {host:#{name} <-> group:#{group}}... OK\n"\
+          "  - Add association {host:#{name} <-> group:#{group}}...\n"\
+          "    - Group does not exist, creating now...\n"\
+          "      - OK\n"\
+          "    - OK\n"
+
+        desired[:STDERR] = desired[:STDERR] +  
+          "WARNING: Group '#{group}' does not exist and will be created." 
       end
       desired[:STDOUT]  = desired[:STDOUT]  + 
-        "Removing automatic association {host:#{name} <-> group:ungrouped}... OK\n"\
-        "Success\n"
+        "  - Remove automatic association {host:#{name} <-> group:ungrouped}...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded\n"
       expected(actual, desired)
       
 

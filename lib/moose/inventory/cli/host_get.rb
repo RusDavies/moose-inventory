@@ -13,8 +13,8 @@ module Moose
         require_relative 'host_add'
 
         #==========================
-        desc 'get HOSTNAME_1 [HOSTNAME_2 ...]',
-             'Get hosts HOSTNAME_n from the inventory'
+        desc 'get HOST_1 [HOST_2 ...]',
+             'Get hosts HOST_n from the inventory'
         def get(*argv) # rubocop:disable Metrics/AbcSize
           if argv.length < 1
             abort('ERROR: Wrong number of arguments, '\

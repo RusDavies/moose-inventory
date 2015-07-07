@@ -66,7 +66,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     
 
     #---------------
-    it 'HOST ... should warn about non-existent groups' do
+    it '<non-existent group> ... should warn about non-existent groups' do
       # Rationale:
       # The request implies the desired state is that the group is not present
       # If the group is not present, for whatever reason, then the desired state
@@ -79,35 +79,44 @@ RSpec.describe Moose::Inventory::Cli::Group do
       #@console.out(actual,'y')
       desired = {}
       desired[:STDOUT] =
-        "Removing the group '#{group_name}'... OK\n"\
-        "Succeeded\n"
+        "Remove group '#{group_name}':\n"\
+        "  - Retrieve group '#{group_name}'...\n"\
+        "    - No such group, skipping.\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded, with warnings.\n"
       desired[:STDERR] =
-        "WARNING: The group '#{group_name}' does not exist, skipping.\n"
+        "WARNING: Group '#{group_name}' does not exist, skipping.\n"
 
       expected(actual, desired)
     end
 
     #---------------
-    it 'HOST ... should remove a group' do
-      name = 'test1'
-      @db.models[:group].create(name: name)
+    it 'GROUP ... should remove a group' do
+      group_name = 'test1'
+      @db.models[:group].create(name: group_name)
 
-      actual = runner { @app.start(%W(group rm #{name})) }
+      actual = runner { @app.start(%W(group rm #{group_name})) }
 
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Removing the group '#{name}'... OK\n"\
-        "Succeeded\n"
+        "Remove group '#{group_name}':\n"\
+        "  - Retrieve group '#{group_name}'...\n"\
+        "    - OK\n"\
+        "  - Destroy group '#{group_name}'...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded.\n"
       expected(actual, desired)
 
       # Check db
-      group = @db.models[:group].find(name: name)
+      group = @db.models[:group].find(name: group_name)
       expect(group).to be_nil
     end
     
     #---------------
-     fit "HOST ... should handle the automatic 'ungrouped' group for associated hosts" do
+    it "GROUP ... should handle the automatic 'ungrouped' group for associated hosts" do
        host_name  = 'test-host1'
        group_name  = 'test-group1'
 
@@ -122,17 +131,22 @@ RSpec.describe Moose::Inventory::Cli::Group do
        # Now do the rm       
        actual = runner { @app.start(%W(group rm #{group_name})) }
  
-       #@console.out(actual)
-       
-       # Check output
-       desired = {}
-       desired[:STDOUT] =
-         "Remove the group '#{group_name}':\n"\
-         "  - Adding automatic association {group:ungrouped <-> host:#{host_name}}... OK\n"\
-         "  - OK\n"\
-         "Succeeded\n"
-       expected(actual, desired)
- 
+       # @console.out(actual)
+
+      # Check output 
+      desired = {}
+      desired[:STDOUT] =
+        "Remove group '#{group_name}':\n"\
+        "  - Retrieve group '#{group_name}'...\n"\
+        "    - OK\n"\
+        "  - Adding automatic association {group:ungrouped <-> host:#{host_name}}...\n"\
+        "    - OK\n"\
+        "  - Destroy group '#{group_name}'...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded.\n"
+      expected(actual, desired)
+
        # Check db
        group = @db.models[:group].find(name: group_name)
        expect(group).to be_nil
@@ -144,27 +158,34 @@ RSpec.describe Moose::Inventory::Cli::Group do
        expect(groups_ds[name: 'ungrouped']).not_to be_nil
      end    
 
-#    #---------------
-#    it 'host rm HOST1 HOST2 ... should remove multiple hosts' do
-#      names = %w(host1 host2 host3)
-#      names.each do |name|
-#        @db.models[:host].create(name: name)
-#      end
-#
-#      actual = runner { @app.start(%w(host rm) + names) }
-#
-#      # Check output
-#      desired = { aborted: false, STDERR: '', STDOUT: '' }
-#      names.each do |name|
-#        desired[:STDOUT] = desired[:STDOUT] +
-#                           "Removing the host '#{name}'... OK\n"
-#      end
-#      desired[:STDOUT] = desired[:STDOUT] + "Success\n"
-#      expected(actual, desired)
-#
-#      # Check db
-#      hosts = @db.models[:host].all
-#      expect(hosts.count).to eq(0)
-#    end
+    #---------------
+    it 'GROUP1 GROUP2 ... should remove multiple groups' do
+      names = %w(group1 group2 group3)
+      names.each do |name|
+        @db.models[:group].create(name: name)
+      end
+
+      actual = runner { @app.start(%w(group rm) + names) }
+
+      # Check output
+      desired = {STDOUT: ''}
+      names.each do |name|
+        # Check output
+        desired[:STDOUT] = desired[:STDOUT] +
+          "Remove group '#{name}':\n"\
+          "  - Retrieve group '#{name}'...\n"\
+          "    - OK\n"\
+          "  - Destroy group '#{name}'...\n"\
+          "    - OK\n"\
+          "  - All OK\n"
+      end
+      desired[:STDOUT] = desired[:STDOUT] + "Succeeded.\n"
+      expected(actual, desired)
+      
+
+      # Check db
+      hosts = @db.models[:host].all
+      expect(hosts.count).to eq(0)
+    end
   end
 end

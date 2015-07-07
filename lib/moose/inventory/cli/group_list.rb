@@ -22,10 +22,13 @@ module Moose
 
             groupvars = {}
             group.groupvars_dataset.each do |gv|
-              groupvars[gv[:name]] = gv[:value]
+              groupvars[gv[:name].to_sym] = gv[:value]
             end
 
-            results[group[:name].to_sym] = { hosts: hosts }
+            results[group[:name].to_sym] = {}
+            unless hosts.length == 0
+              results[group[:name].to_sym][:hosts] = hosts
+            end
             unless groupvars.length == 0
               results[group[:name].to_sym][:groupvars] = groupvars
             end

@@ -16,60 +16,72 @@ module Moose
           # rubocop:enable Metrics/LineLength
           # Sanity
           if args.length < 2
-            fail ArgumentError,
-                 "Wrong number of arguments, #{args.length} for 2 or more"
+            abort("ERROR: Wrong number of arguments, #{args.length} for 2 or more.")
+          end
+
+          # Arguments 
+          name = args[0].downcase
+          hosts = args.slice(1, args.length - 1).uniq.map(&:downcase)
+
+          # Sanity
+          if name == 'ungrouped'
+            abort("ERROR: Cannot manually manipulate the automatic group 'ungrouped'.")
           end
 
           # Convenience
           db    = Moose::Inventory::DB
+          fmt = Moose::Inventory::Cli::Formatter
 
           # Transaction
+          warn_count = 0
           begin
             db.transaction do # Transaction start
-              # Retrieve our host name and groups list
-              name   = args[0].downcase
-              if name == 'ungrouped'
-                abort("Can't remove hosts from automatic group 'ungrouped'")
-              end
-              hosts = args.slice(1, args.length - 1).uniq.map(&:downcase)
-
               # Get the target group
-              print "Retrieving group '#{name}'..."
+              puts "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':"
+              fmt.puts 2, "- retrieve group '#{name}'..."
               group = db.models[:group].find(name: name)
               if group.nil?
-                abort("FAILED: The group '#{name}' was not found '\
-                  'in the inventory.")
+                abort("ERROR: The group '#{name}' does not exist.")
               end
-              puts 'OK'
+              fmt.puts 4, '- OK'
 
               # dissociate group from the hosts
               ungrouped  = db.models[:group].find_or_create(name: 'ungrouped')
               hosts_ds = group.hosts_dataset
               hosts.each do |h| # rubocop:disable Style/Next
-                print "Removing association {group:#{name} <-> host:#{ h }}..."
+                fmt.puts 2, "- remove association {group:#{name} <-> host:#{ h }}..."
 
                 # Check against existing associations
                 if hosts_ds[name: h].nil?
-                  puts 'does not exist'
+                  warn_count += 1
+                  fmt.warn "Association {group:#{name} <-> host:#{ h }} doesn't"\
+                    " exist, skipping.\n"
+                  fmt.puts 4, '- doesn\'t exist, skipping.'
+                  fmt.puts 4, '- OK'
                   next
                 end
 
                 host = db.models[:host].find(name: h)
                 group.remove_host(host) unless host.nil?
-                puts 'OK'
+                fmt.puts 4,'- OK'
 
                 # Add the host to the ungrouped group if not in any other group
-                if host.groups_dataset[name: 'ungrouped'].nil?
-                  print "Adding association {host:#{h} <-> group:ungrouped}..."
+                if host.groups_dataset.count == 0
+                  fmt.puts 2, "- add automatic association {group:ungrouped <-> host:#{h}}..."
                   host.add_group(ungrouped)
-                  puts 'OK'
+                  fmt.puts 4, '- OK'
                 end
               end
+              fmt.puts 2, '- all OK'
             end # Transaction end
           rescue db.exceptions[:moose] => e
             abort("ERROR: #{e.message}")
           end
-          puts 'Success'
+          if warn_count == 0
+            puts 'Succeeded.'
+          else
+            puts 'Succeeded, with warnings.'
+          end
         end
       end
     end

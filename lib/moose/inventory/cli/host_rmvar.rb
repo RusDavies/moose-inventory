@@ -21,7 +21,8 @@ module Moose
           end
 
           # Convenience
-          db    = Moose::Inventory::DB
+          db  = Moose::Inventory::DB
+          fmt = Moose::Inventory::Cli::Formatter
 
           # Arguments
           name = args[0].downcase
@@ -29,17 +30,19 @@ module Moose
 
           # Transaction
           db.transaction do # Transaction start
-            print "Retrieving host '#{name}'... "
+            puts "Remove variable(s) '#{vars.join(",")}' from host '#{name}':"
+            
+            fmt.puts 2, "- retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?
               fail db.exceptions[:moose],
-                   "The host '#{name}' was not found in the database."
+                   "The host '#{name}' does not exist."
             end
-            puts 'OK'
+            fmt.puts 4, '- OK'
 
             hostvars_ds = host.hostvars_dataset
             vars.each do |v|
-              print "Removing hostvar {#{v}}... "
+              fmt.puts 2, "- remove variable '#{v}'..."
               vararray = v.split('=')
               if v.start_with?('=') || v.scan('=').count > 1
                 fail db.exceptions[:moose],
@@ -54,10 +57,11 @@ module Moose
                 host.remove_hostvar(hostvar)
                 hostvar.destroy
               end
-              puts 'OK'
+              fmt.puts 4, '- OK'
             end
+            fmt.puts 2, '- all OK'
           end # Transaction end
-          puts 'Succeeded'
+          puts 'Succeeded.'
         end
       end
     end

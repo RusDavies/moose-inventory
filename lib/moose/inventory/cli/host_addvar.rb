@@ -22,6 +22,7 @@ module Moose
 
           # Convenience
           db = Moose::Inventory::DB
+          fmt = Moose::Inventory::Cli::Formatter
 
           # Arguments
           name = args[0].downcase
@@ -29,29 +30,29 @@ module Moose
 
           # Transaction
           db.transaction do # Transaction start
-            print "Retrieving host '#{name}'... "
+            puts "Add variables '#{vars.join(",")}' to host '#{name}':"
+            fmt.puts 2,"- retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?
               fail db.exceptions[:moose],
-                   "The host '#{name}' was not found in the database."
+                   "The host '#{name}' does not exist."
             end
-            puts 'OK'
+            fmt.puts 4, '- OK'
 
             hostvars_ds = host.hostvars_dataset
             vars.each do |v|
-              print "Adding hostvar {#{v}}... "
+              fmt.puts 2, "- add variable '#{v}'..."
               vararray = v.split('=')
               if v.start_with?('=') ||  v.end_with?('=') || vararray.length != 2
                 fail db.exceptions[:moose],
-                     "Incorrect format in {#{v}}. Expected 'key=value'."
+                     "Incorrect format in '{#{v}}'. Expected 'key=value'."
               end
-
+                
               # Check against existing associations
               hostvar = hostvars_ds[name: vararray[0]]
               if !hostvar.nil?
-                # hostvar exists
                 unless hostvar[:value] == vararray[1]
-                  # existing hostvar has wrong value, so update.  
+                  fmt.puts 4, '- already exists, applying as an update...'
                   update = db.models[:hostvar].find(id: hostvar[:id])
                   update[:value] = vararray[1]
                   update.save
@@ -62,11 +63,12 @@ module Moose
                                                       value: vararray[1])
                 host.add_hostvar(hostvar)
               end
-              puts 'OK'
+              fmt.puts 4, '- OK'
             end
+            fmt.puts 2, '- all OK'
           end # Transaction end
 
-          puts 'Succeeded'
+          puts 'Succeeded.'
         end
       end
     end

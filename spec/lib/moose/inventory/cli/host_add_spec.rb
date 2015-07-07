@@ -228,7 +228,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
         @app.start(%W(host add #{name} --groups #{group_names.join(',')}))
       end
         
-      @console.out(actual,'y')
+      #@console.out(actual,'y')
         
       # Check output
       desired = {STDOUT: '', STDERR: ''}

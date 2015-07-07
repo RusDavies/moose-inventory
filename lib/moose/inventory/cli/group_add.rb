@@ -14,71 +14,82 @@ module Moose
         def add(*argv) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
           # rubocop:enable Metrics/LineLength
           if argv.length < 1
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more.")
+            abort("ERROR: Wrong number of arguments, #{argv.length} for 1 or more.")
           end
-
-          # Convenience
-          db    = Moose::Inventory::DB
 
           # Arguments
           names = argv.uniq.map(&:downcase)
           options[:hosts] = '' if options[:hosts].nil?
-            
-          # split(/\W+/) splits on hyphens too, which is not what we want.
-          #hosts = options[:hosts].downcase.split(/\W+/).uniq
           hosts = options[:hosts].downcase.split(',').uniq
 
           # sanity
           if names.include?('ungrouped')
-            abort("Cannot manually manipulate the automatic group 'ungrouped'\n")
+            abort("ERROR: Cannot manually manipulate the automatic group 'ungrouped'\n")
           end
 
+            # Convenience
+            db    = Moose::Inventory::DB
+            fmt = Moose::Inventory::Cli::Formatter
+          
           # Transaction
+          warn_count = 0
           db.transaction do # Transaction start
             names.each do |name|
               # Add the group
-              print "Adding group #{name}... "
+              puts "Add group '#{name}':"
               group = db.models[:group].find(name: name)
               hosts_ds = nil
+              fmt.puts 2, "- create group..."
               if group.nil?
                 group = db.models[:group].create(name: name)
+                fmt.puts 4, '- OK'
               else
-                warn "WARNING: The group '#{name}' already exists, "\
-                  "skipping creation."
+                warn_count += 1
+                fmt.warn "Group '#{name}' already exists, skipping creation.\n"
+                fmt.puts 4, "- already exists, skipping."
                 hosts_ds = group.hosts_dataset
+                fmt.puts 4, '- OK'
               end
-              puts 'OK'
               
               # Associate with hosts
               hosts.each do |h|
                 next if h.nil? || h.empty?
-                print "Adding association {group:#{name} <-> host:#{ h }}... "
+                fmt.puts 2, "- add association {group:#{name} <-> host:#{ h }}..."
                 host = db.models[:host].find(name: h)
                 if host.nil?
-                  warn ("WARNING: The host '#{h}' doesn't exist, "\
-                    "but will be created.")
+                  warn_count += 1
+                  fmt.warn "Host '#{h}' doesn't exist, but will be created.\n"
+                  fmt.puts 4, "- host doesn't exist, creating now..."
                   host = db.models[:host].create(name: h)
+                  fmt.puts 6, "- OK"
                 end
                 if !hosts_ds.nil? && !hosts_ds[name: h].nil?
-                  warn "WARNING: The association {group:#{name} <-> host:#{ h }}"\
-                    " already exists, skipping creation."
+                  warn_count += 1
+                  fmt.warn "Association {group:#{name} <-> host:#{ h }}"\
+                    " already exists, skipping creation.\n"
+                    fmt.puts 4, "- already exists, skipping."
                 else  
                   group.add_host(host)
                 end
-                puts 'OK'
+                fmt.puts 4, '- OK'
   
                 # Handle the host's automatic 'ungrouped' group
                 ungrouped = host.groups_dataset[name: 'ungrouped']
                 unless ungrouped.nil?
-                  print "Removing automatic association {group:ungrouped <-> host:#{ h }}... "
+                  fmt.puts 2, "- remove automatic association {group:ungrouped"\
+                    " <-> host:#{ h }}..."
                   host.remove_group( ungrouped ) unless ungrouped.nil?
-                  puts 'OK'
+                  fmt.puts 4, '- OK'
                 end
               end
+              fmt.puts 2, '- all OK'
             end
           end # Transaction end
-          puts 'Succeeded'
+          if warn_count == 0
+            puts 'Succeeded'
+          else
+            puts 'Succeeded, with warnings.'
+          end
         end
       end
     end

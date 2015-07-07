@@ -33,7 +33,7 @@ module Moose
           if groups.include?('ungrouped')
             abort 'ERROR: Cannot manually manipulate the automatic '\
               'group \'ungrouped\'.'
-          end
+          end 
           
           # Transaction
           db.transaction do # Transaction start
@@ -54,10 +54,17 @@ module Moose
 
               # Check against existing associations
               if !groups_ds[name: g].nil?
-                fmt.puts 4,  "- Already exists, skipping"
+                fmt.warn "Association {host:#{name} <-> group:#{g}} already exists, skipping."
+                fmt.puts 4,  "- Already exists, skipping."
               else
                 # Add new association
-                group = db.models[:group].find_or_create(name: g)
+                group = db.models[:group].find(name: g)
+                if group.nil?
+                  fmt.warn "Group '#{g}' does not exist and will be created."
+                  fmt.puts 4,  "- Group does not exist, creating now..."
+                  group = db.models[:group].create(name: g)
+                  fmt.puts 6,  "- OK"
+                end
                 host.add_group(group)
               end
               fmt.puts 4, '- OK'

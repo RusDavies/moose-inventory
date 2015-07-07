@@ -40,7 +40,7 @@ module Moose
                 fmt.warn "Host '#{name}' does not exist, skipping.\n"
                 fmt.puts 4, "- No such host, skipping."
               end
-              fmt.puts 4, "- OK"
+              fmt.puts 4, "- OK" 
               unless host.nil?
                 fmt.puts 2, "- Destroy host '#{name}'..."
                 host.remove_all_groups
