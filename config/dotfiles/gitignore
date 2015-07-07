@@ -16,3 +16,4 @@ mkmf.log
 .project
 /coverage/
 *.gem
+/gems/
