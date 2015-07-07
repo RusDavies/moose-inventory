@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   # rubocop:disable Metrics/LineLength
   spec.description   = 'The Moosecastle CLI tool for Ansible-compatable dynamic inventory management.'
   # rubocop:enable Metrics/LineLength
-  spec.homepage      = 'http://www.blakemere.ca'
+  spec.homepage      = 'https://github.com/RusDavies/moose-inventory'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")
