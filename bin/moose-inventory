@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 begin
-  require 'moose_inventory_cli'
+  require 'moose_inventory'
 rescue
   require 'rubygems'
-  require 'moose_inventory_cli'
+  require 'moose_inventory'
 end
 
-Moose::Inventory::Cli.start(ARGV) # if __FILE__ == $PROGRAM_NAME
+Moose::Inventory::Cli.start(ARGV) 

@@ -25,14 +25,14 @@ if RUBY_VERSION >= '1.9'
 end
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__),
-                             '..', 'lib/moose/inventory'))
+                             '..', 'lib/moose_inventory'))
 
 # require 'rdoc'
 require 'rspec'
 require 'json'
 require 'yaml'
 require 'find'
-require 'moose_inventory_cli'
+require 'moose_inventory'
 
 RSpec.configure do |config|
   #config.filter_run focus: true # <- enable to allow test focus

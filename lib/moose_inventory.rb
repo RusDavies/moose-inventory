@@ -1,7 +1,7 @@
 require 'thor'
-require_relative './config/config.rb'
-require_relative './db/db.rb'
-require_relative './cli/application.rb'
+require_relative './moose_inventory/config/config.rb'
+require_relative './moose_inventory/db/db.rb'
+require_relative './moose_inventory/cli/application.rb'
 
 module Moose
   module Inventory

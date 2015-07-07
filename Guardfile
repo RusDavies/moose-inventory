@@ -19,7 +19,7 @@ group 'quality' do
 end
 
 group 'test' do 
-  cmd = 'bundle exec rspec -I lib/moose/inventory -I spec '\
+  cmd = 'bundle exec rspec -I lib/moose_inventory -I spec '\
     '--color --format html --out spec/reports/test/rspec.html'
   guard :rspec, cmd: cmd do
     require 'guard/rspec/dsl'
