@@ -70,7 +70,6 @@ module Moose
       def self.top_level_help
         if @_argv[0] == 'help'
           puts "Global flags:"
-          printf "  %-31s %-10s", "--config FILE", "# Specified configuration file to use\n"
           printf "  %-31s %-10s", "--config FILE", "# Specifies a configuration file to use\n"
           printf "  %-31s %-10s", "--env ENV", "# Specifies the environment section of the config to use\n"
           printf "  %-31s %-10s", "--format yaml|json|pjson", "# Format for the output of 'get' and 'list'\n"
