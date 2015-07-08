@@ -23,8 +23,9 @@ module Moose
       def self.init(args)
         @_argv = args.dup
 
+        top_level_help
         top_level_args
-        # ansible_args
+        ansible_args
         resolve_config_file
         load
       end
@@ -66,27 +67,43 @@ module Moose
       end
 
       #----------------------
+      def self.top_level_help
+        if @_argv[0] == 'help'
+          puts "Global flags:"
+          printf "  %-31s %-10s", "--config FILE", "# Specified configuration file to use\n"
+          printf "  %-31s %-10s", "--config FILE", "# Specifies a configuration file to use\n"
+          printf "  %-31s %-10s", "--env ENV", "# Specifies the environment section of the config to use\n"
+          printf "  %-31s %-10s", "--format yaml|json|pjson", "# Format for the output of 'get' and 'list'\n"
+          puts "\nAnsible flags:"
+          printf "  %-31s %-10s", "--hosts", "# Retrieves the list of hosts (alias for 'host list'\n"
+          printf "  %-31s %-10s", "--hosts HOST", "# Retrieves the specified host (alias for 'host get HOST')\n"
+          printf "  %-31s %-10s", "--groups", "# Retrieves the list of groups (alias for 'group list')\n\n"
+        end
+      end
+      
+      #----------------------
       def self.ansible_args  # rubocop:disable Metrics/AbcSize
         # Handle Ansible flags
-        # --hosts           => list all hosts
-        # --hosts HOSTNAME  => get host name
-        # --groups          => list all groups
+        # --hosts           => host list
+        # --hosts HOSTNAME  => host get HOSTNAME
+        # --groups          => lgroup list
 
         if @_argv[0] == '--hosts'
           host = @_argv[1]
           if !host.nil?
             @_argv.clear
-            ['host', 'get', "#{host}", '--ansiblestyle'].each do |arg|
+            ['host', 'get', "#{host}"].each do |arg|
               @_argv << arg
             end
           else
             @_argv.clear
-            ['host', 'list', '--ansiblestyle'].each do |arg|
+            ['host', 'list'].each do |arg|
               @_argv << arg
             end
           end
         elsif @_argv[0] == '--groups'
-          ['group', 'list', '--ansiblestyle'].each do |arg|
+          @_argv.clear
+          ['group', 'list'].each do |arg|
             @_argv << arg
           end
         end

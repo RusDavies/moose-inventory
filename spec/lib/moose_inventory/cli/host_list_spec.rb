@@ -16,7 +16,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @mockarg_parts.each do |key, val|
       @mockargs << "--#{key}"
       @mockargs << val
-    end
+    end 
 
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
@@ -24,6 +24,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @db = Moose::Inventory::DB
     @db.init if @db.db.nil?
 
+    @console = Moose::Inventory::Cli::Formatter
     @host = Moose::Inventory::Cli::Host
     @app = Moose::Inventory::Cli::Application
   end
@@ -75,9 +76,30 @@ RSpec.describe Moose::Inventory::Cli::Host do
       expected(actual, desired)
     end
     #---------------------
-    #it 'host list ... should display hostvars, if any are set' do
-    # Covered by 'should get a list of hosts from the db'
-    #end
+    it 'should be an alias of --hosts (i.e. Ansible parameter)' do
+      
+      mock = {}
+      hosts = %w(host1 host2)
+      hosts.each do |name|
+        runner { @app.start(%W(host add #{name})) }
+        mock[name.to_sym] = {}
+        mock[name.to_sym][:groups] = ['ungrouped']
+      end
+
+      args = @mockargs.clone
+      args << "--hosts"
+      cli = Moose::Inventory::Cli 
+
+      # items should now be in the db
+      actual = runner{ cli.start(args) }
+        
+      #@console.out(actual, 'y')
+      
+      desired = { aborted: false, STDOUT: '', STDERR: '' }
+      desired[:STDOUT] = mock.to_yaml
+
+      expected(actual, desired)
+    end
     
   end
 end
