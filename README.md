@@ -348,12 +348,7 @@ Note, the above conversions are done automatically by the tool, and are included
 ##Missing features
 The following desired features are yet to be implemented:
 1. Top level switches should be described by the built-in help system.
-2. Groups of groups:
-   -- Group model shall provide a many-to-many relationship to self.
-   -- CLI:Group shall provided an addchild method.
-   -- CLI:Group shall provided a rmchild method.
-   -- CLI:Group.get method shall display child group relationships.
-   -- CLI:Group.list method shall display child group relationships.
+2. Groups of groups
 
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
