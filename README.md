@@ -106,24 +106,24 @@ and,
     
     Add a group NAME to the inventory
 
-###Top level switches
+###Global switches
 Not described in the built-in help system are a handful of top-level switches, as follows. 
 
-#### - -config
+#### - -config FILE
 The *--config* flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to see in standard locations, see later.
 
 For example, 
 
     > moose-inventory --config ./my_conf host list
 
-#### - -env
+#### - -env SECTION
 The *--env* flag sets the section in the configuration file to be used as the environment configuration.  If set, then the section must exist.  If not set, then what ever default is provided in the general::defaultenv parameter of the configuration file will be used. 
 
 For example, 
 
     > moose-inventory --env my_section host list
 
-#### - - format
+#### - - format yaml|json|pjson
 The *--format* switch changes the output format from *list* and *get* operations.  Valid formats are yaml, json, pjson (i.e. pretty JSON).   If the switch is not given, then the default is json. 
 
 For example,
@@ -332,27 +332,35 @@ Removing variables, groups, and hosts is just as easy.  In the following example
 ### Using moose-inventory with Ansible
 For integration with Ansible, a shim script should be used, in order to set the correct configuration file, environment, etc.  
 
-A trivial shim script, to be registered with Ansible as the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html), may look like this, 
+A trivial shim script, to be provided to Ansible as the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html), may look like this, 
+```bash
+#!/bin/bash
 
-    #!/bin/bash
-     
-    moose-inventory --config ./example.conf \
-                    --env dev \
-                    $@
+CONF='./example.conf'
+ENV='dev'
+
+moose-inventory --config $CONF --env $ENV $@
+
+exit $?
+```
 When Ansible calls the external inventory script, it does so using the certain parameters, which *moose-inventory* recognises.  The Ansible parameters, and their equivalent *moose-inventory* native parameters are shown below. 
 
-| Ansible params       | moose-inventory params|
-| ------------- |:-------------:|
-| -<sp>-hosts   | host list    |
-| -<sp>-hosts HOST | host get HOST|
-| --groups | group list      |
+Ansible params   | moose-inventory params
+---------------- |-------------
+-<sp>-hosts      | host list    
+-<sp>-hosts HOST | host get HOST
+--groups         | group list      
+
 Note, the above conversions are done automatically by the tool, and are included here only for reference. 
+
+With *moose-inventory* installed and configured, and a shim script (e.g. shim.sh) in place, then using Ansible would be a bit like this: 
+
+    ansible -i shim.sh -u ubuntu us-east-1d -m ping
 
 ##Missing features
 The following desired features are yet to be implemented:
 
-1. Top level switches should be described by the built-in help system.
-2. Groups of groups
+1. Groups of groups
 
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
