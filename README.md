@@ -134,6 +134,9 @@ For example,
       :groups:
         - ungrouped
 
+###Transactional Behaviour
+The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.  
+
 ###Walk-through examples
 In this example, we will walk through the process of creating two hosts and two groups, assigning variables to each, and then then associating hosts with groups.  Once done, we will then remove each association, variable, group and host.  
 
