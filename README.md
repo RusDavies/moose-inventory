@@ -347,6 +347,7 @@ Note, the above conversions are done automatically by the tool, and are included
 
 ##Missing features
 The following desired features are yet to be implemented:
+
 1. Top level switches should be described by the built-in help system.
 2. Groups of groups
 
