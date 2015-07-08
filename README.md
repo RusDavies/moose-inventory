@@ -1,4 +1,4 @@
-# Moose::Inventory
+# moose-inventory
 
 The [moose-inventory](https://github.com/RusDavies/moose-inventory) Ruby Gem is a package for managing dynamic inventories, intended for use with [Ansible](http://www.ansible.com/home). 
 
