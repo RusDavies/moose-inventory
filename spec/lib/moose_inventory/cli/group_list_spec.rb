@@ -23,6 +23,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     @console = Moose::Inventory::Cli::Formatter
     @group = Moose::Inventory::Cli::Group
+    @cli = Moose::Inventory::Cli 
     @app = Moose::Inventory::Cli::Application
   end
 
@@ -73,7 +74,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #---------------------
-    it 'should be an alias of --groups (i.e. Ansible parameter)' do
+    it 'should be an alias of --list (i.e. Ansible parameter)' do
       
       host_name = 'test_host'
 
@@ -85,15 +86,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
       end
     
       args = @mockargs.clone
-      args << "--groups"
-      cli = Moose::Inventory::Cli 
+      args << "--list"
     
-      actual = runner{ cli.start(args) }
+      actual = runner{ @cli.start(args) }
         
       #@console.out(actual, 'y')
        
       desired = { aborted: false, STDOUT: '', STDERR: '' }
-      desired[:STDOUT] = mock.to_yaml
+      desired[:STDOUT] = mock.to_json + "\n"
     
       expected(actual, desired)
     end    

@@ -32,20 +32,29 @@ module Moose
 
       #----------------------
       def self.top_level_args
-        # Certain top level flags affect the configuration.
+        # The following top-level flags affect the global configuration.
+        #
+        # --ansible      => forces ansible mode in relevant responders
+        #                   Default is not use to use ansible mode
+        #
         # --config FILE  => sets the configuration file to be used.
         #                   Default is to search standard locations.
+        #
         # --env ENV      => sets the section to be used as the configuration.
-        #                   Defaults to ""
+        #                   Defaults to "", which forces the use of the 
+        #                   defaultenv parameter from the general section of 
+        #                   the config file. 
+        #
         # --format FORMAT=> See formatter for supported types.
         #                   Defaults to json.
+        #
+        # -- trace       => Enable more complete exceptions for db transactions
+        #                   Default is not to trace. 
 
-        @_confopts = { env: '', format: 'json', trace: false }
+        @_confopts = { env: '', format: 'json', ansible: false, trace: false }
 
-        # The following are a O(n^m) approach.  TODO: O(n) version?
-          
         # Check for two-part flags   
-        %w(env config format).each do |var|
+        %w(config env format).each do |var|
           @_argv.each_with_index do |val, index|
             next if val != "--#{var}"
             @_confopts[var.to_sym] = @_argv[index + 1]
@@ -55,7 +64,7 @@ module Moose
         end
         
         # Check for one-part flags
-        %w(trace).each do |var|
+        %w(ansible trace).each do |var|
           @_argv.each_with_index do |val, index|
             next if val != "--#{var}"
             @_confopts[var.to_sym] = true
@@ -64,48 +73,49 @@ module Moose
           end
         end
         
+        # Sanity
+        # - Ansible output format must be json
+        # @_confopts[:format] = 'json' if @_confopts[:ansible] == true
+        
       end
 
       #----------------------
       def self.top_level_help
         if @_argv[0] == 'help'
           puts "Global flags:"
+          printf "  %-31s %-10s", "--ansible", "# Force Ansible mode (automatically set when using ansible flags)\n"
           printf "  %-31s %-10s", "--config FILE", "# Specifies a configuration file to use\n"
           printf "  %-31s %-10s", "--env ENV", "# Specifies the environment section of the config to use\n"
-          printf "  %-31s %-10s", "--format yaml|json|pjson", "# Format for the output of 'get' and 'list'\n"
+          printf "  %-31s %-10s", "--format yaml|json|pjson", "# Format for the output of 'get', 'list', and 'listvars' subcommands\n"
+          printf "  %-31s %-10s", "--trace", "# Enable more complete exception dumps for database transactions\n"
           puts "\nAnsible flags:"
-          printf "  %-31s %-10s", "--hosts", "# Retrieves the list of hosts (alias for 'host list'\n"
-          printf "  %-31s %-10s", "--hosts HOST", "# Retrieves the specified host (alias for 'host get HOST')\n"
-          printf "  %-31s %-10s", "--groups", "# Retrieves the list of groups (alias for 'group list')\n\n"
+          printf "  %-31s %-10s", "--host HOSTNAME", "# Retrieves host variables for the specified host (alias for 'host listvars HOSTNAME')\n"
+          printf "  %-31s %-10s", "--list", "# Retrieves the list of groups (alias for 'group list')\n\n"
         end
       end
       
       #----------------------
       def self.ansible_args  # rubocop:disable Metrics/AbcSize
-        # Handle Ansible flags
-        # --hosts           => host list
-        # --hosts HOSTNAME  => host get HOSTNAME
-        # --groups          => lgroup list
+        #
+        # See http://docs.ansible.com/developing_inventory.html for Ansible specs
+        # for dynamic inventory sources
+        
+        # --list            => group list
+        # --host HOSTNAME  => host getvars HOSTNAME
 
-        if @_argv[0] == '--hosts'
-          host = @_argv[1]
-          if !host.nil?
+        case @_argv[0]
+          when '--list' 
+            @_confopts[:ansible] = true
+            @_confopts[:format] = 'json'
             @_argv.clear
-            ['host', 'get', "#{host}"].each do |arg|
-              @_argv << arg
-            end
-          else
+            @_argv.concat(['group', 'list']).flatten
+          when '--host'
+            @_confopts[:ansible] = true
+            @_confopts[:format] = 'json'
+            host = @_argv[1]
             @_argv.clear
-            ['host', 'list'].each do |arg|
-              @_argv << arg
-            end
-          end
-        elsif @_argv[0] == '--groups'
-          @_argv.clear
-          ['group', 'list'].each do |arg|
-            @_argv << arg
-          end
-        end
+            @_argv.concat(['host', 'listvars', "#{host}"]).flatten
+        end 
       end
 
       #----------------------

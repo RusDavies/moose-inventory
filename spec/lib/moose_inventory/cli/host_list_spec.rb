@@ -75,31 +75,5 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       expected(actual, desired)
     end
-    #---------------------
-    it 'should be an alias of --hosts (i.e. Ansible parameter)' do
-      
-      mock = {}
-      hosts = %w(host1 host2)
-      hosts.each do |name|
-        runner { @app.start(%W(host add #{name})) }
-        mock[name.to_sym] = {}
-        mock[name.to_sym][:groups] = ['ungrouped']
-      end
-
-      args = @mockargs.clone
-      args << "--hosts"
-      cli = Moose::Inventory::Cli 
-
-      # items should now be in the db
-      actual = runner{ cli.start(args) }
-        
-      #@console.out(actual, 'y')
-      
-      desired = { aborted: false, STDOUT: '', STDERR: '' }
-      desired[:STDOUT] = mock.to_yaml
-
-      expected(actual, desired)
-    end
-    
   end
 end

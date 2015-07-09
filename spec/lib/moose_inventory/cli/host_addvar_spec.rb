@@ -40,7 +40,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       result = @host.instance_methods(false).include?(:addvar)
       expect(result).to eq(true)
     end
-    
+     
     #-----------------
     it 'host addvar <missing args> ... should abort with an error' do
       actual = runner  do

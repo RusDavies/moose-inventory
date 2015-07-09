@@ -17,6 +17,7 @@ module Moose
         require_relative 'host_addgroup'
         require_relative 'host_rmgroup'
         require_relative 'host_addvar'
+        require_relative 'host_listvars'
         require_relative 'host_rmvar'
       end
     end

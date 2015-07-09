@@ -79,51 +79,30 @@ Additional parameters are also required in the **db** subsection, depending on t
 
 ## Usage
 ### The help system
-The tool itself provides a convenient help feature.  For example, 
+The tool itself provides a convenient help feature.  For example, try each of the following,
 
     > moose-inventory help
-    Commands:
-      moose-inventory group ACTION    # Manipulate groups in…
-      moose-inventory help [COMMAND]  # Describe available c…
-      ⋮
-
-and, 
-
     > moose-inventory help group
-    Commands:
-      moose-inventory group add NAME  # Add a group NAME to …
-      moose-inventory group list      # List the groups, tog…
-      ⋮
-
-and,
-
     > moose-inventory group help add
-    Usage:
-      moose-inventory add NAME
-    
-    Options:
-      [--hosts=HOSTS]  
-    
-    Add a group NAME to the inventory
 
 ###Global switches
 Not described in the built-in help system are a handful of top-level switches, as follows. 
 
-#### - -config FILE
-The *--config* flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to see in standard locations, see later.
+#### Option `--config <FILE>`
+The *--config* flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to search standard locations, see later.
 
 For example, 
 
     > moose-inventory --config ./my_conf host list
 
-#### - -env SECTION
+#### Option `--env <SECTION>`
 The *--env* flag sets the section in the configuration file to be used as the environment configuration.  If set, then the section must exist.  If not set, then what ever default is provided in the general::defaultenv parameter of the configuration file will be used. 
 
 For example, 
 
     > moose-inventory --env my_section host list
 
-#### - - format yaml|json|pjson
+#### Option `--format <yaml|json|pjson>`
 The *--format* switch changes the output format from *list* and *get* operations.  Valid formats are yaml, json, pjson (i.e. pretty JSON).   If the switch is not given, then the default is json. 
 
 For example,
@@ -138,7 +117,7 @@ For example,
 The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.  
 
 ###Walk-through examples
-In this example, we will walk through the process of creating two hosts and two groups, assigning variables to each, and then then associating hosts with groups.  Once done, we will then remove each association, variable, group and host.  
+This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.  
 
 We start by creating three hosts, in this case named *host1*,  *host2*, and *host3*.  Note, we can add as many hosts as we desire via this single command.  Also, although we have used short names here, we could equally have used fully qualified names. 
 
@@ -330,10 +309,11 @@ Removing variables, groups, and hosts is just as easy.  In the following example
     > moose-inventory host rm host1 host2 host3
 
 ### Using moose-inventory with Ansible
-For integration with Ansible, a shim script should be used, in order to set the correct configuration file, environment, etc.  
+The *moose-inventory* tool is compliant with the Ansible specifications for [dynamic inventory sources](http://docs.ansible.com/developing_inventory.html).
 
-A trivial shim script, to be provided to Ansible as the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html), may look like this, 
-```bash
+However, to make use of *moose-inventory's* multiple environment and configuration file options, a shim script should be used as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like this,  
+
+```shell
 #!/bin/bash
 
 CONF='./example.conf'
@@ -343,20 +323,25 @@ moose-inventory --config $CONF --env $ENV $@
 
 exit $?
 ```
-When Ansible calls the external inventory script, it does so using the certain parameters, which *moose-inventory* recognises.  The Ansible parameters, and their equivalent *moose-inventory* native parameters are shown below. 
+When Ansible calls the external inventory script, it does so using certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below. 
 
-Ansible params   | moose-inventory params
+Ansible          | moose-inventory
 ---------------- |-------------
--<sp>-hosts      | host list    
--<sp>-hosts HOST | host get HOST
---groups         | group list      
+`--list`         | `--ansible group list`    
+`--host HOSTNAME` | `--ansible host listvars HOSTNAME`
 
-Note, the above conversions are done automatically by the tool, and are included here only for reference. 
+Note, the above conversions are done **automatically** within *moose-inventory*. 
 
-With *moose-inventory* installed and configured, and a shim script (e.g. shim.sh) in place, then using Ansible would be a bit like this: 
+With *moose-inventory* installed and configured, and a shim script (e.g. *shim.sh*) in place, then use by Ansible can be acheived via Ansible's `-i` option.
 
     ansible -i shim.sh -u ubuntu us-east-1d -m ping
 
+Alternatively, if you are using an [Ansible configuration file](http://docs.ansible.com/intro_configuration.html), then you can set the [inventory](http://docs.ansible.com/intro_configuration.html#inventory) option,
+
+    inventory = ./shim.sh
+    
+Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
+    
 ##Missing features
 The following desired features are yet to be implemented:
 
