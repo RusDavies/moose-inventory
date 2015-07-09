@@ -34,9 +34,9 @@ module Moose
         # long-running code. Personally, I don't like this pooling regime - 
         # perhaps I'm not understanding how it's supposed to be used? 
         #
-        # TODO: can the models be refreshed, to make then again valid? What if
+        # QUESTION: can the models be refreshed, to make then again valid? What if
         #       we "load" instead of "require" the models?
-        # UPDATE: Nope, still borks even if we use a load.
+        # ANSWER: Nope, still borks even if we use a load.
         #
         # @db = nil            # <- fails for unit tests
         return unless @db.nil? # <- works for unit tests
@@ -113,6 +113,7 @@ module Moose
           Group.all.each do |g|
             g.remove_all_hosts
             g.remove_all_groupvars
+            g.remove_all_children
             g.destroy
           end
 
@@ -153,6 +154,7 @@ module Moose
         unless @db.table_exists? :groups
           @db.create_table(:groups) do
             primary_key :id
+            foreign_key :parent_id
             column :name, :text, unique: true
           end
         end

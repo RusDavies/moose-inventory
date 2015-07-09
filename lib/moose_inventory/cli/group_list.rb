@@ -23,16 +23,24 @@ module Moose
 
             # Hide the automatic ungrouped group, if it's empty
             next if group[:name] == 'ungrouped' && hosts.length == 0
-            
+
+            children = group.children_dataset.map(:name)
+                          
             groupvars = {}
             group.groupvars_dataset.each do |gv|
               groupvars[gv[:name].to_sym] = gv[:value]
             end
 
+              
             results[group[:name].to_sym] = {}
             unless hosts.length == 0
               results[group[:name].to_sym][:hosts] = hosts
             end
+
+            unless children.length == 0
+              results[group[:name].to_sym][:children] = children
+            end
+            
             unless groupvars.length == 0
               if confopts[:ansible] == true
                 results[group[:name].to_sym][:vars] = groupvars

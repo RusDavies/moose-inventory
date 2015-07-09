@@ -13,7 +13,8 @@ module Moose
         def addhost(*args) # rubocop:disable Metrics/AbcSize
           # Sanity
           if args.length < 2
-            abort("ERROR: Wrong number of arguments, #{args.length} for 2 or more.")
+            abort("ERROR: Wrong number of arguments, #{args.length} "\
+              "for 2 or more.")
           end
 
           # Arguments

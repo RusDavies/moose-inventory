@@ -29,6 +29,8 @@ module Moose
             unless group.nil?
               hosts = group.hosts_dataset.map(:name)
             
+              children = group.children_dataset.map(:name)
+              
               groupvars = {}
               group.groupvars_dataset.each do |gv|
                 groupvars[gv[:name].to_sym] = gv[:value]
@@ -38,6 +40,11 @@ module Moose
               unless hosts.length == 0
                 results[group[:name].to_sym][:hosts]     = hosts
               end
+
+              unless children.length == 0
+                results[group[:name].to_sym][:children] = children
+              end
+              
               unless groupvars.length == 0
                 results[group[:name].to_sym][:groupvars] = groupvars
               end

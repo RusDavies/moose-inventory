@@ -11,7 +11,8 @@ module Moose
       ##
       # Model for the groups table
       class Group < Sequel::Model
-        # TODO: Groups of groups? (i.e. a group with children?)
+        many_to_one :parent, :class=>self
+        one_to_many :children, :key=>:parent_id, :class=>self
         many_to_many :hosts
         one_to_many :groupvars
       end
