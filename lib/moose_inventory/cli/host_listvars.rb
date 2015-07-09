@@ -45,7 +45,7 @@ module Moose
             name = names.first
             host = db.models[:host].find(name: name)
             if host.nil?
-              fmt.warn "The host #{name} does not exist."
+              fmt.warn "The host #{name} does not exist.\n"
             else
               host.hostvars_dataset.each do |hv|
                 results[hv[:name].to_sym] = hv[:value]

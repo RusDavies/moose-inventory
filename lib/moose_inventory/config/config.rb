@@ -74,8 +74,12 @@ module Moose
         end
         
         # Sanity
-        # - Ansible output format must be json
-        # @_confopts[:format] = 'json' if @_confopts[:ansible] == true
+        # - Ansible output format must be json - pjson is permitted, but yaml is not. 
+        if @_confopts[:ansible] == true
+          unless @_confopts[:format] =~ /p|pjson|j|json/ 
+            @_confopts[:format] = 'json'
+          end 
+        end
         
       end
 
@@ -106,12 +110,12 @@ module Moose
         case @_argv[0]
           when '--list' 
             @_confopts[:ansible] = true
-            @_confopts[:format] = 'json'
+            @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/ 
             @_argv.clear
             @_argv.concat(['group', 'list']).flatten
           when '--host'
             @_confopts[:ansible] = true
-            @_confopts[:format] = 'json'
+            @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/ 
             host = @_argv[1]
             @_argv.clear
             @_argv.concat(['host', 'listvars', "#{host}"]).flatten
