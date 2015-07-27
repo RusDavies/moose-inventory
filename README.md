@@ -6,19 +6,22 @@ Note: This software is intended for use on UNIX, Linux, or similar systems.  It 
 
 ## Installation
 
-Add this line to your application's Gemfile:
+The tool is a ruby gem. 
+
+It can be install from the command line as follows.
+
+    $ gem install moose-inventory
+
+Alternatively, it can be installed by adding the following line to a Gemfile:
 
 ```ruby
 gem 'moose-inventory'
 ```
 
-And then execute:
+And then executing:
 
     $ bundle
-Or install it yourself as:
-```ruby
-$ gem install moose-inventory
-```
+    
 
 ## Configuration
 The [moose-inventory](https://github.com/RusDavies/moose-inventory) tool makes use of a simple YAML configuration file.  
