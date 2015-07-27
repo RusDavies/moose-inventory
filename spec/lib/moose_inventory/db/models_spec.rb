@@ -126,25 +126,51 @@ RSpec.describe 'models' do
       expect(hosts.count).to eq(1)
       expect(hosts.first[:name]).to eq('Host-test')
     end
-  end
 
-  it 'should have relationships with Hostvars' do
-    groupname = 'group-test'
-    groupvarname = 'groupvar-test'
-    groupvarval = '1'
+    it 'should have a many-to-many self-referential relationship (i.e. GROUPS of GROUPS)' do
+      
+      parent1 = @db.models[:group].create(name: 'parent1')
+      parent2 = @db.models[:group].create(name: 'parent2')
+      child1 = @db.models[:group].create(name: 'child1')
+      child2 = @db.models[:group].create(name: 'child2')
 
-    group = @db.models[:group].create(name: groupname)
-    groupvar = @db.models[:groupvar].create(name: groupvarname,
-                                            value: groupvarval)
+      parent1.add_child(child1)  
+      parent1.add_child(child2)
 
-    group.add_groupvar(groupvar)
+      parent2.add_child(child1)  
+      parent2.add_child(child2)
+      
+      group = @db.models[:group].find(name: 'parent1')
+      children = group.children_dataset
 
-    group = @db.models[:group].find(name: groupname)
-    groupvars = group.groupvars_dataset
+      expect(children).not_to be_nil
+      expect(children.count).to eq(2)
+      
+      group = @db.models[:group].find(name: 'parent2')
+      children = group.children_dataset
 
-    expect(groupvars).not_to be_nil
-    expect(groupvars.count).to eq(1)
-    expect(groupvars.first[:name]).to eq(groupvarname)
-    expect(groupvars.first[:value]).to eq(groupvarval)
+      expect(children).not_to be_nil
+      expect(children.count).to eq(2)
+    end
+     
+    it 'should have relationships with Hostvars' do
+      groupname = 'group-test'
+      groupvarname = 'groupvar-test'
+      groupvarval = '1'
+  
+      group = @db.models[:group].create(name: groupname)
+      groupvar = @db.models[:groupvar].create(name: groupvarname,
+                                              value: groupvarval)
+  
+      group.add_groupvar(groupvar)
+  
+      group = @db.models[:group].find(name: groupname)
+      groupvars = group.groupvars_dataset
+  
+      expect(groupvars).not_to be_nil
+      expect(groupvars.count).to eq(1)
+      expect(groupvars.first[:name]).to eq(groupvarname)
+      expect(groupvars.first[:value]).to eq(groupvarval)
+    end
   end
 end

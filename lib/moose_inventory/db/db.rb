@@ -154,11 +154,18 @@ module Moose
         unless @db.table_exists? :groups
           @db.create_table(:groups) do
             primary_key :id
-            foreign_key :parent_id
             column :name, :text, unique: true
           end
         end
 
+        unless @db.table_exists? :groups_groups
+          @db.create_table(:groups_groups) do
+            primary_key :id
+            foreign_key :parent_id, :groups
+            foreign_key :child_id,  :groups
+          end
+        end
+        
         unless @db.table_exists? :groupvars
           @db.create_table(:groupvars) do
             primary_key :id
