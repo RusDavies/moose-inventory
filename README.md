@@ -86,7 +86,6 @@ The tool itself provides a convenient help feature.  For example, try each of th
     > moose-inventory group help add
 
 ###Global switches
-Not described in the built-in help system are a handful of top-level switches, as follows. 
 
 #### Option `--config <FILE>`
 The *--config* flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to search standard locations, see later.
@@ -341,11 +340,6 @@ Alternatively, if you are using an [Ansible configuration file](http://docs.ansi
     inventory = ./shim.sh
     
 Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
-    
-##Missing features
-The following desired features are yet to be implemented:
-
-1. Groups of groups
 
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
