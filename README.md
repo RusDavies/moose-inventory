@@ -311,6 +311,7 @@ Removing variables, groups, and hosts is just as easy.  In the following example
     > moose-inventory host rm host1 host2 host3
 
 ### Using moose-inventory with Ansible
+
 The *moose-inventory* tool is compliant with the Ansible specifications for [dynamic inventory sources](http://docs.ansible.com/developing_inventory.html).
 
 However, to make use of *moose-inventory's* multiple environment and configuration file options, a shim script should be used as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like this,  
@@ -344,6 +345,15 @@ Alternatively, if you are using an [Ansible configuration file](http://docs.ansi
     
 Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
 
+To persist data from Ansible to the inventory, simply call the shim script via a local_action command:
+
+```shell
+- set_fact: mydata="Hello World"
+- local_action: command shim.sh host addvar {{ ansible_host }} mydata={{ mydata }} 
+```
+
+
+ 
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
 2. Create your feature branch (git checkout -b my-new-feature`)
