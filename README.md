@@ -349,8 +349,8 @@ Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod
 To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
 
 ```shell
-- set_fact: mydata="Hello_world"
-- local_action: command shim.sh host addvar {{ inventory_hostname }} mydata={{ mydata }} 
+- set_fact: mydata="Hello world"
+- local_action: command shim.sh host addvar {{ inventory_hostname }} mydata="{{ mydata }}" 
 ```
 
 
