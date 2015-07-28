@@ -6,7 +6,7 @@ Note: This software is intended for use on UNIX, Linux, or similar systems.  It 
 
 ## Installation
 
-The tool is a ruby gem. Assuming that you have ruby on your system, then it can be install from the command line as follows.
+The tool is a ruby gem. Assuming that you have ruby on your system, then it can be installed from the command line as follows.
 
     $ gem install moose-inventory
 

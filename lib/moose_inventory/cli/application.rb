@@ -17,12 +17,12 @@ module Moose
 
         desc 'group ACTION',
              'Manipulate groups in the inventory. ' \
-             'ACTION can be add, rm, addhost, rmhost, addvar, rmvar'
+             'ACTION can be add, rm, get, list, addhost, rmhost, addchild, rmchild, addvar, rmvar'
         subcommand 'group', Moose::Inventory::Cli::Group
 
         desc 'host ACTION',
              'Manipulate hosts in the inventory. ' \
-             'ACTION can be add, rm, addgroup, rmgroup, addvar, rmvar'
+             'ACTION can be add, rm, get, list, addgroup, rmgroup, addvar, rmvar'
         subcommand 'host', Moose::Inventory::Cli::Host
       end
     end
