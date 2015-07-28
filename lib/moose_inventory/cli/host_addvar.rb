@@ -31,6 +31,7 @@ module Moose
           # Transaction
           db.transaction do # Transaction start
             puts "Add variables '#{vars.join(",")}' to host '#{name}':"
+            
             fmt.puts 2,"- retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?

@@ -113,7 +113,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
      end
     
     #------------------------
-    it 'host addvar HOST key=value ... should associate the host with the key/value pair' do
+    fit 'host addvar HOST key=value ... should associate the host with the key/value pair' do
       # 1. Should add the var to the db
       # 2. Should associate the host with the var
       
@@ -145,7 +145,41 @@ RSpec.describe Moose::Inventory::Cli::Host do
       expect(hostvars[name: var[:name]]).not_to be_nil
       expect(hostvars[name: var[:name]][:value]).to eq(var[:value])
     end
-   
+
+    #------------------------
+    fit 'host addvar HOST "my val"="hello world" ... should associate the host with the key/value pair' do
+      # 1. Should add the var to the db
+      # 2. Should associate the host with the var
+      
+      host_name = 'test1'
+      var  = {name: 'my val', value: "hello world"}
+    
+      @db.models[:host].create(name: host_name)
+      
+      actual = runner do
+        @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]} ))
+      end
+      #@console.out(actual,'p')
+      
+      desired = { aborted: false}
+      desired[:STDOUT] = 
+        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n"\
+        "  - retrieve host '#{host_name}'...\n"\
+        "    - OK\n"\
+        "  - add variable '#{var[:name]}=#{var[:value]}'...\n"\
+        "    - OK\n"\
+        "  - all OK\n"\
+        "Succeeded.\n"
+      expected(actual, desired)
+    
+      # We should have the correct hostvar associations
+      host = @db.models[:host].find(name: host_name)
+      hostvars = host.hostvars_dataset
+      expect(hostvars.count).to eq(1)
+      expect(hostvars[name: var[:name]]).not_to be_nil
+      expect(hostvars[name: var[:name]][:value]).to eq(var[:value])
+    end
+    
   #------------------------
   it 'host addvar HOST key1=value1 key2=value2 ... should associate the host with multiple key/value pairs' do
     # 1. Should add the var to the db

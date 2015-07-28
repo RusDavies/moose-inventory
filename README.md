@@ -308,7 +308,7 @@ Removing variables, groups, and hosts is just as easy.  In the following example
 
 The *moose-inventory* tool is compliant with the Ansible specifications for [dynamic inventory sources](http://docs.ansible.com/developing_inventory.html).
 
-However, to make use of *moose-inventory's* multiple environment and configuration file options, a shim script should be used as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like this,  
+However, to make use of *moose-inventory's* multiple environment and configuration file options, a shim script should be used as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like the following.  
 
 ```shell
 #!/bin/bash
@@ -316,10 +316,13 @@ However, to make use of *moose-inventory's* multiple environment and configurati
 CONF='./example.conf'
 ENV='dev'
 
-moose-inventory --config $CONF --env $ENV $@
+moose-inventory --config $CONF --env $ENV "$@"
 
 exit $?
 ```
+
+**VERY IMPORTANT NOTE**: Take care to notice that "$@" is the quoted form.  In fact, $@ and "$@" behave differently in how they handle white space.  If you expect spaces in your variable names or values, then you must use the quoted form "$@".
+
 When Ansible calls the external inventory script, it passes certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below. 
 
 Ansible          | moose-inventory
