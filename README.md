@@ -321,7 +321,7 @@ moose-inventory --config $CONF --env $ENV "$@"
 exit $?
 ```
 
-**VERY IMPORTANT NOTE**: Take care to notice that "$@" is the quoted form.  In fact, $@ and "$@" behave differently in how they handle white space.  If you expect spaces in your variable names or values, then you must use the quoted form "$@".
+**IMPORTANT**: Take care to notice that "$@" is the quoted form.  In fact, $@ and "$@" behave differently in how they handle white space.  If you expect spaces in your variable names or values, then you must use the quoted form "$@".
 
 When Ansible calls the external inventory script, it passes certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below. 
 
