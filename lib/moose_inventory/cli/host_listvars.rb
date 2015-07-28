@@ -32,7 +32,7 @@ module Moose
 
           # Convenience
           db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          fmt = Moose::Inventory::Cli::Formatter 
 
           # Arguments
           names = argv.uniq.map(&:downcase)
@@ -51,8 +51,20 @@ module Moose
                 results[hv[:name].to_sym] = hv[:value]
               end
             end
+            
+            # Add the Ansible 1.3 '_meta' tag 
+            # see http://docs.ansible.com/ansible/developing_inventory.html#tuning-the-external-inventory-script
+            results['_meta'.to_sym] = {} 
+            results['_meta'.to_sym]['hostvars'.to_sym] = {}
+            db.models[:host].each do |host| 
+              results['_meta'.to_sym]['hostvars'.to_sym][host.name().to_sym] = {}
+              host.hostvars_dataset.each do |hv|
+                results['_meta'.to_sym]['hostvars'.to_sym][host.name().to_sym][hv[:name].to_sym] = hv[:value]
+              end
+            end
+            
           else
-            # This our more flexible implementation, which is not  compatible 
+            # This our more flexible implementation, which is not compatible 
             # with the Ansible specs 
             names.each do |name|
               host = db.models[:host].find(name: name)

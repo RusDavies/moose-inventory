@@ -18,7 +18,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       @mockargs << val
     end
 
-    @config = Moose::Inventory::Config
+    @config = Moose::Inventory::Config 
     @config.init(@mockargs)
 
     @db = Moose::Inventory::DB
@@ -64,7 +64,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       actual = runner{ @cli.start(args) }
  
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true} 
       desired[:STDERR] = "ERROR: Wrong number of arguments for Ansible mode, 0 for 1.\n"
       expected(actual, desired)
     end
@@ -111,12 +111,18 @@ RSpec.describe Moose::Inventory::Cli::Host do
       #@console.out(actual, 'y')
       
       # Check output
+      meta = {}
+      meta['hostvars'.to_sym] = {}
+      meta['hostvars'.to_sym][host_name.to_sym] = {}
+
       mock = {}
       host_vars.each do |hv|
         hv_array = hv.split('=')  
-        mock[hv_array[0].to_sym] = hv_array[1] 
+        mock[hv_array[0].to_sym] = hv_array[1]
+        meta['hostvars'.to_sym][host_name.to_sym][hv_array[0].to_sym] = hv_array[1]  
       end
-      
+      mock['_meta'.to_sym] = meta
+        
       desired = {}
       desired[:STDOUT] = mock.to_json + "\n"
       expected(actual, desired)
@@ -137,11 +143,17 @@ RSpec.describe Moose::Inventory::Cli::Host do
       #@console.out(actual, 'y')
       
       # Check output
+      meta = {} 
+      meta['hostvars'.to_sym] = {}
+      meta['hostvars'.to_sym][host_name.to_sym] = {}
+
       mock = {}
       host_vars.each do |hv|
         hv_array = hv.split('=')  
         mock[hv_array[0].to_sym] = hv_array[1] 
+        meta['hostvars'.to_sym][host_name.to_sym][hv_array[0].to_sym] = hv_array[1]  
       end
+      mock['_meta'.to_sym] = meta
       
       desired = {}
       desired[:STDOUT] = mock.to_json + "\n"
