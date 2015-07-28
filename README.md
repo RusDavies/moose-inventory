@@ -324,7 +324,7 @@ exit $?
 **IMPORTANT**: Take care to notice that "$@" is the quoted form.  In fact, $@ and "$@" behave differently in how they handle white space.  If you expect spaces in your variable names or values, such as in the following example, then you must use the quoted form "$@".
 
     $ ./shim.sh host add example
-    $ ./shim.sh host addvar "my var"="hello world"
+    $ ./shim.sh host addvar example "my var"="hello world"
      
 
 When Ansible calls the external inventory script, it passes certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below. 
