@@ -33,7 +33,7 @@ module Moose
 
               
             results[group[:name].to_sym] = {}
-            unless hosts.length == 0
+            unless hosts.length == 0  and confopts[:ansible] != true 
               results[group[:name].to_sym][:hosts] = hosts
             end
 
