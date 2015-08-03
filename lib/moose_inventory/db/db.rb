@@ -92,11 +92,11 @@ module Moose
           sleep rand()
           retry
         else
-          error('The database appears to be locked by another process, and '\
-               " did not become free after #{tries} tries. Giving up. "
+          warn('The database appears to be locked by another process, and '\
+               " did not become free after #{tries} tries. Giving up. ")
 
           # TODO: Some useful advice to the user, as to what to do about this error. 
-          raise 
+          raise  
         end
             
         rescue @exceptions[:moose] => e
