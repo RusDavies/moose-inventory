@@ -89,12 +89,13 @@ module Moose
           if Moose::Inventory::Config._confopts[:trace] == true
             STDERR.puts e.message
           end
-          warn('The database appears to be locked by another process. '\
-               " This was try #{tries} of 10. "\
-               ' Retrying after a delay of random duration.')
           sleep rand()
           retry
         else
+          error('The database appears to be locked by another process, and '\
+               " did not become free after #{tries} tries. Giving up. "
+
+          # TODO: Some useful advice to the user, as to what to do about this error. 
           raise 
         end
             
