@@ -65,17 +65,46 @@ module Moose
       #--------------------
       def self.transaction
         fail('Database connection has not been established') if @db.nil?
+        
+        tries = 0
+        
         begin
           @db.transaction(savepoint: true) do
             yield
           end
 
+        rescue Sequel::DatabaseError => e
+        # We want to rescue Sqlite3::BusyException.  But, sequel catches that
+        # and re-raises it as Sequel::DatabaseError, with a message referencing
+        # the original exception class  
+         
+        # We look into e, to see whether it is a BusyException.  If not, 
+        # we re-raise immediately.  
+        raise unless e.message.include?("BusyException")  
+
+        # Looks like a BusyException, so we retry, after a random delay.           
+        tries += 1
+        case tries
+        when 1..10
+          if Moose::Inventory::Config._confopts[:trace] == true
+            STDERR.puts e.message
+          end
+          warn('The database appears to be locked by another process. '\
+               " This was try #{tries} of 10. "\
+               ' Retrying after a delay of random duration.')
+          sleep rand()
+          retry
+        else
+          raise 
+        end
+            
         rescue @exceptions[:moose] => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
 
           if Moose::Inventory::Config._confopts[:trace] == true
+            STDERR.puts $!.backtrace    
             abort("ERROR: #{e}")
-          else          
+          else      
             abort("ERROR: #{e.message}")
           end
 
