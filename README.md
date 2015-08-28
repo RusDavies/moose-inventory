@@ -2,7 +2,9 @@
 
 The [moose-inventory](https://github.com/RusDavies/moose-inventory) software is a tool for managing dynamic inventories, intended for use with [Ansible](http://www.ansible.com/home). 
 
-Note: This software is intended for use on UNIX, Linux, or similar systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry. 
+Note: This software is intended for use on UNIX/Linux systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry. 
+
+Note 2: For many, the really interesting part of this tool will be it's ability to write to the inventory database from within Ansible, as described at the end of this document.  If that's what tickles your fancy, then I encourage you to get a sense of the capability by [jumping to that section first](https://github.com/RusDavies/moose-inventory#using-moose-inventory-with-ansible). ;o) 
 
 ## Installation
 
@@ -346,13 +348,12 @@ Alternatively, if using an [Ansible configuration file](http://docs.ansible.com/
     
 Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
 
-To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
+An advantage of a dynamic inventory over simple files, is the possibility of writing data to the inventory. To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
 
 ```shell
 - set_fact: mydata="Hello world"
 - local_action: command shim.sh host addvar {{ inventory_hostname }} mydata="{{ mydata }}" 
 ```
-
 
  
 ## Contributing
