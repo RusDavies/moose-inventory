@@ -351,7 +351,7 @@ Alternatively, if using an [Ansible configuration file](http://docs.ansible.com/
 Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
 
 #### Writing to the dynamic inventory from Ansible
-An advantage of a dynamic inventory over simple files, is the possibility of writing data to the inventory. To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
+A useful aspect of dynamic inventories is the possibility of writing data to the inventory. To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
 
 ```shell
 - set_fact: mydata="Hello world"
