@@ -2,9 +2,10 @@
 
 The [moose-inventory](https://github.com/RusDavies/moose-inventory) software is a tool for managing dynamic inventories, intended for use with [Ansible](http://www.ansible.com/home). 
 
-Note: This software is intended for use on UNIX/Linux systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry. 
+Note 1: For many, the really interesting part of this tool will be it's ability to write to the inventory database from within Ansible, as described at the end of this document.  If that's what tickles your fancy, then I encourage you to get a sense of the capability by [jumping to that section first](https://github.com/RusDavies/moose-inventory#writing-to-the-dynamic-inventory-from-ansible). ;o)
 
-Note 2: For many, the really interesting part of this tool will be it's ability to write to the inventory database from within Ansible, as described at the end of this document.  If that's what tickles your fancy, then I encourage you to get a sense of the capability by [jumping to that section first](https://github.com/RusDavies/moose-inventory#using-moose-inventory-with-ansible). ;o) 
+
+Note 2: This software is intended for use on UNIX/Linux systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry. 
 
 ## Installation
 
