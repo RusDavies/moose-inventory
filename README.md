@@ -9,9 +9,14 @@ Note 2: This software is intended for use on UNIX/Linux systems.  It will likely
 
 ## Installation
 
+Note: You may need to install certain development tools (e.g. gcc, postresql-devel, mysql-devel, sqlite-devel) on your system, in order for the gem installation to perform native builds. 
+
 The tool is a ruby gem. Assuming that you have ruby on your system, then it can be installed from the command line as follows.
 
     $ gem install moose-inventory
+
+Note: It may be necassary to first install certain development tools (e.g. gcc, postresql-devel, mysql-devel, sqlite-devel), in order for the gem installation to perform nati
+ve builds.
 
 It can also be installed by adding the following line to a Gemfile and then executing `bundle`:
 
