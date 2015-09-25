@@ -184,8 +184,65 @@ RSpec.describe Moose::Inventory::Cli::Group do
       
 
       # Check db
-      hosts = @db.models[:host].all
-      expect(hosts.count).to eq(0)
+      groups = @db.models[:group].all
+      expect(groups.count).to eq(0)
     end
+
+    #---------------
+    it 'GROUP ... should remove GROUP, where GROUP has an associated parent.' do
+      @db.models[:group].create(name: "parent")
+      runner { @app.start(%w(group addchild parent child) ) }
+
+      actual = runner { @app.start(%w(group rm child) ) }
+    
+      # Check output
+      desired = {STDOUT: ''}
+      # Check output
+      desired[:STDOUT] = desired[:STDOUT] +
+        "Remove group 'child':\n"\
+        "  - Retrieve group 'child'...\n"\
+        "    - OK\n"\
+        "  - Remove association {group:child <-> group:parent}...\n"\
+        "    - OK\n"\
+        "  - Destroy group 'child'...\n"\
+        "    - OK\n"\
+        "  - All OK\n"
+
+      desired[:STDOUT] = desired[:STDOUT] + "Succeeded.\n"
+      expected(actual, desired)
+    
+      # Check db
+      groups = @db.models[:group].all
+      expect(groups.count).to eq(1)
+    end
+
+    #---------------
+    it 'GROUP ... should remove GROUP, where GROUP has an associated child.' do
+      @db.models[:group].create(name: "parent")
+      runner { @app.start(%w(group addchild parent child) ) }
+    
+      actual = runner { @app.start(%w(group rm parent) ) }
+    
+      # Check output
+      desired = {STDOUT: ''}
+      # Check output
+      desired[:STDOUT] = desired[:STDOUT] +
+        "Remove group 'parent':\n"\
+        "  - Retrieve group 'parent'...\n"\
+        "    - OK\n"\
+        "  - Remove association {group:parent <-> group:child}...\n"\
+        "    - OK\n"\
+        "  - Destroy group 'parent'...\n"\
+        "    - OK\n"\
+        "  - All OK\n"
+    
+      desired[:STDOUT] = desired[:STDOUT] + "Succeeded.\n"
+      expected(actual, desired)
+    
+      # Check db
+      groups = @db.models[:group].all
+      expect(groups.count).to eq(1)
+    end
+    
   end
 end

@@ -45,6 +45,23 @@ module Moose
               end
               fmt.puts 4, "- OK" 
               unless group.nil?
+                # Dissociate from any parent groups
+                pgroups_ds = group.parents_dataset
+                pgroups_ds.each do |parent|
+                  fmt.puts 2, "- Remove association {group:#{name} <-> group:#{parent.name}}..."
+                  parent.remove_child(group)
+                  fmt.puts 4, '- OK'
+                end
+
+                # Dissociate from any child groups
+                groups_ds = group.children_dataset
+                groups_ds.each do |child|
+                  fmt.puts 2, "- Remove association {group:#{name} <-> group:#{child.name}}..."
+                  group.remove_child(child)
+                  # TODO: Should we propagate the delete to orphaned children? 
+                  fmt.puts 4, '- OK'
+                end
+                                
                 # Handle automatic group for any associated hosts
                 hosts_ds = group.hosts_dataset
                 hosts_ds.each do |host|
