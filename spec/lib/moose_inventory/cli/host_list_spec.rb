@@ -9,14 +9,14 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
     @mockarg_parts.each do |key, val|
       @mockargs << "--#{key}"
       @mockargs << val
-    end 
+    end
 
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
@@ -45,7 +45,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     it 'should return an empty set when no results' do
       # no items in the db
       name = 'not-in-db'
-      actual = runner { @app.start(%W(host list)) }
+      actual = runner { @app.start(%w(host list)) }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = {}.to_yaml
@@ -56,20 +56,20 @@ RSpec.describe Moose::Inventory::Cli::Host do
     #---------------------
     it 'should get a list of hosts from the db' do
       var = 'foo=bar'
-      
+
       mock = {}
       hosts = %w(host1 host2 host3)
       hosts.each do |name|
         runner { @app.start(%W(host add #{name})) }
-        runner { @app.start(%W(host addvar #{ name } foo=bar)) }
+        runner { @app.start(%W(host addvar #{name} foo=bar)) }
         mock[name.to_sym] = {}
         mock[name.to_sym][:groups] = ['ungrouped']
-        mock[name.to_sym][:hostvars] = {foo: 'bar'}
+        mock[name.to_sym][:hostvars] = { foo: 'bar' }
       end
 
       # items should now be in the db
-      actual = runner{ @app.start(%w(host list)) }
-        
+      actual = runner { @app.start(%w(host list)) }
+
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml
 

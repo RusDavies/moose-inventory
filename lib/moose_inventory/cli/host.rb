@@ -9,7 +9,7 @@ module Moose
     module Cli
       ##
       # Class implementing the "host" methods of the CLI
-      class Host < Thor # rubocop:disable Metrics/ClassLength
+      class Host < Thor
         require_relative 'host_add'
         require_relative 'host_get'
         require_relative 'host_list'

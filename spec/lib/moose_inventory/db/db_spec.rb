@@ -10,7 +10,7 @@ RSpec.describe 'Moose::Inventory::DB' do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -22,7 +22,7 @@ RSpec.describe 'Moose::Inventory::DB' do
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
 
-    @db      = Moose::Inventory::DB
+    @db = Moose::Inventory::DB
   end
 
   #=============================

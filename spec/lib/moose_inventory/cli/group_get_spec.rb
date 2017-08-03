@@ -9,7 +9,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test' 
+      env:     'test',
     }
 
     @mockargs = []
@@ -21,7 +21,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
     @console = Moose::Inventory::Cli::Formatter
-    
+
     @db = Moose::Inventory::DB
     @db.init if @db.db.nil?
 
@@ -43,23 +43,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #---------------------
     it '<missing args> ... should abort with an error' do
-      actual = runner { @app.start(%W(group get)) }
+      actual = runner { @app.start(%w(group get)) }
 
-      #@console.out(actual,'y')
-      
-      desired = {aborted: true}
+      # @console.out(actual,'y')
+
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Wrong number of arguments, 0 for 1 or more\n"
 
       expected(actual, desired)
     end
-    
+
     #---------------------
     it "GROUP ... should return an empty set when GROUP doesn't exist" do
       group_name = 'does-not-exist'
-      actual = runner { @app.start(%W(group get #{ group_name })) }
+      actual = runner { @app.start(%W(group get #{group_name})) }
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       desired = {}
       desired[:STDOUT] = {}.to_yaml
 
@@ -69,14 +69,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #---------------------
     it 'GROUP ... should get a group from the db' do
       name = 'test_group'
-      runner { @app.start(%W(group add #{ name })) }
+      runner { @app.start(%W(group add #{name})) }
 
-      actual = runner { @app.start(%W(group get #{ name })) }
+      actual = runner { @app.start(%W(group get #{name})) }
 
       mock = {}
       mock[name.to_sym] = {}
-      # mock[name.to_sym][:hosts] = [] # TODO: Should this be present or not? 
-        
+      # mock[name.to_sym][:hosts] = [] # TODO: Should this be present or not?
+
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml
 
@@ -87,21 +87,20 @@ RSpec.describe Moose::Inventory::Cli::Group do
     it 'GROUP ... should display groupvars, if any are set' do
       name = 'test_group'
       var = 'foo=bar'
-      tmp = runner { @app.start(%W(group add #{ name })) }
-      tmp = runner { @app.start(%W(group addvar #{ name } #{ var })) }
+      tmp = runner { @app.start(%W(group add #{name})) }
+      tmp = runner { @app.start(%W(group addvar #{name} #{var})) }
 
-      actual = runner { @app.start(%W(group get #{ name })) }
-      #@console.out(actual, 'y')
-      
+      actual = runner { @app.start(%W(group get #{name})) }
+      # @console.out(actual, 'y')
+
       mock = {}
       mock[name.to_sym] = {}
-      mock[name.to_sym][:groupvars] = {foo: 'bar'}
-        
+      mock[name.to_sym][:groupvars] = { foo: 'bar' }
+
       desired = {}
       desired[:STDOUT] = mock.to_yaml
-       
+
       expected(actual, desired)
     end
-        
   end
 end

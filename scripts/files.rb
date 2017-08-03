@@ -12,7 +12,4 @@ out['Executables'.to_sym] = executables
 out['Test_Files'.to_sym] = test_files
 out['Require_Paths'.to_sym] = require_paths
 
-puts "#{out.to_yaml}"
-
-
-
+puts out.to_yaml.to_s

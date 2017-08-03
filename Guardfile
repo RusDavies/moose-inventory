@@ -12,13 +12,13 @@ end
 
 group 'quality' do
   opts = ' -D -a --format html -o spec/reports/quality/rubocop.html'.split(' ')
-  guard :rubocop, all_on_start: true,  cli: opts do
+  guard :rubocop, all_on_start: true, cli: opts do
     watch(/.+\.rb$/)
     watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
   end
 end
 
-group 'test' do 
+group 'test' do
   cmd = 'bundle exec rspec -I lib/moose_inventory -I spec '\
     '--color --format html --out spec/reports/test/rspec.html'
   guard :rspec, cmd: cmd do

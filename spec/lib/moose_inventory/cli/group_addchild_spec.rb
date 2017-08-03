@@ -9,7 +9,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -19,7 +19,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     @console = Moose::Inventory::Cli::Formatter
-    
+
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
 
@@ -49,66 +49,65 @@ RSpec.describe Moose::Inventory::Cli::Group do
         @app.start(%w(group addchild))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Wrong number of arguments, 0 for 2 or more.\n"
       expected(actual, desired)
     end
-    
+
     #------------------------
     it 'ungrouped ... should abort with an error' do
-      parent_name = "ungrouped"
-      child_name = "fake"
-      
-      actual = runner  do
+      parent_name = 'ungrouped'
+      child_name = 'fake'
+
+      actual = runner do
         @app.start(%W(group addchild #{parent_name} #{child_name}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
       expected(actual, desired)
-      
+
       ############################
-      # Should work the other way round too, when the child in the ungrouped item      
-      parent_name = "fake"
-      child_name = "ungrouped"
-      
-      actual = runner  do
+      # Should work the other way round too, when the child in the ungrouped item
+      parent_name = 'fake'
+      child_name = 'ungrouped'
+
+      actual = runner do
         @app.start(%W(group addchild #{parent_name} #{child_name}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
       expected(actual, desired)
-      
-    end    
+    end
 
     #------------------------
     it 'GROUP CHILDGROUP  ... should abort if GROUP does not exist' do
       # TODO: Why don't we just create GROUP?  Likewise for all similar functions?
-      
+
       pname = 'parent_group'
       cname = 'child group'
-      
+
       actual = runner do
         @app.start(%W(group addchild #{pname} #{cname}))
       end
 
-      #@console.out(actual, 'y')
+      # @console.out(actual, 'y')
       # Check output
-      desired = { aborted: true}
-      desired[:STDOUT] = 
+      desired = { aborted: true }
+      desired[:STDOUT] =
         "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"
-      desired[:STDERR] = 
+      desired[:STDERR] =
         "ERROR: The group '#{pname}' does not exist.\n"\
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
@@ -121,12 +120,12 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       runner { @app.start(%W(group add #{pname} #{cname})) }
 
-      actual = runner { @app.start(%W(group addchild #{pname} #{cname} )) }
+      actual = runner { @app.start(%W(group addchild #{pname} #{cname})) }
 
-      #@console.out(actual, 'y')
-       
-      desired = { aborted: false}
-      desired[:STDOUT] = 
+      # @console.out(actual, 'y')
+
+      desired = { aborted: false }
+      desired[:STDOUT] =
         "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"\
         "    - OK\n"\
@@ -138,26 +137,26 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       # We should have the correct group associations
       pgroup = @db.models[:group].find(name: pname)
-      cgroups = pgroup.children_dataset 
+      cgroups = pgroup.children_dataset
       expect(cgroups.count).to eq(1)
       expect(cgroups[name: cname]).not_to be_nil
     end
-    
+
     #------------------------
     it 'GROUP CHILDGROUP... should associate GROUP with a CHILDGROUP '\
       'creating it if necessary' do
-      #  
+      #
       pname = 'parent_group'
-      cname = 'child_group' 
-  
+      cname = 'child_group'
+
       runner { @app.start(%W(group add #{pname})) } # <- don't pre-create the child
-  
-      actual = runner { @app.start(%W(group addchild #{pname} #{cname} )) }
-  
-      #@console.out(actual, 'y')
-       
-      desired = { aborted: false}
-      desired[:STDOUT] = 
+
+      actual = runner { @app.start(%W(group addchild #{pname} #{cname})) }
+
+      # @console.out(actual, 'y')
+
+      desired = { aborted: false }
+      desired[:STDOUT] =
         "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"\
         "    - OK\n"\
@@ -167,15 +166,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "    - OK\n"\
         "  - all OK\n"\
         "Succeeded, with warnings.\n"
-      desired[:STDERR] = "WARNING: Group '#{cname}' does not exist and will be created.\n" 
+      desired[:STDERR] = "WARNING: Group '#{cname}' does not exist and will be created.\n"
       expected(actual, desired)
-  
+
       # We should have the correct group associations
       pgroup = @db.models[:group].find(name: pname)
-      cgroups = pgroup.children_dataset 
+      cgroups = pgroup.children_dataset
       expect(cgroups.count).to eq(1)
       expect(cgroups[name: cname]).not_to be_nil
     end
-    
   end
 end

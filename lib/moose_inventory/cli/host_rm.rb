@@ -16,7 +16,7 @@ module Moose
         def rm(*argv) # rubocop:disable Metrics/AbcSize
           #
           # Sanity
-          if argv.length < 1
+          if argv.empty?
             abort('ERROR: Wrong number of arguments, '\
               "#{argv.length} for 1 or more.")
           end
@@ -24,7 +24,7 @@ module Moose
           # Convenience
           db = Moose::Inventory::DB
           fmt = Moose::Inventory::Cli::Formatter
-          
+
           # Arguments
           names = argv.uniq.map(&:downcase)
 
@@ -38,22 +38,22 @@ module Moose
               if host.nil?
                 warn_count += 1
                 fmt.warn "Host '#{name}' does not exist, skipping.\n"
-                fmt.puts 4, "- No such host, skipping."
+                fmt.puts 4, '- No such host, skipping.'
               end
-              fmt.puts 4, "- OK" 
+              fmt.puts 4, '- OK'
               unless host.nil?
                 fmt.puts 2, "- Destroy host '#{name}'..."
                 host.remove_all_groups
                 host.destroy
-                fmt.puts 4, "- OK"
+                fmt.puts 4, '- OK'
               end
-              fmt.puts 2, "- All OK"
+              fmt.puts 2, '- All OK'
             end
           end # Transaction end
-          if warn_count == 0 
-            puts "Succeeded."
+          if warn_count == 0
+            puts 'Succeeded.'
           else
-            puts "Succeeded, with warnings."
+            puts 'Succeeded, with warnings.'
           end
         end
       end

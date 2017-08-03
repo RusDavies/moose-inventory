@@ -6,7 +6,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -23,7 +23,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     @console = Moose::Inventory::Cli::Formatter
     @group = Moose::Inventory::Cli::Group
-    @cli = Moose::Inventory::Cli 
+    @cli = Moose::Inventory::Cli
     @app = Moose::Inventory::Cli::Application
   end
 
@@ -42,7 +42,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #---------------------
     it 'should return an empty set when no results' do
       # no items in the db
-      actual = runner { @app.start(%W(group list)) }
+      actual = runner { @app.start(%w(group list)) }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = {}.to_yaml
@@ -59,14 +59,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
       groups = %w(group1 group2 group3)
       groups.each do |name|
         runner { @app.start(%W(group add #{name})) }
-        runner { @app.start(%W(group addvar #{ name } #{var})) }
+        runner { @app.start(%W(group addvar #{name} #{var})) }
         mock[name.to_sym] = {}
-        mock[name.to_sym][:groupvars] = {foo: 'bar'}
+        mock[name.to_sym][:groupvars] = { foo: 'bar' }
       end
 
       # items should now be in the db
-      actual = runner{ @app.start(%w(group list)) }
-        
+      actual = runner { @app.start(%w(group list)) }
+
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml
 
@@ -75,7 +75,6 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #---------------------
     it 'should be an alias of --list (i.e. Ansible parameter)' do
-      
       host_name = 'test_host'
 
       mock = {}
@@ -84,19 +83,19 @@ RSpec.describe Moose::Inventory::Cli::Group do
         runner { @app.start(%W(group add #{name})) }
         mock[name.to_sym] = {}
       end
-    
+
       args = @mockargs.clone
-      args << "--list"
-    
-      actual = runner{ @cli.start(args) }
-        
-      #@console.out(actual, 'y')
-       
+      args << '--list'
+
+      actual = runner { @cli.start(args) }
+
+      # @console.out(actual, 'y')
+
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_json + "\n"
-    
+
       expected(actual, desired)
-    end    
-    
+    end
+    end
   end
-end
+

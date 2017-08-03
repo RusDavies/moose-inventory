@@ -31,8 +31,8 @@ module Moose
         # So, we allow init only once, gated by whether @db is nil. In effect,
         # this means we pool the DB connection for the life of the application.
         # Again, not a problem for our one-shot app, but it may be an issue in
-        # long-running code. Personally, I don't like this pooling regime - 
-        # perhaps I'm not understanding how it's supposed to be used? 
+        # long-running code. Personally, I don't like this pooling regime -
+        # perhaps I'm not understanding how it's supposed to be used?
         #
         # QUESTION: can the models be refreshed, to make then again valid? What if
         #       we "load" instead of "require" the models?
@@ -59,53 +59,52 @@ module Moose
 
         @exceptions = {}
         @exceptions[:moose] = Moose::Inventory::DB::MooseDBException
-
       end
 
       #--------------------
       def self.transaction
         fail('Database connection has not been established') if @db.nil?
-        
+
         tries = 0
-        
+
         begin
           @db.transaction(savepoint: true) do
             yield
           end
 
         rescue Sequel::DatabaseError => e
-        # We want to rescue Sqlite3::BusyException.  But, sequel catches that
-        # and re-raises it as Sequel::DatabaseError, with a message referencing
-        # the original exception class  
-         
-        # We look into e, to see whether it is a BusyException.  If not, 
-        # we re-raise immediately.  
-        raise unless e.message.include?("BusyException")  
+          # We want to rescue Sqlite3::BusyException.  But, sequel catches that
+          # and re-raises it as Sequel::DatabaseError, with a message referencing
+          # the original exception class
 
-        # Looks like a BusyException, so we retry, after a random delay.           
-        tries += 1
-        case tries
-        when 1..10
-          if Moose::Inventory::Config._confopts[:trace] == true
-            STDERR.puts e.message
+          # We look into e, to see whether it is a BusyException.  If not,
+          # we re-raise immediately.
+          raise unless e.message.include?('BusyException')
+
+          # Looks like a BusyException, so we retry, after a random delay.
+          tries += 1
+          case tries
+          when 1..10
+            if Moose::Inventory::Config._confopts[:trace] == true
+              STDERR.puts e.message
+            end
+            sleep rand
+            retry
+          else
+            warn('The database appears to be locked by another process, and '\
+                 " did not become free after #{tries} tries. Giving up. ")
+
+            # TODO: Some useful advice to the user, as to what to do about this error.
+            raise
           end
-          sleep rand()
-          retry
-        else
-          warn('The database appears to be locked by another process, and '\
-               " did not become free after #{tries} tries. Giving up. ")
 
-          # TODO: Some useful advice to the user, as to what to do about this error. 
-          raise  
-        end
-            
         rescue @exceptions[:moose] => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
 
           if Moose::Inventory::Config._confopts[:trace] == true
-            STDERR.puts $!.backtrace    
+            STDERR.puts $ERROR_INFO.backtrace
             abort("ERROR: #{e}")
-          else      
+          else
             abort("ERROR: #{e.message}")
           end
 
@@ -158,7 +157,7 @@ module Moose
 
         else
           @db.drop_table(:hosts, :hostvars,
-                         :groups,  :groupvars, :group_hosts,
+                         :groups, :groupvars, :group_hosts,
                          if_exists: true, cascade: true)
         end
       end
@@ -195,7 +194,7 @@ module Moose
             foreign_key :child_id,  :groups
           end
         end
-        
+
         unless @db.table_exists? :groupvars
           @db.create_table(:groupvars) do
             primary_key :id
@@ -232,8 +231,8 @@ module Moose
           init_postgresql
 
         else
-          fail @exceptions[:moose ], 
-            "database adapter #{adapter} is not yet supported."
+          fail @exceptions[:moose],
+               "database adapter #{adapter} is not yet supported."
         end
       end
 
@@ -245,8 +244,8 @@ module Moose
         config = Moose::Inventory::Config._settings[:config][:db]
         [:file].each do |key|
           if config[key].nil?
-            fail @exceptions[:moose ], 
-              "Expected key #{key} missing in sqlite3 configuration"
+            fail @exceptions[:moose],
+                 "Expected key #{key} missing in sqlite3 configuration"
           end
         end
         config[:file].empty? && fail("SQLite3 DB 'file' cannot be empty")
@@ -272,16 +271,15 @@ module Moose
         config = Moose::Inventory::Config._settings[:config][:db]
         [:host, :database, :user, :password].each do |key|
           if config[key].nil?
-            fail @exceptions[:moose ],
-              "Expected key #{key} missing in mysql configuration"
+            fail @exceptions[:moose],
+                 "Expected key #{key} missing in mysql configuration"
           end
         end
 
         @db = Sequel.mysql(user: config[:user],
                            password: config[:password],
                            host: config[:host],
-                           database: config[:database]
-                          )
+                           database: config[:database])
       end
     end
   end

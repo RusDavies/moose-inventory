@@ -7,16 +7,15 @@ module Moose
     module Cli
       ##
       # Implemention of the "group rmchild" methods of the CLI
-      class Group < Thor # rubocop:disable ClassLength
+      class Group
         #==========================
         desc 'rmchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
-        'Dissociate one or more child-groups CHILDGROUP_n from PARENTGROUP'
-        def rmchild(*argv)
-
+             'Dissociate one or more child-groups CHILDGROUP_n from PARENTGROUP'
+        def rmchild(*_argv)
           # Sanity check
           if args.length < 2
             abort("ERROR: Wrong number of arguments, #{args.length} "\
-              "for 2 or more.")
+              'for 2 or more.')
           end
 
           # Arguments
@@ -43,7 +42,7 @@ module Moose
               if pgroup.nil?
                 abort("ERROR: The group '#{pname}' does not exist.")
               end
-              fmt.puts 4, "- OK"
+              fmt.puts 4, '- OK'
 
               # Dissociate parent group from the child groups
               groups_ds = pgroup.children_dataset

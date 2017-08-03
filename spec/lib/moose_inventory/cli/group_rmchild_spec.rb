@@ -9,7 +9,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -19,7 +19,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     @console = Moose::Inventory::Cli::Formatter
-    
+
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
 
@@ -49,65 +49,63 @@ RSpec.describe Moose::Inventory::Cli::Group do
         @app.start(%w(group addchild))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Wrong number of arguments, 0 for 2 or more.\n"
       expected(actual, desired)
     end
-    
+
     #------------------------
     it 'ungrouped ... should abort with an error' do
-      parent_name = "ungrouped"
-      child_name = "fake"
-      
-      actual = runner  do
+      parent_name = 'ungrouped'
+      child_name = 'fake'
+
+      actual = runner do
         @app.start(%W(group addchild #{parent_name} #{child_name}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
       expected(actual, desired)
-      
+
       ############################
-      # Should work the other way round too, when the child in the ungrouped item      
-      parent_name = "fake"
-      child_name = "ungrouped"
-      
-      actual = runner  do
+      # Should work the other way round too, when the child in the ungrouped item
+      parent_name = 'fake'
+      child_name = 'ungrouped'
+
+      actual = runner do
         @app.start(%W(group rmchild #{parent_name} #{child_name}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
       expected(actual, desired)
-      
-    end    
+    end
 
     #------------------------
     it 'GROUP CHILDGROUP  ... should abort if GROUP does not exist' do
-      
       pname = 'parent_group'
       cname = 'child group'
-      
+
       actual = runner do
         @app.start(%W(group rmchild #{pname} #{cname}))
       end
 
-      #@console.out(actual, 'y')
+      # @console.out(actual, 'y')
       # Check output
-      desired = { aborted: true}
-      desired[:STDOUT] = 
+      desired = { aborted: true }
+      desired[:STDOUT] =
         "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"
-      desired[:STDERR] = 
+      desired[:STDERR] =
         "ERROR: The group '#{pname}' does not exist.\n"\
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
@@ -115,21 +113,20 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #------------------------
     it 'GROUP CHILDGROUP  ... should succeed with warnings if CHILDGROUP is not associated' do
-      
       pname = 'parent_group'
       cname = 'child group'
 
       runner { @app.start(%W(group add #{pname} #{cname})) }
-            
+
       actual = runner do
         @app.start(%W(group rmchild #{pname} #{cname}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
       desired = {}
-      desired[:STDOUT] = 
+      desired[:STDOUT] =
         "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"\
         "    - OK\n"\
@@ -137,9 +134,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "    - doesn't exist, skipping.\n"\
         "    - OK\n"\
         "  - all OK\n"\
-        "Succeeded, with warnings.\n"  
-        
-      desired[:STDERR] = 
+        "Succeeded, with warnings.\n"
+
+      desired[:STDERR] =
         "WARNING: Association {group:#{pname} <-> group:#{cname}} does not exist, skipping.\n"
 
       expected(actual, desired)
@@ -147,30 +144,29 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #------------------------
     it 'GROUP CHILDGROUP  ... should succeed without warnings if CHILDGROUP is associated' do
-      
       pname = 'parent_group'
       cname = 'child group'
 
       runner { @app.start(%W(group add #{pname} #{cname})) }
       runner { @app.start(%W(group addchild #{pname} #{cname})) }
-            
+
       actual = runner do
         @app.start(%W(group rmchild #{pname} #{cname}))
       end
 
-      #@console.out(actual, 'y')
-      
+      # @console.out(actual, 'y')
+
       # Check output
       desired = {}
-      desired[:STDOUT] = 
+      desired[:STDOUT] =
         "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
         "  - retrieve group '#{pname}'...\n"\
         "    - OK\n"\
         "  - remove association {group:#{pname} <-> group:#{cname}}...\n"\
         "    - OK\n"\
         "  - all OK\n"\
-        "Succeeded.\n"  
-        
+        "Succeeded.\n"
+
       expected(actual, desired)
     end
   end

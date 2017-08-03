@@ -41,19 +41,19 @@ module Moose
         #                   Default is to search standard locations.
         #
         # --env ENV      => sets the section to be used as the configuration.
-        #                   Defaults to "", which forces the use of the 
-        #                   defaultenv parameter from the general section of 
-        #                   the config file. 
+        #                   Defaults to "", which forces the use of the
+        #                   defaultenv parameter from the general section of
+        #                   the config file.
         #
         # --format FORMAT=> See formatter for supported types.
         #                   Defaults to json.
         #
         # -- trace       => Enable more complete exceptions for db transactions
-        #                   Default is not to trace. 
+        #                   Default is not to trace.
 
         @_confopts = { env: '', format: 'json', ansible: false, trace: false }
 
-        # Check for two-part flags   
+        # Check for two-part flags
         %w(config env format).each do |var|
           @_argv.each_with_index do |val, index|
             next if val != "--#{var}"
@@ -62,7 +62,7 @@ module Moose
             break
           end
         end
-        
+
         # Check for one-part flags
         %w(ansible trace).each do |var|
           @_argv.each_with_index do |val, index|
@@ -72,59 +72,58 @@ module Moose
             break
           end
         end
-        
+
         # Sanity
-        # - Ansible output format must be json - pjson is permitted, but yaml is not. 
+        # - Ansible output format must be json - pjson is permitted, but yaml is not.
         if @_confopts[:ansible] == true
-          unless @_confopts[:format] =~ /p|pjson|j|json/ 
+          unless @_confopts[:format] =~ /p|pjson|j|json/
             @_confopts[:format] = 'json'
-          end 
+          end
         end
-        
       end
 
       #----------------------
       def self.top_level_help
         if @_argv[0] == 'help'
-          puts "Global flags:"
-          printf "  %-31s %-10s", "--ansible", "# Force Ansible mode (automatically set when using ansible flags)\n"
-          printf "  %-31s %-10s", "--config FILE", "# Specifies a configuration file to use\n"
-          printf "  %-31s %-10s", "--env ENV", "# Specifies the environment section of the config to use\n"
-          printf "  %-31s %-10s", "--format yaml|json|pjson", "# Format for the output of 'get', 'list', and 'listvars' subcommands\n"
-          printf "  %-31s %-10s", "--trace", "# Enable more complete exception dumps for database transactions\n"
+          puts 'Global flags:'
+          printf '  %-31s %-10s', '--ansible', "# Force Ansible mode (automatically set when using ansible flags)\n"
+          printf '  %-31s %-10s', '--config FILE', "# Specifies a configuration file to use\n"
+          printf '  %-31s %-10s', '--env ENV', "# Specifies the environment section of the config to use\n"
+          printf '  %-31s %-10s', '--format yaml|json|pjson', "# Format for the output of 'get', 'list', and 'listvars' subcommands\n"
+          printf '  %-31s %-10s', '--trace', "# Enable more complete exception dumps for database transactions\n"
           puts "\nAnsible flags:"
-          printf "  %-31s %-10s", "--host HOSTNAME", "# Retrieves host variables for the specified host (alias for 'host listvars HOSTNAME')\n"
-          printf "  %-31s %-10s", "--list", "# Retrieves the list of groups (alias for 'group list')\n\n"
+          printf '  %-31s %-10s', '--host HOSTNAME', "# Retrieves host variables for the specified host (alias for 'host listvars HOSTNAME')\n"
+          printf '  %-31s %-10s', '--list', "# Retrieves the list of groups (alias for 'group list')\n\n"
         end
       end
-      
+
       #----------------------
-      def self.ansible_args  # rubocop:disable Metrics/AbcSize
+      def self.ansible_args
         #
         # See http://docs.ansible.com/developing_inventory.html for Ansible specs
         # for dynamic inventory sources
-        
+
         # --list            => group list
         # --host HOSTNAME  => host getvars HOSTNAME
 
         case @_argv[0]
-          when '--list' 
-            @_confopts[:ansible] = true
-            @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/ 
-            @_argv.clear
-            @_argv.concat(['group', 'list']).flatten
-          when '--host'
-            @_confopts[:ansible] = true
-            @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/ 
-            host = @_argv[1]
-            @_argv.clear
-            @_argv.concat(['host', 'listvars', "#{host}"]).flatten
-        end 
+        when '--list'
+          @_confopts[:ansible] = true
+          @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/
+          @_argv.clear
+          @_argv.concat(%w(group list)).flatten
+        when '--host'
+          @_confopts[:ansible] = true
+          @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/
+          host = @_argv[1]
+          @_argv.clear
+          @_argv.concat(['host', 'listvars', host.to_s]).flatten
+        end
       end
 
       #----------------------
-      def self.resolve_config_file # rubocop:disable Metrics/AbcSize
-        if ! @_confopts[:config].nil?
+      def self.resolve_config_file
+        if !@_confopts[:config].nil?
           path = File.expand_path(@_confopts[:config])
           if File.exist?(path)
             @_confopts[:config] = path
@@ -135,8 +134,7 @@ module Moose
           possibles = ['./.moose-tools/inventory/config',
                        '~/.moose-tools/inventory/config',
                        '~/local/etc/moose-tools/inventory/config',
-                       '/etc/moose-tools/inventory/config'
-                      ]
+                       '/etc/moose-tools/inventory/config']
           possibles.each do |f|
             file = File.expand_path(f)
             @_confopts[:config] = file if File.exist?(file)
@@ -184,7 +182,7 @@ module Moose
           env = @_confopts[:env]
           @_settings[:config] = newsets[@_confopts[:env].to_sym]
         else
-          env  = @_settings[:general][:defaultenv]
+          env = @_settings[:general][:defaultenv]
           (env.nil? || env.empty?) && fail("No defaultenv set in #{path}")
           @_settings[:config] = newsets[env.to_sym]
         end

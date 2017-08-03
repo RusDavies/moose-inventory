@@ -9,7 +9,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -44,8 +44,8 @@ RSpec.describe Moose::Inventory::Cli::Host do
     # --------------------
     it '<no arguments> ... should bail with an error' do
       actual = runner { @app.start(%w(host add)) }
- 
-      desired = { aborted: true}
+
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Wrong number of arguments, 0 for 1 or more.\n"
       expected(actual, desired)
     end
@@ -55,8 +55,8 @@ RSpec.describe Moose::Inventory::Cli::Host do
       name = 'test-host-add'
 
       actual = runner { @app.start(%W(host add #{name})) }
-      #@console.out(actual,'y')
-      
+      # @console.out(actual,'y')
+
       # Check output
       desired = {}
       desired[:STDOUT] =
@@ -88,13 +88,13 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       # Check output
       desired = {}
-      desired[:STDOUT] = 
+      desired[:STDOUT] =
         "Add host '#{name}':\n"\
         "  - Creating host '#{name}'...\n"\
         "    - OK\n"\
         "  - All OK\n"\
         "Succeeded\n"
-          
+
       desired[:STDERR] =
         "WARNING: The host '#{name}' already exists, skipping creation.\n"
 
@@ -108,15 +108,15 @@ RSpec.describe Moose::Inventory::Cli::Host do
       actual = runner { @app.start(%w(host add) + names) }
 
       # Check output
-      desired = {STDOUT: ''}
+      desired = { STDOUT: '' }
       names.each do |name|
-        desired[:STDOUT] =  desired[:STDOUT] +
-          "Add host '#{name}':\n"\
-          "  - Creating host '#{name}'...\n"\
-          "    - OK\n"\
-          "  - Adding automatic association {host:#{name} <-> group:ungrouped}...\n"\
-          "    - OK\n"\
-          "  - All OK\n"
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "Add host '#{name}':\n"\
+                           "  - Creating host '#{name}'...\n"\
+                           "    - OK\n"\
+                           "  - Adding automatic association {host:#{name} <-> group:ungrouped}...\n"\
+                           "    - OK\n"\
+                           "  - All OK\n"
       end
       desired[:STDOUT] = desired[:STDOUT] + "Succeeded\n"
 
@@ -189,7 +189,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
         "Succeeded\n"
       desired[:STDERR] =
         "WARNING: The group '#{group_name}' doesn't exist, but will be created.\n"
-        
+
       expected(actual, desired)
 
       # Check db
@@ -208,7 +208,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       end
 
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] =
         "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
       expected(actual, desired)
@@ -227,26 +227,26 @@ RSpec.describe Moose::Inventory::Cli::Host do
       actual = runner do
         @app.start(%W(host add #{name} --groups #{group_names.join(',')}))
       end
-        
-      #@console.out(actual,'y')
-        
+
+      # @console.out(actual,'y')
+
       # Check output
-      desired = {STDOUT: '', STDERR: ''}
-      desired[:STDOUT] = 
+      desired = { STDOUT: '', STDERR: '' }
+      desired[:STDOUT] =
         "Add host '#{name}':\n"\
         "  - Creating host '#{name}'...\n"\
         "    - OK\n"\
-        
+
       group_names.each do |group|
         desired[:STDOUT] =  desired[:STDOUT] +
-          "  - Adding association {host:#{name} <-> group:#{group}}...\n"\
-          "    - OK\n"
+                            "  - Adding association {host:#{name} <-> group:#{group}}...\n"\
+                            "    - OK\n"
         desired[:STDERR] =  desired[:STDERR] +
-          "WARNING: The group '#{group}' doesn't exist, but will be created.\n"
+                            "WARNING: The group '#{group}' doesn't exist, but will be created.\n"
       end
-      desired[:STDOUT] = desired[:STDOUT] + 
-        "  - All OK\n"\
-        "Succeeded\n"
+      desired[:STDOUT] = desired[:STDOUT] +
+                         "  - All OK\n"\
+                         "Succeeded\n"
 
       expected(actual, desired)
 
@@ -270,7 +270,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       end
 
       # Check output
-      desired = { aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] =
         "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
 
@@ -291,27 +291,27 @@ RSpec.describe Moose::Inventory::Cli::Host do
       # Check output
       desired = { aborted: false, STDERR: '', STDOUT: '' }
       names.each do |name|
-        desired[:STDOUT] = desired[:STDOUT] + 
-          "Add host '#{name}':\n"\
-          "  - Creating host '#{name}'...\n"\
-          "    - OK\n"
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "Add host '#{name}':\n"\
+                           "  - Creating host '#{name}'...\n"\
+                           "    - OK\n"
         group_names.each do |group|
-          desired[:STDOUT] =  desired[:STDOUT] +
-            "  - Adding association {host:#{name} <-> group:#{group}}...\n"\
-            "    - OK\n"
+          desired[:STDOUT] = desired[:STDOUT] +
+                             "  - Adding association {host:#{name} <-> group:#{group}}...\n"\
+                             "    - OK\n"
         end
         desired[:STDOUT] = desired[:STDOUT] +
-          "  - All OK\n" 
+                           "  - All OK\n"
       end
-      
+
       group_names.each do |group|
-        desired[:STDERR] =  desired[:STDERR] +
-          "WARNING: The group '#{group}' doesn't exist, but will be created.\n"
+        desired[:STDERR] = desired[:STDERR] +
+                           "WARNING: The group '#{group}' doesn't exist, but will be created.\n"
       end
       desired[:STDOUT] = desired[:STDOUT] + "Succeeded\n"
 
-      #@console.out(desired,'y')
-      
+      # @console.out(desired,'y')
+
       expected(actual, desired)
 
       # Check db

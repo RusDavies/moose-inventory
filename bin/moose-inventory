@@ -7,4 +7,4 @@ rescue
   require 'moose_inventory'
 end
 
-Moose::Inventory::Cli.start(ARGV) 
+Moose::Inventory::Cli.start(ARGV)

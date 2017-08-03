@@ -14,7 +14,7 @@ module Moose
           # Sanity
           if args.length < 2
             abort("ERROR: Wrong number of arguments, #{args.length} "\
-              "for 2 or more.")
+              'for 2 or more.')
           end
 
           # Arguments
@@ -32,27 +32,25 @@ module Moose
 
           # Transaction
           warn_count = 0
-          begin 
+          begin
             db.transaction do # Transaction start
               puts "Associate group '#{name}' with host(s) '#{hosts.join(',')}':"
               # Get the target group
               fmt.puts 2, "- retrieve group '#{name}'..."
               group = db.models[:group].find(name: name)
-              if group.nil?
-                abort("ERROR: The group '#{name}' does not exist.")
-              end
-              fmt.puts 4,  '- OK'
+              abort("ERROR: The group '#{name}' does not exist.") if group.nil?
+              fmt.puts 4, '- OK'
 
               # Associate group with the hosts
-              ungrouped  = db.models[:group].find_or_create(name: 'ungrouped')
+              ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
               hosts_ds = group.hosts_dataset
-              hosts.each do |h| # rubocop:disable Style/Next
-                fmt.puts 2, "- add association {group:#{name} <-> host:#{ h }}..."
+              hosts.each do |h|
+                fmt.puts 2, "- add association {group:#{name} <-> host:#{h}}..."
 
                 # Check against existing associations
                 unless hosts_ds[name: h].nil?
                   warn_count += 1
-                  fmt.warn "Association {group:#{name} <-> host:#{ h }} already"\
+                  fmt.warn "Association {group:#{name} <-> host:#{h}} already"\
                     " exists, skipping.\n"
                   fmt.puts 4, '- already exists, skipping.'
                   fmt.puts 4, '- OK'
@@ -68,17 +66,16 @@ module Moose
                   host = db.models[:host].create(name: h)
                   fmt.puts 6, '- OK'
                 end
-                  
+
                 group.add_host(host)
                 fmt.puts 4, '- OK'
 
                 # Remove the host from the ungrouped group, if necessary
-                unless host.groups_dataset[name: 'ungrouped'].nil?
-                  fmt.puts 2,'- remove automatic association '\
-                    "{group:ungrouped <-> host:#{h}}..."
-                  host.remove_group(ungrouped)
-                  fmt.puts 4, '- OK'
-                end
+                next if host.groups_dataset[name: 'ungrouped'].nil?
+                fmt.puts 2, '- remove automatic association '\
+                  "{group:ungrouped <-> host:#{h}}..."
+                host.remove_group(ungrouped)
+                fmt.puts 4, '- OK'
               end
               fmt.puts 2, '- all OK'
             end # Transaction end
@@ -91,7 +88,6 @@ module Moose
             puts 'Succeeded, with warnings.'
           end
         end
-
       end
     end
   end

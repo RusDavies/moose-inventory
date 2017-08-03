@@ -12,20 +12,20 @@ RSpec.describe Moose::Inventory::Cli::Group do
       env:     'test',
     }
 
-    @mockargs = [] 
+    @mockargs = []
     @mockarg_parts.each do |key, val|
       @mockargs << "--#{key}"
       @mockargs << val
     end
     @mockargs << '--trace' # extra info for debugging
-    
+
     @console = Moose::Inventory::Cli::Formatter
 
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
-    
+
     @db = Moose::Inventory::DB
-    @db.init if @db.db.nil? 
+    @db.init if @db.db.nil?
 
     @host = Moose::Inventory::Cli::Host
     @group = Moose::Inventory::Cli::Group
@@ -48,29 +48,29 @@ RSpec.describe Moose::Inventory::Cli::Group do
     it '<no arguments> ... should bail with an error' do
       actual = runner { @app.start(%w(group add)) }
 
-      desired = {aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] = "ERROR: Wrong number of arguments, 0 for 1 or more.\n"
       expected(actual, desired)
     end
 
     # --------------------
     it 'ungrouped ... should abort with an error' do
-      actual = runner { @app.start(%W(group add ungrouped)) }
+      actual = runner { @app.start(%w(group add ungrouped)) }
 
       # Check output
-      desired = {aborted: true}
+      desired = { aborted: true }
       desired[:STDERR] =
         "ERROR: Cannot manually manipulate the automatic group 'ungrouped'\n"
       expected(actual, desired)
-    end    
+    end
 
     # --------------------
     it 'GROUP ... should add a group to the db' do
       name = 'test'
       actual = runner { @app.start(%W(group add #{name})) }
 
-      #@console.out(actual)
-      
+      # @console.out(actual)
+
       # Check output
       desired = {}
       desired[:STDOUT] =
@@ -94,8 +94,8 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       actual = runner { @app.start(%W(group add #{name})) }
 
-      #@console.out(actual)
-        
+      # @console.out(actual)
+
       # Check output
       desired = {}
       desired[:STDOUT] =
@@ -105,11 +105,10 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "    - OK\n"\
         "  - all OK\n"\
         "Succeeded, with warnings.\n"
-      desired[:STDERR] = 
+      desired[:STDERR] =
         "WARNING: Group '#{name}' already exists, skipping creation.\n"
 
       expected(actual, desired)
-
 
       expected(actual, desired)
     end
@@ -120,16 +119,16 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       actual = runner { @app.start(%w(group add) + names) }
 
-      #@console.out(actual)
-        
+      # @console.out(actual)
+
       # Check output
-      desired = {STDOUT: ''}
+      desired = { STDOUT: '' }
       names.each do |name|
-        desired[:STDOUT] =  desired[:STDOUT] +
-          "Add group '#{name}':\n"\
-          "  - create group...\n"\
-          "    - OK\n"\
-          "  - all OK\n"\
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "Add group '#{name}':\n"\
+                           "  - create group...\n"\
+                           "    - OK\n"\
+                           "  - all OK\n"\
       end
       desired[:STDOUT] = desired[:STDOUT] + "Succeeded\n"
 
@@ -145,7 +144,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     # --------------------
     it 'GROUP1 --hosts HOST1 ... should add the '\
       'group and associate it with existing hosts' do
-      
+
       host_name = 'test-host'
       @db.models[:host].create(name: host_name)
 
@@ -154,8 +153,8 @@ RSpec.describe Moose::Inventory::Cli::Group do
         @app.start(%W(group add #{group_name} --hosts #{host_name}))
       end
 
-      #@console.out(actual)
-      
+      # @console.out(actual)
+
       # Check output
       desired = {}
       desired[:STDOUT] =
@@ -179,57 +178,57 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     # --------------------
     it 'GROUP1 --hosts HOST ... should create HOST if necessary, and warn' do
-        host_name = 'test-host'
-        
-        # DON'T CREATE THE HOST! That's the point!
-        
-        group_name = 'test-group'
-        actual = runner do
-          @app.start(%W(group add #{group_name} --hosts #{host_name}))
-        end
-  
-        #@console.out(actual)
-        
-        # Check output
-        desired = {}
-        desired[:STDOUT] =
-          "Add group '#{group_name}':\n"\
-          "  - create group...\n"\
-          "    - OK\n"\
-          "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
-          "    - host doesn't exist, creating now...\n"\
-          "      - OK\n"\
-          "    - OK\n"\
-          "  - all OK\n"\
-          "Succeeded, with warnings.\n"
-        desired[:STDERR] = 
-          "WARNING: Host '#{host_name}' doesn't exist, but will be created.\n"
-  
-        expected(actual, desired)
-  
-        # Check db
-        group = @db.models[:group].find(name: group_name)
-        hosts = group.hosts_dataset
-        expect(hosts).not_to be_nil
-        expect(hosts.count).to eq(1)
-        expect(hosts[name: host_name]).not_to be_nil
+      host_name = 'test-host'
+
+      # DON'T CREATE THE HOST! That's the point!
+
+      group_name = 'test-group'
+      actual = runner do
+        @app.start(%W(group add #{group_name} --hosts #{host_name}))
+      end
+
+      # @console.out(actual)
+
+      # Check output
+      desired = {}
+      desired[:STDOUT] =
+        "Add group '#{group_name}':\n"\
+        "  - create group...\n"\
+        "    - OK\n"\
+        "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
+        "    - host doesn't exist, creating now...\n"\
+        "      - OK\n"\
+        "    - OK\n"\
+        "  - all OK\n"\
+        "Succeeded, with warnings.\n"
+      desired[:STDERR] =
+        "WARNING: Host '#{host_name}' doesn't exist, but will be created.\n"
+
+      expected(actual, desired)
+
+      # Check db
+      group = @db.models[:group].find(name: group_name)
+      hosts = group.hosts_dataset
+      expect(hosts).not_to be_nil
+      expect(hosts.count).to eq(1)
+      expect(hosts[name: host_name]).not_to be_nil
     end
 
     # --------------------
     it 'GROUP1 --hosts HOST ... should skip if association already exists, and warn' do
       host_name = 'test-host'
       group_name = 'test-group'
-      
+
       # Create group and association
       runner { @app.start(%W(group add #{group_name} --hosts #{host_name})) }
-     
+
       # Do it again, to prove that we skip
       actual = runner do
         @app.start(%W(group add #{group_name} --hosts #{host_name}))
       end
-  
-      #@console.out(actual, 'y')
-      
+
+      # @console.out(actual, 'y')
+
       # Check output
       desired = {}
       desired[:STDOUT] =
@@ -242,12 +241,12 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "    - OK\n"\
         "  - all OK\n"\
         "Succeeded, with warnings.\n"
-      desired[:STDERR] = 
+      desired[:STDERR] =
         "WARNING: Group '#{group_name}' already exists, skipping creation.\n"\
         "WARNING: Association {group:#{group_name} <-> host:#{host_name}} already exists, skipping creation.\n"
-  
+
       expected(actual, desired)
-  
+
       # Check db
       group = @db.models[:group].find(name: group_name)
       hosts = group.hosts_dataset
@@ -255,35 +254,35 @@ RSpec.describe Moose::Inventory::Cli::Group do
       expect(hosts.count).to eq(1)
       expect(hosts[name: host_name]).not_to be_nil
     end
-    
+
     # --------------------
     it 'GROUP --hosts HOST1,HOST2 ... should add the group and '\
       'associate it with multiple hosts' do
-        
+
       # The group should be added
       # Each host should be associated with the group
       # Each host should be removed from the automatic 'ungrouped' group
-              
+
       group_name = 'test-group'
       host_names = %w(host1 host2 host3)
-      
+
       # Add just the first host. This ensure that we cover paths for both
       # and existing host (with an 'ungrouped' association) and for none
-      # existing groups. 
+      # existing groups.
       tmp = runner { @app.start(%W(host add #{host_names[0]})) }
-        
-      #@console.out(tmp,  'y') 
-        
-      # Now run the actual group addition  
+
+      # @console.out(tmp,  'y')
+
+      # Now run the actual group addition
       actual = runner do
         @app.start(%W(group add #{group_name} --hosts #{host_names.join(',')}))
       end
-      
-      #@console.out(actual,'y')
-  
+
+      # @console.out(actual,'y')
+
       # Check output
       desired = { aborted: false, STDERR: '', STDOUT: '' }
-      desired[:STDOUT] = 
+      desired[:STDOUT] =
         "Add group '#{group_name}':\n"\
         "  - create group...\n"\
         "    - OK\n"\
@@ -291,22 +290,22 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "    - OK\n"\
         "  - remove automatic association {group:ungrouped <-> host:#{host_names[0]}}...\n"\
         "    - OK\n"
-        
-        host_names.slice(1, host_names.length - 1 ).each do |host_name|
-          desired[:STDOUT] =  desired[:STDOUT] +
-            "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
-            "    - host doesn't exist, creating now...\n"\
-            "      - OK\n"\
-            "    - OK\n"
-          desired[:STDERR] =  desired[:STDERR] +
-            "WARNING: Host '#{host_name}' doesn't exist, but will be created.\n"
+
+      host_names.slice(1, host_names.length - 1).each do |host_name|
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
+                           "    - host doesn't exist, creating now...\n"\
+                           "      - OK\n"\
+                           "    - OK\n"
+        desired[:STDERR] = desired[:STDERR] +
+                           "WARNING: Host '#{host_name}' doesn't exist, but will be created.\n"
       end
-      desired[:STDOUT] = desired[:STDOUT] + 
-        "  - all OK\n"\
-        "Succeeded, with warnings.\n"
-  
+      desired[:STDOUT] = desired[:STDOUT] +
+                         "  - all OK\n"\
+                         "Succeeded, with warnings.\n"
+
       expected(actual, desired)
-  
+
       # Check db
       group = @db.models[:group].find(name: group_name)
       hosts = group.hosts_dataset
@@ -323,16 +322,16 @@ RSpec.describe Moose::Inventory::Cli::Group do
       'with an error' do
       name = 'testhost'
       group_names = %w(group1 ungrouped)
-  
+
       actual = runner do
         @app.start(%W(host add #{name} --groups #{group_names.join(',')}))
       end
-  
+
       # Check output
       desired = { aborted: true, STDERR: '', STDOUT: '' }
       desired[:STDERR] =
-      "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
-  
+        "ERROR: Cannot manually manipulate the automatic group 'ungrouped'.\n"
+
       expected(actual, desired)
     end
 
@@ -347,38 +346,38 @@ RSpec.describe Moose::Inventory::Cli::Group do
       actual = runner do
         @app.start(%w(group add) + group_names + %W(--hosts #{host_names.join(',')}))
       end
-      
-      #@console.out(actual,'y')
-      
+
+      # @console.out(actual,'y')
+
       # Check output
       desired = { aborted: false, STDERR: '', STDOUT: '' }
       first_pass = true
       group_names.each do |group|
-        desired[:STDOUT] = desired[:STDOUT] +  
-          "Add group '#{group}':\n"\
-          "  - create group...\n"\
-          "    - OK\n"
-          
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "Add group '#{group}':\n"\
+                           "  - create group...\n"\
+                           "    - OK\n"
+
         host_names.each do |host|
-          desired[:STDOUT] = desired[:STDOUT] +  
-            "  - add association {group:#{group} <-> host:#{host}}...\n"
+          desired[:STDOUT] = desired[:STDOUT] +
+                             "  - add association {group:#{group} <-> host:#{host}}...\n"
           if first_pass
-            desired[:STDOUT] = desired[:STDOUT] +  
-              "    - host doesn't exist, creating now...\n"\
-              "      - OK\n"
+            desired[:STDOUT] = desired[:STDOUT] +
+                               "    - host doesn't exist, creating now...\n"\
+                               "      - OK\n"
           end
-          desired[:STDOUT] = desired[:STDOUT] +  
-            "    - OK\n"
+          desired[:STDOUT] = desired[:STDOUT] +
+                             "    - OK\n"
         end
-        desired[:STDOUT] = desired[:STDOUT] +  
-          "  - all OK\n"
+        desired[:STDOUT] = desired[:STDOUT] +
+                           "  - all OK\n"
         first_pass = false
-      end 
-      
+      end
+
       desired[:STDOUT] = desired[:STDOUT] + "Succeeded, with warnings.\n"
       host_names.each do |host|
-        desired[:STDERR] =  desired[:STDERR] +
-          "WARNING: Host '#{host}' doesn't exist, but will be created.\n"
+        desired[:STDERR] = desired[:STDERR] +
+                           "WARNING: Host '#{host}' doesn't exist, but will be created.\n"
       end
       expected(actual, desired)
 

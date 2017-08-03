@@ -30,9 +30,9 @@ module Moose
 
           # Transaction
           db.transaction do # Transaction start
-            puts "Add variables '#{vars.join(",")}' to host '#{name}':"
-            
-            fmt.puts 2,"- retrieve host '#{name}'..."
+            puts "Add variables '#{vars.join(',')}' to host '#{name}':"
+
+            fmt.puts 2, "- retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?
               fail db.exceptions[:moose],
@@ -44,11 +44,11 @@ module Moose
             vars.each do |v|
               fmt.puts 2, "- add variable '#{v}'..."
               vararray = v.split('=')
-              if v.start_with?('=') ||  v.end_with?('=') || vararray.length != 2
+              if v.start_with?('=') || v.end_with?('=') || vararray.length != 2
                 fail db.exceptions[:moose],
                      "Incorrect format in '{#{v}}'. Expected 'key=value'."
               end
-                
+
               # Check against existing associations
               hostvar = hostvars_ds[name: vararray[0]]
               if !hostvar.nil?
@@ -61,7 +61,7 @@ module Moose
               else
                 # hostvar doesn't exist, so create and associate
                 hostvar = db.models[:hostvar].create(name: vararray[0],
-                                                      value: vararray[1])
+                                                     value: vararray[1])
                 host.add_hostvar(hostvar)
               end
               fmt.puts 4, '- OK'

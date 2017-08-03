@@ -6,7 +6,7 @@ RSpec.describe 'Moose::Inventory::Config' do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []

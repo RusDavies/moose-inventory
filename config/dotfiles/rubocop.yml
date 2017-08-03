@@ -26,7 +26,9 @@ AllCops:
     - 'vendor/**/*'
   # By default, the rails cops are not run. Override in project or home
   # directory .rubocop.yml files, or by giving the -R/--rails option.
-  RunRailsCops: false
+# OBSOLETE  RunRailsCops: false
+  Rails:
+    Enabled: true
   # Cop names are not displayed in offense messages by default. Change behavior
   # by overriding DisplayCopNames, or by giving the -D/--display-cop-names
   # option.
@@ -613,9 +615,10 @@ Style/SpaceAroundEqualsInParameterDefault:
     - no_space
 
 Style/SpaceAroundOperators:
-  MultiSpaceAllowedForOperators:
-    - '='
-    - '=>'
+  AllowForAlignment: true
+#  MultiSpaceAllowedForOperators:
+#    - '='
+#    - '=>'
 
 Style/SpaceBeforeBlockBraces:
   EnforcedStyle: space
@@ -652,12 +655,14 @@ Style/TrailingBlankLines:
     - final_newline
     - final_blank_line
 
-Style/TrailingComma:
+Style/TrailingCommaInArguments:
   # If EnforcedStyleForMultiline is comma, the cop requires a comma after the
   # last item of a list, but only for lists where each item is on its own line.
   # If EnforcedStyleForMultiline is consistent_comma, the cop requires a comma
   # after the last item of a list, for all lists.
   EnforcedStyleForMultiline: no_comma
+Style/TrailingCommaInLiteral:
+  EnforcedStyleForMultiline: comma
   SupportedStyles:
     - comma
     - consistent_comma

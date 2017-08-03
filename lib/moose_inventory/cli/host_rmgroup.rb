@@ -20,7 +20,7 @@ module Moose
             abort('ERROR: Wrong number of arguments, '\
                   "#{args.length} for 2 or more.")
           end
-          
+
           # Convenience
           db = Moose::Inventory::DB
           fmt = Moose::Inventory::Cli::Formatter
@@ -34,10 +34,10 @@ module Moose
             abort 'ERROR: Cannot manually manipulate the automatic '\
               'group \'ungrouped\'.'
           end
-          
+
           # Transaction
           db.transaction do # Transaction start
-            puts "Dissociate host '#{name}' from groups '#{groups.join(',')}':" 
+            puts "Dissociate host '#{name}' from groups '#{groups.join(',')}':"
             fmt.puts 2, "- Retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?
@@ -54,7 +54,7 @@ module Moose
               # Check against existing associations
               if groups_ds[name: g].nil?
                 fmt.warn "Association {host:#{name} <-> group:#{g}} doesn't exist, skipping.\n"
-                fmt.puts 4,  "- Doesn't exist, skipping."
+                fmt.puts 4, "- Doesn't exist, skipping."
               else
                 group = db.models[:group].find(name: g)
                 host.remove_group(group) unless group.nil?
@@ -66,7 +66,7 @@ module Moose
             if host.groups_dataset.count == 0
               fmt.puts 2, '- Add automatic association '\
                 "{host:#{name} <-> group:ungrouped}..."
-              ungrouped  = db.models[:group].find_or_create(name: 'ungrouped')
+              ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
               host.add_group(ungrouped) unless ungrouped.nil?
               fmt.puts 4, '- OK'
             end

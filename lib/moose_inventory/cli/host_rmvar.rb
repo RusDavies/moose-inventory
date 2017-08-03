@@ -13,7 +13,7 @@ module Moose
         #==========================
         desc 'rmvar', 'Remove a variable from the host'
         # rubocop:disable Metrics/LineLength
-        def rmvar(*args) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
+        def rmvar(*args) # rubocop:disable Metrics/AbcSize
           # rubocop:enableMetrics/LineLength
           if args.length < 2
             abort('ERROR: Wrong number of arguments, ' \
@@ -30,8 +30,8 @@ module Moose
 
           # Transaction
           db.transaction do # Transaction start
-            puts "Remove variable(s) '#{vars.join(",")}' from host '#{name}':"
-            
+            puts "Remove variable(s) '#{vars.join(',')}' from host '#{name}':"
+
             fmt.puts 2, "- retrieve host '#{name}'..."
             host = db.models[:host].find(name: name)
             if host.nil?

@@ -6,7 +6,7 @@ module Moose
     module Cli
       ##
       # Class implementing the "group" methods of the CLI
-      class Group < Thor 
+      class Group < Thor
         require_relative 'group_add'
         require_relative 'group_get'
         require_relative 'group_list'

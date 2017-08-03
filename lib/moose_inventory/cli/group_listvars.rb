@@ -19,22 +19,21 @@ module Moose
           # Note, the Ansible spects don't call for a "--group GROUPNAME" method.
           # So, strictly, there is no Ansible compatibility for this method.
           # Instead, the Ansible compatibility included herein is for consistency
-          # with the "hosts listvars" method, which services the Ansible 
+          # with the "hosts listvars" method, which services the Ansible
           # "--host HOSTNAME" specs.
-                     
+
           # sanity
           if confopts[:ansible] == true
             if argv.length != 1
-            abort('ERROR: Wrong number of arguments for Ansible mode, '\
-                  "#{args.length} for 1.")
+              abort('ERROR: Wrong number of arguments for Ansible mode, '\
+                    "#{args.length} for 1.")
             end
           else
-            if argv.length < 1
+            if argv.empty?
               abort('ERROR: Wrong number of arguments, '\
                     "#{args.length} for 1 or more.")
             end
           end
-
 
           # Convenience
           db = Moose::Inventory::DB
@@ -43,10 +42,10 @@ module Moose
           # Arguments
           names = argv.uniq.map(&:downcase)
 
-          #process
+          # process
           results = {}
-            
-          if confopts[:ansible] == true 
+
+          if confopts[:ansible] == true
             # This is the implementation per Ansible specs
             name = names.first
             group = db.models[:group].find(name: name)
@@ -61,11 +60,10 @@ module Moose
             # This our more flexible implementation
             names.each do |name|
               group = db.models[:group].find(name: name)
-              unless group.nil?
-                results[name.to_sym] = {}
-                group.groupvars_dataset.each do |gv|
-                  results[name.to_sym][gv[:name].to_sym] = gv[:value]
-                end
+              next if group.nil?
+              results[name.to_sym] = {}
+              group.groupvars_dataset.each do |gv|
+                results[name.to_sym][gv[:name].to_sym] = gv[:value]
               end
             end
           end

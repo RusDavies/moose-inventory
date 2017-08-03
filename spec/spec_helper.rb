@@ -35,7 +35,7 @@ require 'find'
 require 'moose_inventory'
 
 RSpec.configure do |config|
-  #config.filter_run focus: true # <- enable to allow test focus
+  # config.filter_run focus: true # <- enable to allow test focus
   config.color = true
   config.tty = true
   config.formatter = :progress #:documentation # :progress, :html, :textmate
@@ -87,7 +87,7 @@ RSpec.configure do |config|
   def expected(actual, desired)
     desired[:aborted].nil? && desired[:aborted] = false
     desired[:STDOUT].nil? && desired[:STDOUT] = ''
-    desired[:STDERR].nil? && desired[:STDERR] = '' 
+    desired[:STDERR].nil? && desired[:STDERR] = ''
 
     expect(actual[:unexpected]).to eq(false)
     expect(actual[:aborted]).to eq(desired[:aborted])
@@ -97,8 +97,8 @@ RSpec.configure do |config|
 
   def clobber_db_files
     paths = []
-    Find.find('tmp/') { |path|  paths << path if path =~ /.*\.db$/ }
-    paths.each { |file|  File.delete(file) }
+    Find.find('tmp/') { |path| paths << path if path =~ /.*\.db$/ }
+    paths.each { |file| File.delete(file) }
   end
 
   def spec_root

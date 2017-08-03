@@ -24,11 +24,11 @@ module Moose
             results[host[:name].to_sym][:groups] = groups
 
             hostvars = {}
-            host.hostvars_dataset.each do |hv| 
-              hostvars[hv[:name].to_sym] = hv[:value] 
+            host.hostvars_dataset.each do |hv|
+              hostvars[hv[:name].to_sym] = hv[:value]
             end
 
-            unless hostvars.length == 0
+            unless hostvars.empty?
               results[host[:name].to_sym][:hostvars] = hostvars
             end
           end

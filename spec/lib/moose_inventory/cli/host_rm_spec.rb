@@ -9,7 +9,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
     @mockarg_parts = {
       config:  File.join(spec_root, 'config/config.yml'),
       format:  'yaml',
-      env:     'test'
+      env:     'test',
     }
 
     @mockargs = []
@@ -58,8 +58,8 @@ RSpec.describe Moose::Inventory::Cli::Host do
       # already exists.
 
       # no items in the db
-      name = "fake"
-      actual = runner {  @app.start(%W(host rm #{name})) }
+      name = 'fake'
+      actual = runner { @app.start(%W(host rm #{name})) }
 
       desired = {}
       desired[:STDOUT] =
@@ -92,7 +92,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
         "    - OK\n"\
         "  - All OK\n"\
         "Succeeded.\n"
-        
+
       expected(actual, desired)
 
       # Check db
@@ -113,15 +113,15 @@ RSpec.describe Moose::Inventory::Cli::Host do
       desired = { aborted: false, STDERR: '', STDOUT: '' }
       names.each do |name|
         desired[:STDOUT] = desired[:STDOUT] +
-          "Remove host '#{name}':\n"\
-          "  - Retrieve host '#{name}'...\n"\
-          "    - OK\n"\
-          "  - Destroy host '#{name}'...\n"\
-          "    - OK\n"\
-          "  - All OK\n"
+                           "Remove host '#{name}':\n"\
+                           "  - Retrieve host '#{name}'...\n"\
+                           "    - OK\n"\
+                           "  - Destroy host '#{name}'...\n"\
+                           "    - OK\n"\
+                           "  - All OK\n"
       end
-      desired[:STDOUT] = desired[:STDOUT] + 
-        "Succeeded.\n"
+      desired[:STDOUT] = desired[:STDOUT] +
+                         "Succeeded.\n"
       expected(actual, desired)
 
       # Check db
