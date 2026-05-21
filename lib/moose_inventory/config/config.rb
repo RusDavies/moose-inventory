@@ -168,7 +168,12 @@ module Moose
       # rubocop:disable PerceivedComplexity
       # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
       def self.load
-        newsets = symbolize_keys(YAML.load_file(@_confopts[:config]))
+        newsets = symbolize_keys(YAML.safe_load_file(
+          @_confopts[:config],
+          aliases: false,
+          permitted_classes: [],
+          permitted_symbols: []
+        ))
 
         path = @_confopts[:config]
 
