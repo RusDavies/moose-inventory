@@ -1,14 +1,17 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 7 done / 1 open.
+Fresh pass status counts: 8 done / 0 open.
 
 ## Open
 
-1. Refresh user-facing docs and setup scripts after DB support decisions.
-   - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
-   - Update README, install script, and examples to match the support matrix established above.
+_No open fresh-pass items._
 
 ## Done
+
+1. Refresh user-facing docs and setup scripts after DB support decisions.
+   - Fixed README typos/stale DB support notes and documented the tested support matrix: SQLite live file coverage plus MySQL/PostgreSQL adapter/error-path smoke coverage.
+   - Updated `scripts/install_dependencies.sh` for current Fedora package names, removing obsolete `mysql-utilities` and using client development headers for SQLite, MariaDB/MySQL, and PostgreSQL.
+   - Verified with full `./scripts/check.sh` and shell syntax check for the install script.
 
 1. Add adapter/error-path smoke tests to the stable QA gate.
    - Expanded DB specs included by `./scripts/check.sh` to cover documented adapter dispatch for SQLite, MySQL, and PostgreSQL.

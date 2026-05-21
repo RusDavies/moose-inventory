@@ -1,22 +1,17 @@
 #!/bin/bash
+set -euo pipefail
 
-sudo dnf groupinstall "C Development Tools and Libraries" "Development Tools"
-sudo dnf install ansible \
+sudo dnf groupinstall -y "C Development Tools and Libraries" "Development Tools"
+sudo dnf install -y \
+            ansible \
             ruby \
             ruby-devel \
-            rubygem-mysql2 \
-            mysql-utilities \
-            rubygem-sqlite3 \
+            rubygem-bundler \
             sqlite \
             sqlite-libs \
             sqlite-devel \
-            mariadb-devel \
-            mariadb \
-            rubygem-bundler \
-            libffi-devel \
+            mariadb-connector-c-devel \
+            libpq-devel \
             libffi \
-            rubygem-ffi \
-            rpm-build \
-            postgresql \
-            postgresql-devel
-
+            libffi-devel \
+            rpm-build
