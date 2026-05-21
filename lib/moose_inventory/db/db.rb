@@ -283,6 +283,25 @@ module Moose
                             host: config[:host],
                             database: config[:database])
       end
+
+      #--------------------
+      def self.init_postgresql
+        require 'pg'
+
+        # Quick check that expected keys are at least present
+        config = Moose::Inventory::Config._settings[:config][:db]
+        [:host, :database, :user, :password].each do |key|
+          if config[key].nil?
+            fail @exceptions[:moose],
+                 "Expected key #{key} missing in postgresql configuration"
+          end
+        end
+
+        @db = Sequel.postgres(user: config[:user],
+                              password: config[:password],
+                              host: config[:host],
+                              database: config[:database])
+      end
     end
   end
 end
