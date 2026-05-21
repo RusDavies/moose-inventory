@@ -1,15 +1,15 @@
 # Moose Inventory Modernization Backlog
 
-Status counts: 5 done / 4 open.
+Status counts: 7 done / 3 open.
 
 ## Open
 
 1. Generate and commit a current `Gemfile.lock` after deciding whether to stop ignoring it.
    - `bundle lock` now resolves successfully with Bundler 2.6.9, but `Gemfile.lock` is currently ignored by `.gitignore`.
-2. Run the existing RSpec suite and record failures before changing behavior.
-3. Modernize remaining stale runtime dependencies with care, especially `json`, `mysql2`, `sequel`, `sqlite3`, and `thor`.
+2. Modernize remaining stale runtime dependencies with care, especially `mysql2` and `sqlite3`.
    - `pg` has been moved to a Ruby-3.4-compatible constraint.
-4. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
+   - `json`, `sequel`, and `thor` have been moved to Ruby-3.4-compatible constraints.
+3. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
 
 ## Done
 
@@ -30,3 +30,15 @@ Status counts: 5 done / 4 open.
    - Changed `pg` from `~> 0` to `>= 1.5, < 2`.
    - Verified Bundler resolves `pg 1.6.3` instead of `pg 0.21.0`.
    - Verified `bundle install` completes successfully under Ruby 3.4.8 / Bundler 2.6.9.
+6. Run the existing RSpec suite and establish a green modern-Ruby baseline.
+   - Initial baseline exposed startup/runtime incompatibilities in old `thor`, `json`, and `sequel` constraints.
+   - Updated `json` from `~> 1` to `>= 2.7, < 3`.
+   - Updated `thor` from `~> 0` to `>= 1.3, < 2`.
+   - Updated `sequel` from `~> 4` to `>= 5.80, < 6`.
+   - Verified Bundler resolves `json 2.19.5`, `thor 1.5.0`, and `sequel 5.104.0`.
+7. Fix RSpec harness compatibility with the current checkout/test flow.
+   - `spec_helper` now creates `tmp/` before deleting test database files, avoiding `Errno::ENOENT` on fresh clones.
+   - Config specs now pass an explicit fixture config when testing default option values.
+   - Ansible-mode CLI specs now pass the fixture config when invoking the top-level CLI.
+   - Updated the `--list` expectation for Ansible mode, which correctly includes empty `hosts` arrays.
+   - Verified `bundle exec rspec --format documentation`: 242 examples, 0 failures; line coverage 95.16%.

@@ -31,6 +31,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__),
 require 'rspec'
 require 'json'
 require 'yaml'
+require 'fileutils'
 require 'find'
 require 'moose_inventory'
 
@@ -96,8 +97,9 @@ RSpec.configure do |config|
   end
 
   def clobber_db_files
+    FileUtils.mkdir_p('tmp')
     paths = []
-    Find.find('tmp/') { |path| paths << path if path =~ /.*\.db$/ }
+    Find.find('tmp') { |path| paths << path if path =~ /.*\.db$/ }
     paths.each { |file| File.delete(file) }
   end
 
