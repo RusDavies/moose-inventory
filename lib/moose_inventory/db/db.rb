@@ -22,6 +22,8 @@ module Moose
 
       #----------------------
       def self.init
+        init_exceptions
+
         # If we allow init more than once, then the db connection is remade,
         # which changes Sequel:DATABASES[0], thereby invalidating the sequel
         # models.  This causes unexpected behavour. That is to say, because
@@ -57,8 +59,12 @@ module Moose
         @models[:group]    = Moose::Inventory::DB::Group
         @models[:groupvar] = Moose::Inventory::DB::Groupvar
 
-        @exceptions = {}
-        @exceptions[:moose] = Moose::Inventory::DB::MooseDBException
+      end
+
+      #--------------------
+      def self.init_exceptions
+        @exceptions ||= {}
+        @exceptions[:moose] ||= Moose::Inventory::DB::MooseDBException
       end
 
       #--------------------
