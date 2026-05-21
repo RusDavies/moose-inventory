@@ -21,7 +21,7 @@ GEM
     mysql2 (0.5.7)
       bigdecimal
     pg (1.6.3-x86_64-linux)
-    rake (10.5.0)
+    rake (13.4.2)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -52,7 +52,7 @@ PLATFORMS
 DEPENDENCIES
   bundler (>= 1.17, < 3)
   moose-inventory!
-  rake (~> 10)
+  rake (>= 13.0, < 14)
   rspec (~> 3)
   simplecov (~> 0)
 

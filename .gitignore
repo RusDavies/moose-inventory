@@ -17,3 +17,4 @@ mkmf.log
 *.gem
 /gems/
 moose-inventory.spec
+/.openclaw-security-audit/
