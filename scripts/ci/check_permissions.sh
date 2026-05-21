@@ -19,7 +19,7 @@ trap 'rm -f "$allowed_file" "$actual_file"' EXIT
 
 printf '%s\n' "${allowed_executables[@]}" | sort > "$allowed_file"
 
-git ls-files --cached --others --exclude-standard -z | while IFS= read -r -d '' path; do
+git ls-files -z | while IFS= read -r -d '' path; do
   if [[ -x "$path" ]]; then
     printf '%s\n' "$path"
   fi
