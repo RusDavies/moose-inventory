@@ -47,6 +47,39 @@ RSpec.describe 'Moose::Inventory::DB' do
 
       expect(failed).to eq(false)
     end
+
+    it 'raises a Moose DB exception for unsupported adapters' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_models = @db.instance_variable_get(:@models)
+      saved_exceptions = @db.instance_variable_get(:@exceptions)
+      saved_settings = @config._settings.dup
+
+      begin
+        @db.instance_variable_set(:@db, nil)
+        @db.instance_variable_set(:@models, nil)
+        @db.instance_variable_set(:@exceptions, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: { adapter: 'unsupported' } }
+
+        expect { @db.init }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /database adapter unsupported is not yet supported/
+        )
+        expect(@db.exceptions[:moose]).to eq(Moose::Inventory::DB::MooseDBException)
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+        @db.instance_variable_set(:@models, saved_models)
+        @db.instance_variable_set(:@exceptions, saved_exceptions)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+      end
+    end
+  end
+
+  describe '.init_exceptions()' do
+    it 'is responsive' do
+      expect(@db.respond_to?(:init_exceptions)).to eq(true)
+    end
   end
 
   describe '.db' do
