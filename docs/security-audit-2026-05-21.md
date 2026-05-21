@@ -58,3 +58,14 @@ After the dependency update, an OSV query for locked RubyGems dependencies retur
 
 - Consider adding a CI security job for OSV or bundler-audit so dependency advisories are caught before they fossilize in the lockfile like a tiny Jurassic Park exhibit.
 - Consider keeping generated coverage artifacts out of normal grep/scanner paths; they are ignored from this audit because they contain large bundled HTML/CSS assets.
+
+## GitHub Dependabot follow-up after first push
+
+After pushing the audit remediation, GitHub emitted a default-branch warning for 7 Dependabot vulnerabilities. Querying the repository Dependabot alerts through `gh api repos/RusDavies/moose-inventory/dependabot/alerts` showed that all 7 were already in `fixed` state after the modernization/security-audit commits reached GitHub:
+
+- `rake`: GHSA-jppv-gw3r-w3q8 / CVE-2020-8130, fixed by `rake >= 13.0, < 14` and lockfile `rake 13.4.2`.
+- `json`: GHSA-jphg-qwrw-7w9g / CVE-2020-10663, fixed by the existing current constraint `json >= 2.7, < 3` and lockfile `json 2.19.5`.
+- `rubocop`: GHSA-wmjf-jpjj-9f3j / CVE-2017-8418, fixed by removing RuboCop as a development dependency.
+- `bundler`: GHSA-jvgm-pfqv-887x / CVE-2016-7954, GHSA-g98m-96g9-wfjq / CVE-2019-3881, GHSA-fp4w-jxhp-m23p / CVE-2020-36327, and GHSA-fj7f-vq84-fh43 / CVE-2021-43809. GitHub marked these fixed because the lockfile uses Bundler 2.6.9; this follow-up also tightens the gemspec development dependency to `bundler >= 2.2.33, < 3` so fresh development installs cannot select known-vulnerable Bundler 1.x/early 2.x releases.
+
+Follow-up validation: `gh api 'repos/RusDavies/moose-inventory/dependabot/alerts?state=open'` returned no open alerts.
