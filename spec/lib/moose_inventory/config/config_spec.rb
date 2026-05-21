@@ -76,5 +76,18 @@ RSpec.describe 'Moose::Inventory::Config' do
       @config.init(@mockargs)
       expect(@config._settings[:config][:db]).not_to be_nil
     end
+
+    it 'uses safe YAML loading for configuration files' do
+      expect(YAML).not_to receive(:load_file)
+      expect(YAML).to receive(:safe_load_file).with(
+        @mockarg_parts[:config],
+        aliases: false,
+        permitted_classes: [],
+        permitted_symbols: []
+      ).and_call_original
+
+      @config.init(@mockargs)
+      expect(@config._settings[:config][:db]).not_to be_nil
+    end
   end
 end

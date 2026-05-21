@@ -1,19 +1,22 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 5 done / 3 open.
+Fresh pass status counts: 6 done / 2 open.
 
 ## Open
 
-1. Harden YAML config loading.
-   - Evidence: config loading uses `YAML.load_file`; switch to `YAML.safe_load_file` or equivalent with explicit permitted classes, then verify current config examples still work.
-2. Add adapter/error-path smoke tests to the stable QA gate.
+1. Add adapter/error-path smoke tests to the stable QA gate.
    - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
    - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-3. Refresh user-facing docs and setup scripts after DB support decisions.
+2. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Harden YAML config loading.
+   - Replaced `YAML.load_file` with `YAML.safe_load_file` using no permitted classes, no permitted symbols, and aliases disabled.
+   - Added regression coverage ensuring config loading uses the safe YAML loader while preserving existing config fixture behavior.
+   - Verified with full `./scripts/check.sh`.
 
 1. Use recursive directory creation for SQLite database paths.
    - Replaced single-level `Dir.mkdir` with `FileUtils.mkdir_p` in `init_sqlite3`.
