@@ -38,6 +38,38 @@ Release readiness status counts: 4 done / 3 open.
 
 ---
 
+# Moose Inventory GitHub Issues Backlog
+
+GitHub issues status counts: 0 done / 4 open.
+
+## Open
+
+1. [#14 Passwords in config files](https://github.com/RusDavies/moose-inventory/issues/14)
+   - README examples currently show database passwords stored directly in configuration files.
+   - Determine whether Moose Inventory supports reading credentials from environment variables today.
+   - If not, decide whether to add environment-variable credential support or at least document safer credential-handling guidance.
+   - Update README/config examples so they do not accidentally encourage secret-in-repo bad practice.
+
+1. [#13 Need to refactor](https://github.com/RusDavies/moose-inventory/issues/13)
+   - CLI command modules contain similar methods across host/group operations, for example `GroupAdd` and `HostAdd`-style flows.
+   - Existing code has historically needed complexity metric disables such as `Metrics/AbcSize` and `Metrics/CyclomaticComplexity`.
+   - Evaluate cost/benefit before doing a broad refactor; identify specific low-risk extraction targets and regression coverage needed.
+
+1. [#12 Allow `group rm` to recursively delete orphaned child groups](https://github.com/RusDavies/moose-inventory/issues/12)
+   - Decide product semantics for recursive group deletion: default behavior, explicit switch, safety prompts/flags, and how to distinguish intentional tree deletion from accidental orphan cleanup.
+   - If implemented, add tests for `group rm` and `group rmchild` orphan-child behavior, root-group handling, and host `ungrouped` behavior.
+
+1. [#4 `--trace` doesn't do what it claims](https://github.com/RusDavies/moose-inventory/issues/4)
+   - Reproduce current `--trace` behavior and confirm whether exceptions/backtraces are still truncated.
+   - Fix trace handling so transaction errors emit useful full exception/backtrace information when `--trace` is enabled while preserving concise default errors.
+   - Add regression coverage for both trace and non-trace error output.
+
+## Done
+
+_No GitHub issue backlog items completed yet._
+
+---
+
 # Moose Inventory Fresh Pass Backlog
 
 Fresh pass status counts: 8 done / 0 open.
