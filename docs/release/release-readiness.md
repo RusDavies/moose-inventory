@@ -14,7 +14,7 @@ The gate currently runs:
 
 1. RSpec with coverage via the existing spec helper.
 2. `git diff --check` for whitespace/conflict-marker issues in the working tree.
-3. `scripts/ci/check_permissions.sh` to ensure only intentional entrypoints are executable.
+3. `scripts/ci/check_permissions.sh` to ensure only intentional tracked repository entrypoints are executable.
 4. `scripts/ci/check_security.sh` to query OSV for locked RubyGems dependency advisories.
 5. `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, and smoke-test the CLI version command.
 
