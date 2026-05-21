@@ -45,10 +45,10 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'indentation', '~> 0'
   spec.add_runtime_dependency 'json', '>= 2.7', '< 3'
-  spec.add_runtime_dependency 'mysql2', '~> 0'
+  spec.add_runtime_dependency 'mysql2', '>= 0.5.7', '< 0.6'
   spec.add_runtime_dependency 'pg', '>= 1.5', '< 2'
   spec.add_runtime_dependency 'sequel', '>= 5.80', '< 6'
-  spec.add_runtime_dependency 'sqlite3', '~> 1'
+  spec.add_runtime_dependency 'sqlite3', '>= 1.7', '< 3'
   spec.add_runtime_dependency 'thor', '>= 1.3', '< 2'
 
   spec.add_development_dependency 'bundler', '>= 1.17', '< 3'

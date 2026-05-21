@@ -1,15 +1,19 @@
 # Moose Inventory Modernization Backlog
 
-Status counts: 8 done / 2 open.
+Status counts: 9 done / 1 open.
 
 ## Open
+
+1. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
+
+## Done
 
 1. Modernize remaining stale runtime dependencies with care, especially `mysql2` and `sqlite3`.
    - `pg` has been moved to a Ruby-3.4-compatible constraint.
    - `json`, `sequel`, and `thor` have been moved to Ruby-3.4-compatible constraints.
-2. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
-
-## Done
+   - Tightened `mysql2` from `~> 0` to `>= 0.5.7, < 0.6`; Bundler keeps resolving `mysql2 0.5.7`.
+   - Relaxed/modernized `sqlite3` from `~> 1` to `>= 1.7, < 3`; Bundler now resolves `sqlite3 2.9.4`.
+   - Verified with `bundle update sqlite3 mysql2 --conservative` and `bundle exec rspec --format documentation`: 242 examples, 0 failures; line coverage 95.16%.
 
 1. Generate and commit a current `Gemfile.lock` after deciding whether to stop ignoring it.
    - Removed `/Gemfile.lock` from `.gitignore`.
