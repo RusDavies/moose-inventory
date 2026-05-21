@@ -34,7 +34,7 @@ It installs native headers needed by the DB gems, uses Ruby 3.4, relies on Bundl
 - `README.md`
 - `LICENSE.txt`
 
-It also verifies the gem metadata exposes the `moose-inventory` executable and that `ruby -Ilib bin/moose-inventory version` returns a version string.
+It also verifies the gem metadata exposes the `moose-inventory` executable and that `bundle exec ruby -Ilib bin/moose-inventory --config spec/config/config.yml version` returns a version string.
 
 ## Dependency advisory expectations
 

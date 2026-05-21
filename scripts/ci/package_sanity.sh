@@ -38,7 +38,7 @@ if ! grep -q "^- moose-inventory$" "$pkg_dir/executables.yml"; then
   exit 1
 fi
 
-if ! ruby -Ilib bin/moose-inventory --config spec/config/config.yml version | grep -q '^Version '; then
+if ! bundle exec ruby -Ilib bin/moose-inventory --config spec/config/config.yml version | grep -q '^Version '; then
   echo "CLI version smoke failed." >&2
   exit 1
 fi
