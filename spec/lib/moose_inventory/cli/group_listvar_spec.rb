@@ -101,7 +101,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       tmp = runner {  @app.start(%W(group addvar #{group_name} #{group_vars[0]} #{group_vars[1]})) }
 
       actual = runner do
-        @cli.start(%W(--ansible group listvars #{group_name}))
+        @cli.start(%W(--config #{@mockarg_parts[:config]} --ansible group listvars #{group_name}))
       end
 
       # @console.out(actual, 'y')

@@ -16,7 +16,6 @@ sudo dnf install ansible \
             libffi-devel \
             libffi \
             rubygem-ffi \
-            rubygem-hitimes \
             rpm-build \
             postgresql \
             postgresql-devel

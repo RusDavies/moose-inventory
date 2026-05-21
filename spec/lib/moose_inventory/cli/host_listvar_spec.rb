@@ -104,7 +104,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       tmp = runner {  @app.start(%W(host addvar #{host_name} #{host_vars[0]} #{host_vars[1]})) }
 
       actual = runner do
-        @cli.start(%W(--ansible host listvars #{host_name}))
+        @cli.start(%W(--config #{@mockarg_parts[:config]} --ansible host listvars #{host_name}))
       end
 
       # @console.out(actual, 'y')
@@ -136,7 +136,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       tmp = runner {  @app.start(%W(host addvar #{host_name} #{host_vars[0]} #{host_vars[1]})) }
 
       actual = runner do
-        @cli.start(%W(--host #{host_name}))
+        @cli.start(%W(--config #{@mockarg_parts[:config]} --host #{host_name}))
       end
 
       # @console.out(actual, 'y')

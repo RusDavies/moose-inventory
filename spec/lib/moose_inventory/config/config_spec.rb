@@ -39,7 +39,7 @@ RSpec.describe 'Moose::Inventory::Config' do
     end
 
     it 'should default "--format" to json' do
-      @config.init([])
+      @config.init(['--config', @mockarg_parts[:config]])
       expect(@config._confopts[:format]).to eq('json')
     end
 
@@ -49,7 +49,7 @@ RSpec.describe 'Moose::Inventory::Config' do
     end
 
     it 'should default "--env" to ""' do
-      @config.init([])
+      @config.init(['--config', @mockarg_parts[:config]])
       expect(@config._confopts[:env]).to eq('')
     end
 

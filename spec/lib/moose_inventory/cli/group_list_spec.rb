@@ -81,7 +81,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       groups = %w(group1 group2 group3)
       groups.each do |name|
         runner { @app.start(%W(group add #{name})) }
-        mock[name.to_sym] = {}
+        mock[name.to_sym] = { hosts: [] }
       end
 
       args = @mockargs.clone
