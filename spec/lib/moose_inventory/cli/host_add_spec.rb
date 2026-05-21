@@ -201,6 +201,66 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     # --------------------
+    it 'existing HOST --groups NEWGROUP should associate the host with the new group' do
+      name = 'testhost'
+      initial_group = 'initialgroup'
+      new_group = 'newgroup'
+
+      runner { @app.start(%W(host add #{name} --groups #{initial_group})) }
+      actual = runner { @app.start(%W(host add #{name} --groups #{new_group})) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Add host '#{name}':\n"\
+        "  - Creating host '#{name}'...\n"\
+        "    - OK\n"\
+        "  - Adding association {host:#{name} <-> group:#{new_group}}...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded\n"
+      desired[:STDERR] =
+        "WARNING: The host '#{name}' already exists, skipping creation.\n"\
+        "WARNING: The group '#{new_group}' doesn't exist, but will be created.\n"
+
+      expected(actual, desired)
+
+      host = @db.models[:host].find(name: name)
+      groups = host.groups_dataset
+      expect(groups.count).to eq(2)
+      expect(groups[name: initial_group]).not_to be_nil
+      expect(groups[name: new_group]).not_to be_nil
+    end
+
+    # --------------------
+    it 'existing HOST --groups EXISTINGGROUP should skip existing associations' do
+      name = 'testhost'
+      group_name = 'testgroup'
+
+      runner { @app.start(%W(host add #{name} --groups #{group_name})) }
+      actual = runner { @app.start(%W(host add #{name} --groups #{group_name})) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Add host '#{name}':\n"\
+        "  - Creating host '#{name}'...\n"\
+        "    - OK\n"\
+        "  - Adding association {host:#{name} <-> group:#{group_name}}...\n"\
+        "    - OK\n"\
+        "  - All OK\n"\
+        "Succeeded\n"
+      desired[:STDERR] =
+        "WARNING: The host '#{name}' already exists, skipping creation.\n"\
+        "WARNING: Association {host:#{name} <-> group:#{group_name}} already exists, skipping creation.\n"
+
+      expected(actual, desired)
+
+      host = @db.models[:host].find(name: name)
+      groups = host.groups_dataset
+      expect(groups.count).to eq(1)
+      expect(groups[name: group_name]).not_to be_nil
+    end
+
+    # --------------------
     it 'HOST1 --groups ungrouped ... should abort with an error' do
       name = 'testhost'
       actual = runner do

@@ -1,25 +1,27 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 3 done / 5 open.
+Fresh pass status counts: 4 done / 4 open.
 
 ## Open
 
-1. Fix existing-host group association logic in `host add --groups`.
-   - Evidence: adding an existing host to a new group creates the group but does not associate it; the warning says the association already exists when `groups_ds[name: g]` is actually nil.
-   - Add regression coverage for adding new groups to an existing host and for idempotently skipping already-existing associations.
-2. Use recursive directory creation for SQLite database paths.
+1. Use recursive directory creation for SQLite database paths.
    - Evidence: `init_sqlite3` uses `Dir.mkdir(dbdir)`, which fails when the configured DB file is inside nested missing directories.
    - Replace with `FileUtils.mkdir_p(dbdir)` and add coverage for nested SQLite paths.
-3. Harden YAML config loading.
+2. Harden YAML config loading.
    - Evidence: config loading uses `YAML.load_file`; switch to `YAML.safe_load_file` or equivalent with explicit permitted classes, then verify current config examples still work.
-4. Add adapter/error-path smoke tests to the stable QA gate.
+3. Add adapter/error-path smoke tests to the stable QA gate.
    - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
    - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-5. Refresh user-facing docs and setup scripts after DB support decisions.
+4. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Fix existing-host group association logic in `host add --groups`.
+   - Fixed the association-existence condition so existing hosts can be associated with new groups and true duplicate associations are skipped with the existing warning.
+   - Added regression coverage for adding a new group to an existing host and idempotently skipping an existing association.
+   - Verified with full `./scripts/check.sh`.
 
 1. Fix or de-scope PostgreSQL support.
    - Implemented `init_postgresql` using the existing `pg` dependency and `Sequel.postgres`.
