@@ -364,6 +364,16 @@ A useful aspect of dynamic inventories is the possibility of writing data to the
 ```
 
  
+## Development checks
+
+Run the local verification gate before committing changes:
+
+```shell
+./scripts/check.sh
+```
+
+The check script runs the RSpec suite and enforces the SimpleCov coverage minimum.
+
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
 2. Create your feature branch (git checkout -b my-new-feature`)
