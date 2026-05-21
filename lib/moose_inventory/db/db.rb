@@ -230,7 +230,7 @@ module Moose
         when 'sqlite3'
           init_sqlite3
 
-        when 'msqsql'
+        when 'mysql'
           init_mysql
 
         when 'postgresql'
@@ -267,11 +267,7 @@ module Moose
 
       #--------------------
       def self.init_mysql
-        require 'mysql'
-
-        # TODO: native MySQL driver vs the pure ruby one?
-        #       Sequel requires the native on.
-        # gem('mysql')
+        require 'mysql2'
 
         # Quick check that expected keys are at least present
         config = Moose::Inventory::Config._settings[:config][:db]
@@ -282,10 +278,10 @@ module Moose
           end
         end
 
-        @db = Sequel.mysql(user: config[:user],
-                           password: config[:password],
-                           host: config[:host],
-                           database: config[:database])
+        @db = Sequel.mysql2(user: config[:user],
+                            password: config[:password],
+                            host: config[:host],
+                            database: config[:database])
       end
     end
   end

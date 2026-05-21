@@ -82,6 +82,63 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
   end
 
+  describe '.connect()' do
+    it 'dispatches the documented mysql adapter to the mysql initializer' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+
+      begin
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: { adapter: 'mysql' } }
+
+        expect(@db).to receive(:init_mysql) do
+          @db.instance_variable_set(:@db, :mysql_connection)
+        end
+        @db.connect
+        expect(@db.db).to eq(:mysql_connection)
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+      end
+    end
+  end
+
+  describe '.init_mysql()' do
+    it 'uses the mysql2 Sequel adapter with configured connection settings' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+      mysql_config = {
+        adapter: 'mysql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        user: 'moose',
+        password: 'secret',
+      }
+
+      begin
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: mysql_config }
+
+        expect(Sequel).to receive(:mysql2).with(
+          user: 'moose',
+          password: 'secret',
+          host: 'localhost',
+          database: 'moose_inventory_test'
+        ).and_return(:mysql2_connection)
+
+        @db.init_mysql
+        expect(@db.db).to eq(:mysql2_connection)
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+      end
+    end
+  end
+
   describe '.db' do
     it 'should be responsive' do
       expect(@db.respond_to?(:db)).to eq(true)

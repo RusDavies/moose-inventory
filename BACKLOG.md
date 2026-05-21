@@ -1,31 +1,34 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 1 done / 7 open.
+Fresh pass status counts: 2 done / 6 open.
 
 ## Open
 
-1. Fix MySQL adapter support or remove it from advertised support.
-   - Evidence: `README.md` documents `adapter: mysql`, but `DB.connect` dispatches on misspelled `msqsql`, so `adapter: mysql` falls into the unsupported-adapter path.
-   - Likely implementation: dispatch on `mysql`, require/use `mysql2`, and add a smoke spec with the adapter mocked or an integration test gated by environment.
-2. Fix or de-scope PostgreSQL support.
+1. Fix or de-scope PostgreSQL support.
    - Evidence: `README.md` documents `adapter: postgresql`, but `DB.connect` calls missing method `init_postgresql`, producing `NameError`.
    - Decide whether to implement `Sequel.postgres` support with tests or explicitly remove PostgreSQL from docs/dependencies.
-3. Fix existing-host group association logic in `host add --groups`.
+2. Fix existing-host group association logic in `host add --groups`.
    - Evidence: adding an existing host to a new group creates the group but does not associate it; the warning says the association already exists when `groups_ds[name: g]` is actually nil.
    - Add regression coverage for adding new groups to an existing host and for idempotently skipping already-existing associations.
-4. Use recursive directory creation for SQLite database paths.
+3. Use recursive directory creation for SQLite database paths.
    - Evidence: `init_sqlite3` uses `Dir.mkdir(dbdir)`, which fails when the configured DB file is inside nested missing directories.
    - Replace with `FileUtils.mkdir_p(dbdir)` and add coverage for nested SQLite paths.
-5. Harden YAML config loading.
+4. Harden YAML config loading.
    - Evidence: config loading uses `YAML.load_file`; switch to `YAML.safe_load_file` or equivalent with explicit permitted classes, then verify current config examples still work.
-6. Add adapter/error-path smoke tests to the stable QA gate.
+5. Add adapter/error-path smoke tests to the stable QA gate.
    - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
    - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-7. Refresh user-facing docs and setup scripts after DB support decisions.
+6. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Fix MySQL adapter support or remove it from advertised support.
+   - Fixed `DB.connect` to dispatch documented `adapter: mysql` instead of misspelled `msqsql`.
+   - Updated `init_mysql` to require `mysql2` and use `Sequel.mysql2`, matching the project dependency.
+   - Added regression coverage for MySQL adapter dispatch and connection option wiring without requiring a live MySQL server.
+   - Verified with full `./scripts/check.sh`.
 
 1. Initialize/use DB exception classes before connection failures.
    - Added DB exception initialization before connection setup so unsupported adapters raise `Moose::Inventory::DB::MooseDBException` instead of masking the intended error with `NoMethodError` on nil `@exceptions`.
