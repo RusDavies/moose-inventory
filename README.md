@@ -9,14 +9,13 @@ Note 2: This software is intended for use on UNIX/Linux systems.  It will likely
 
 ## Installation
 
-Note: You may need to install certain development tools (e.g. gcc, postresql-devel, mysql-devel, sqlite-devel) on your system, in order for the gem installation to perform native builds. 
+Note: You may need to install Ruby development headers and database client development packages on your system so native gems can build. On current Fedora releases, the project helper script installs the expected SQLite, MariaDB/MySQL, and PostgreSQL client headers.
 
 The tool is a ruby gem. Assuming that you have ruby on your system, then it can be installed from the command line as follows.
 
     $ gem install moose-inventory
 
-Note: It may be necassary to first install certain development tools (e.g. gcc, postresql-devel, mysql-devel, sqlite-devel), in order for the gem installation to perform nati
-ve builds.
+Note: It may be necessary to first install native build tools and database client development headers before installing the gem or running Bundler.
 
 It can also be installed by adding the following line to a Gemfile and then executing `bundle`:
 
@@ -77,9 +76,9 @@ You may add as many environment sections as you desire. The intention is to enab
 
 At present,  each environment section contains only a **db** subsection, describing database connection parameters.  Additional subsections may be added in the future, as functionality increases. 
 
-Each **db** section must include an **adapter** parameter. Currently supported adapter types are *sqlite3*, *mysql*, and *postresql*.  Note, as a matter of portability, only *sqlite3* is exercised via the test suite. 
+Each **db** section must include an **adapter** parameter. Currently supported adapter types are *sqlite3*, *mysql*, and *postgresql*. The test suite exercises SQLite with a local database file and includes adapter dispatch/error-path smoke coverage for MySQL and PostgreSQL without requiring live database servers.
 
-Additional parameters are also required in the **db** subsection, depending on the adapter type.   For the *sqlite3* adapter only a **file** parameter is required.  For both *mysql* and *postgresql*, then **host**, **database**, **user**, and **password** are the required parameters. 
+Additional parameters are also required in the **db** subsection, depending on the adapter type. For the *sqlite3* adapter only a **file** parameter is required; parent directories are created automatically. For both *mysql* and *postgresql*, **host**, **database**, **user**, and **password** are required.
 
 
 ## Usage
