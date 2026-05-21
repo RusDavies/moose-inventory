@@ -1,8 +1,12 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 4 done / 2 open.
+Release readiness status counts: 4 done / 3 open.
 
 ## Open
+
+1. Resolve GitHub Actions Node.js 20 deprecation warning.
+   - Current CI passes, but GitHub warns that `actions/checkout@v4` is running on Node.js 20 and Node.js 24 will become the default.
+   - Review available `actions/checkout` updates or GitHub-recommended configuration, then update the workflow so CI stays warning-free before Node.js 20 removal.
 
 1. Add GitHub Actions RubyGems trusted publishing.
    - Manual publishing is documented in `docs/release/publishing.md`.
