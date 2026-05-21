@@ -1,17 +1,19 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 6 done / 2 open.
+Fresh pass status counts: 7 done / 1 open.
 
 ## Open
 
-1. Add adapter/error-path smoke tests to the stable QA gate.
-   - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
-   - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-2. Refresh user-facing docs and setup scripts after DB support decisions.
+1. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Add adapter/error-path smoke tests to the stable QA gate.
+   - Expanded DB specs included by `./scripts/check.sh` to cover documented adapter dispatch for SQLite, MySQL, and PostgreSQL.
+   - Added missing-key error-path smoke coverage for SQLite, MySQL, and PostgreSQL, alongside existing unsupported-adapter and nested SQLite path coverage.
+   - Verified with full `./scripts/check.sh`.
 
 1. Harden YAML config loading.
    - Replaced `YAML.load_file` with `YAML.safe_load_file` using no permitted classes, no permitted symbols, and aliases disabled.

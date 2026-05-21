@@ -3,6 +3,24 @@ require 'fileutils'
 require 'tmpdir'
 
 RSpec.describe 'Moose::Inventory::DB' do
+  def with_db_config(db_config)
+    saved_db = @db.instance_variable_get(:@db)
+    saved_settings = @config._settings.dup
+
+    begin
+      @db.instance_variable_set(:@db, nil)
+      @config._settings.clear
+      @config._settings[:config] = { db: db_config }
+      yield
+    ensure
+      current_db = @db.instance_variable_get(:@db)
+      current_db.disconnect if current_db.respond_to?(:disconnect)
+      @db.instance_variable_set(:@db, saved_db)
+      @config._settings.clear
+      @config._settings.merge!(saved_settings)
+    end
+  end
+
   #=============================
   # Initialization
   #
@@ -85,29 +103,47 @@ RSpec.describe 'Moose::Inventory::DB' do
   end
 
   describe '.connect()' do
+    it 'dispatches the documented sqlite3 adapter to the sqlite initializer' do
+      with_db_config(adapter: 'sqlite3') do
+        expect(@db).to receive(:init_sqlite3) do
+          @db.instance_variable_set(:@db, :sqlite_connection)
+        end
+        @db.connect
+        expect(@db.db).to eq(:sqlite_connection)
+      end
+    end
+
     it 'dispatches the documented mysql adapter to the mysql initializer' do
-      saved_db = @db.instance_variable_get(:@db)
-      saved_settings = @config._settings.dup
-
-      begin
-        @db.instance_variable_set(:@db, nil)
-        @config._settings.clear
-        @config._settings[:config] = { db: { adapter: 'mysql' } }
-
+      with_db_config(adapter: 'mysql') do
         expect(@db).to receive(:init_mysql) do
           @db.instance_variable_set(:@db, :mysql_connection)
         end
         @db.connect
         expect(@db.db).to eq(:mysql_connection)
-      ensure
-        @db.instance_variable_set(:@db, saved_db)
-        @config._settings.clear
-        @config._settings.merge!(saved_settings)
+      end
+    end
+
+    it 'dispatches the documented postgresql adapter to the postgresql initializer' do
+      with_db_config(adapter: 'postgresql') do
+        expect(@db).to receive(:init_postgresql) do
+          @db.instance_variable_set(:@db, :postgresql_connection)
+        end
+        @db.connect
+        expect(@db.db).to eq(:postgresql_connection)
       end
     end
   end
 
   describe '.init_sqlite3()' do
+    it 'raises a Moose DB exception when the configured database file is missing' do
+      with_db_config(adapter: 'sqlite3') do
+        expect { @db.init_sqlite3 }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /Expected key file missing in sqlite3 configuration/
+        )
+      end
+    end
+
     it 'creates nested parent directories for configured database files' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
@@ -140,6 +176,20 @@ RSpec.describe 'Moose::Inventory::DB' do
   end
 
   describe '.init_mysql()' do
+    it 'raises a Moose DB exception when a required connection key is missing' do
+      with_db_config(
+        adapter: 'mysql',
+        database: 'moose_inventory_test',
+        user: 'moose',
+        password: 'secret'
+      ) do
+        expect { @db.init_mysql }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /Expected key host missing in mysql configuration/
+        )
+      end
+    end
+
     it 'uses the mysql2 Sequel adapter with configured connection settings' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
@@ -174,6 +224,20 @@ RSpec.describe 'Moose::Inventory::DB' do
   end
 
   describe '.init_postgresql()' do
+    it 'raises a Moose DB exception when a required connection key is missing' do
+      with_db_config(
+        adapter: 'postgresql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        password: 'secret'
+      ) do
+        expect { @db.init_postgresql }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /Expected key user missing in postgresql configuration/
+        )
+      end
+    end
+
     it 'uses the postgres Sequel adapter with configured connection settings' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
