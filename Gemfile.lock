@@ -50,7 +50,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  bundler (>= 1.17, < 3)
+  bundler (>= 2.2.33, < 3)
   moose-inventory!
   rake (>= 13.0, < 14)
   rspec (~> 3)
