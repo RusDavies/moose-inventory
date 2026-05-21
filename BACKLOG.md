@@ -1,3 +1,30 @@
+# Moose Inventory Release Readiness Backlog
+
+Release readiness status counts: 3 done / 1 open.
+
+## Open
+
+1. Decide and declare the supported Ruby version floor.
+   - `gem build` now warns that the gemspec does not set `required_ruby_version`.
+   - Pick the oldest Ruby version this maintained branch should support, then add the gemspec constraint and CI matrix coverage for that floor.
+
+## Done
+
+1. Create a release-readiness backlog.
+   - Added this release-readiness section to track post-modernization packaging/CI hardening separately from the completed modernization and fresh-pass backlogs.
+
+1. Add CI/security gates to prevent regressions.
+   - Added `.github/workflows/ci.yml` for GitHub Actions on `master` pushes and pull requests.
+   - Expanded `./scripts/check.sh` to run the RSpec suite, `git diff --check`, executable-permission checks, OSV dependency advisory checks, and package sanity checks.
+   - Added `scripts/ci/check_permissions.sh` to keep executable bits limited to intentional entrypoints and scripts.
+   - Added `scripts/ci/check_security.sh` to query OSV for locked RubyGems dependency advisories.
+
+1. Do a gem/package sanity pass.
+   - Added `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, verify required files, check executable metadata, and smoke-test the CLI version command.
+   - Documented the release-readiness gate in `docs/release/release-readiness.md`.
+
+---
+
 # Moose Inventory Fresh Pass Backlog
 
 Fresh pass status counts: 8 done / 0 open.
