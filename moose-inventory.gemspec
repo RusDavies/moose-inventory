@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   # rubocop:enable Metrics/LineLength
   spec.homepage      = 'https://github.com/RusDavies/moose-inventory'
   spec.license       = 'MIT'
+  spec.required_ruby_version = '>= 3.2'
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
