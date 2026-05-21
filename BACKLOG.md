@@ -1,14 +1,23 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 3 done / 1 open.
+Release readiness status counts: 4 done / 2 open.
 
 ## Open
+
+1. Add GitHub Actions RubyGems trusted publishing.
+   - Manual publishing is documented in `docs/release/publishing.md`.
+   - Future improvement: configure RubyGems trusted publishing, publish from reviewed `v*` tags, and avoid long-lived RubyGems API keys on developer machines.
 
 1. Decide and declare the supported Ruby version floor.
    - `gem build` now warns that the gemspec does not set `required_ruby_version`.
    - Pick the oldest Ruby version this maintained branch should support, then add the gemspec constraint and CI matrix coverage for that floor.
 
 ## Done
+
+1. Document manual RubyGems publishing.
+   - Added `docs/release/publishing.md` with the current manual release path: verify version, run `./scripts/check.sh`, push and wait for CI, build the gem, `gem push`, verify RubyGems, then tag the release.
+   - Noted that the repo currently has CI but no publishing workflow.
+   - Added the trusted-publishing follow-up as an open release-readiness item.
 
 1. Create a release-readiness backlog.
    - Added this release-readiness section to track post-modernization packaging/CI hardening separately from the completed modernization and fresh-pass backlogs.
