@@ -22,7 +22,7 @@ The gate currently runs:
 
 GitHub Actions workflow: `.github/workflows/ci.yml`.
 
-It installs native headers needed by the DB gems, uses Ruby 3.4, relies on Bundler caching, and runs the same `./scripts/check.sh` gate used locally.
+It installs native headers needed by the DB gems, runs the same `./scripts/check.sh` gate used locally, and tests the maintained Ruby version range through the GitHub Actions matrix.
 
 ## Package sanity expectations
 

@@ -1,6 +1,6 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 4 done / 3 open.
+Release readiness status counts: 5 done / 2 open.
 
 ## Open
 
@@ -12,11 +12,12 @@ Release readiness status counts: 4 done / 3 open.
    - Manual publishing is documented in `docs/release/publishing.md`.
    - Future improvement: configure RubyGems trusted publishing, publish from reviewed `v*` tags, and avoid long-lived RubyGems API keys on developer machines.
 
-1. Decide and declare the supported Ruby version floor.
-   - `gem build` now warns that the gemspec does not set `required_ruby_version`.
-   - Pick the oldest Ruby version this maintained branch should support, then add the gemspec constraint and CI matrix coverage for that floor.
-
 ## Done
+
+1. Decide and declare the supported Ruby version floor.
+   - Set `spec.required_ruby_version` to `>= 3.2` in the gemspec.
+   - Updated GitHub Actions CI to test Ruby `3.2`, `3.3`, and `3.4` so the declared floor remains exercised.
+   - Updated release-readiness documentation to describe matrix coverage.
 
 1. Document manual RubyGems publishing.
    - Added `docs/release/publishing.md` with the current manual release path: verify version, run `./scripts/check.sh`, push and wait for CI, build the gem, `gem push`, verify RubyGems, then tag the release.
