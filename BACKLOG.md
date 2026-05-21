@@ -1,12 +1,19 @@
 # Moose Inventory Modernization Backlog
 
-Status counts: 9 done / 1 open.
+Status counts: 10 done / 0 open.
 
 ## Open
 
-1. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
+_No open modernization items._
 
 ## Done
+
+1. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
+   - Removed obsolete RuboCop/Guard/Coveralls tooling after confirming current `rubocop 0.93.1` fails under Ruby 3.4 with missing bundled/default gems and obsolete config entries.
+   - Kept SimpleCov as the local coverage gate because the RSpec suite still passes with 95.16% line coverage against a 90% minimum.
+   - Added `scripts/check.sh` as the stable local QA entry point for `bundle exec rspec --format progress` and documented it in the README.
+   - Updated `scripts/reports.sh` to open the remaining SimpleCov HTML report only.
+   - Verified with `bundle lock`, `scripts/check.sh`, and `git diff --check`.
 
 1. Modernize remaining stale runtime dependencies with care, especially `mysql2` and `sqlite3`.
    - `pg` has been moved to a Ruby-3.4-compatible constraint.

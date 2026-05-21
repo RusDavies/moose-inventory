@@ -52,13 +52,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'thor', '>= 1.3', '< 2'
 
   spec.add_development_dependency 'bundler', '>= 1.17', '< 3'
-  spec.add_development_dependency 'coveralls', '~> 0'
-  spec.add_development_dependency 'guard', '~> 2'
-  spec.add_development_dependency 'guard-rspec', '~> 4'
-  spec.add_development_dependency 'guard-rubocop', '~> 1'
   spec.add_development_dependency 'rake', '~> 10'
   spec.add_development_dependency 'rspec', '~> 3'
-  spec.add_development_dependency 'rubocop', '~> 0'
   spec.add_development_dependency 'simplecov', '~> 0'
 
 end
