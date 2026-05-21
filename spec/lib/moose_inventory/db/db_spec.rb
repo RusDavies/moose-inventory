@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'fileutils'
+require 'tmpdir'
 
 RSpec.describe 'Moose::Inventory::DB' do
   #=============================
@@ -101,6 +103,38 @@ RSpec.describe 'Moose::Inventory::DB' do
         @db.instance_variable_set(:@db, saved_db)
         @config._settings.clear
         @config._settings.merge!(saved_settings)
+      end
+    end
+  end
+
+  describe '.init_sqlite3()' do
+    it 'creates nested parent directories for configured database files' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+      tmpdir = Dir.mktmpdir('moose-inventory-sqlite')
+      nested_dbfile = File.join(tmpdir, 'one', 'two', 'inventory.db')
+
+      begin
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = {
+          db: {
+            adapter: 'sqlite3',
+            file: nested_dbfile,
+          },
+        }
+
+        @db.init_sqlite3
+
+        expect(File.directory?(File.dirname(nested_dbfile))).to eq(true)
+        expect(File.file?(nested_dbfile)).to eq(true)
+      ensure
+        current_db = @db.instance_variable_get(:@db)
+        current_db.disconnect if current_db.respond_to?(:disconnect)
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+        FileUtils.remove_entry(tmpdir) if tmpdir && Dir.exist?(tmpdir)
       end
     end
   end

@@ -245,6 +245,7 @@ module Moose
       #--------------------
       def self.init_sqlite3 # rubocop:disable Metrics/AbcSize
         require 'sqlite3'
+        require 'fileutils'
 
         # Quick check that expected keys are at least present & sensible
         config = Moose::Inventory::Config._settings[:config][:db]
@@ -259,7 +260,7 @@ module Moose
         # Make sure the directory exists
         dbfile = File.expand_path(config[:file])
         dbdir = File.dirname(dbfile)
-        Dir.mkdir(dbdir) unless Dir.exist?(dbdir)
+        FileUtils.mkdir_p(dbdir) unless Dir.exist?(dbdir)
 
         # Create and/or open the database file
         @db = Sequel.sqlite(dbfile)
