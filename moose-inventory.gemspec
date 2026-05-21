@@ -46,7 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'indentation', '~> 0'
   spec.add_runtime_dependency 'json', '~> 1'
   spec.add_runtime_dependency 'mysql2', '~> 0'
-  spec.add_runtime_dependency 'pg', '~> 0'
+  spec.add_runtime_dependency 'pg', '>= 1.5', '< 2'
   spec.add_runtime_dependency 'sequel', '~> 4'
   spec.add_runtime_dependency 'sqlite3', '~> 1'
   spec.add_runtime_dependency 'thor', '~> 0'

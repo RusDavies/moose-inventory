@@ -1,17 +1,15 @@
 # Moose Inventory Modernization Backlog
 
-Status counts: 4 done / 5 open.
+Status counts: 5 done / 4 open.
 
 ## Open
 
 1. Generate and commit a current `Gemfile.lock` after deciding whether to stop ignoring it.
    - `bundle lock` now resolves successfully with Bundler 2.6.9, but `Gemfile.lock` is currently ignored by `.gitignore`.
 2. Run the existing RSpec suite and record failures before changing behavior.
-3. Modernize stale runtime dependencies with care, especially `json`, `mysql2`, `pg`, `sequel`, `sqlite3`, and `thor`.
+3. Modernize remaining stale runtime dependencies with care, especially `json`, `mysql2`, `sequel`, `sqlite3`, and `thor`.
+   - `pg` has been moved to a Ruby-3.4-compatible constraint.
 4. Review old QA tooling (`rubocop ~> 0`, Guard, Coveralls/SimpleCov setup) and decide what still belongs in the project.
-5. Update the stale `pg` dependency for Ruby 3.4 compatibility.
-   - After removing `hitimes`, `bundle install` reaches `pg 0.21.0` and finds `pg_config` plus `libpq-fe.h`, but fails compiling because old `pg` calls removed Ruby API `rb_tainted_str_new`.
-   - This is a dependency age problem now, not a missing-header problem.
 
 ## Done
 
@@ -27,5 +25,8 @@ Status counts: 4 done / 5 open.
    - `hitimes 1.3.1` failed to compile against Ruby 3.4 and was only referenced as legacy development tooling.
    - Verified `bundle lock --print` no longer includes `hitimes`.
 4. Move past missing database client headers.
-   - `bundle install` now finds PostgreSQL headers/config (`pg_config`, `libpq-fe.h`).
-   - The next PostgreSQL failure is due to stale `pg 0.21.0` Ruby API usage, not missing system packages.
+   - `bundle install` now builds/installs both `mysql2` and `pg` dependencies in this environment.
+5. Update the stale `pg` dependency for Ruby 3.4 compatibility.
+   - Changed `pg` from `~> 0` to `>= 1.5, < 2`.
+   - Verified Bundler resolves `pg 1.6.3` instead of `pg 0.21.0`.
+   - Verified `bundle install` completes successfully under Ruby 3.4.8 / Bundler 2.6.9.
