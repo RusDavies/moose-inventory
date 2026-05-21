@@ -66,7 +66,7 @@ module Moose
                   fmt.warn "The group '#{g}' doesn't exist, but will be created.\n"
                   group = db.models[:group].create(name: g)
                 end
-                if !groups_ds.nil? && groups_ds[name: g].nil?
+                if !groups_ds.nil? && !groups_ds[name: g].nil?
                   fmt.warn "Association {host:#{name} <-> group:#{g}} already exists, skipping creation.\n"
                 else
                   host.add_group(group)
