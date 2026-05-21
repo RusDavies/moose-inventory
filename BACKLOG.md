@@ -1,22 +1,24 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 4 done / 4 open.
+Fresh pass status counts: 5 done / 3 open.
 
 ## Open
 
-1. Use recursive directory creation for SQLite database paths.
-   - Evidence: `init_sqlite3` uses `Dir.mkdir(dbdir)`, which fails when the configured DB file is inside nested missing directories.
-   - Replace with `FileUtils.mkdir_p(dbdir)` and add coverage for nested SQLite paths.
-2. Harden YAML config loading.
+1. Harden YAML config loading.
    - Evidence: config loading uses `YAML.load_file`; switch to `YAML.safe_load_file` or equivalent with explicit permitted classes, then verify current config examples still work.
-3. Add adapter/error-path smoke tests to the stable QA gate.
+2. Add adapter/error-path smoke tests to the stable QA gate.
    - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
    - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-4. Refresh user-facing docs and setup scripts after DB support decisions.
+3. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Use recursive directory creation for SQLite database paths.
+   - Replaced single-level `Dir.mkdir` with `FileUtils.mkdir_p` in `init_sqlite3`.
+   - Added regression coverage for nested SQLite database file paths.
+   - Verified with full `./scripts/check.sh`.
 
 1. Fix existing-host group association logic in `host add --groups`.
    - Fixed the association-existence condition so existing hosts can be associated with new groups and true duplicate associations are skipped with the existing warning.
