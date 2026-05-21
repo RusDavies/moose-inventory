@@ -1,28 +1,30 @@
 # Moose Inventory Fresh Pass Backlog
 
-Fresh pass status counts: 2 done / 6 open.
+Fresh pass status counts: 3 done / 5 open.
 
 ## Open
 
-1. Fix or de-scope PostgreSQL support.
-   - Evidence: `README.md` documents `adapter: postgresql`, but `DB.connect` calls missing method `init_postgresql`, producing `NameError`.
-   - Decide whether to implement `Sequel.postgres` support with tests or explicitly remove PostgreSQL from docs/dependencies.
-2. Fix existing-host group association logic in `host add --groups`.
+1. Fix existing-host group association logic in `host add --groups`.
    - Evidence: adding an existing host to a new group creates the group but does not associate it; the warning says the association already exists when `groups_ds[name: g]` is actually nil.
    - Add regression coverage for adding new groups to an existing host and for idempotently skipping already-existing associations.
-3. Use recursive directory creation for SQLite database paths.
+2. Use recursive directory creation for SQLite database paths.
    - Evidence: `init_sqlite3` uses `Dir.mkdir(dbdir)`, which fails when the configured DB file is inside nested missing directories.
    - Replace with `FileUtils.mkdir_p(dbdir)` and add coverage for nested SQLite paths.
-4. Harden YAML config loading.
+3. Harden YAML config loading.
    - Evidence: config loading uses `YAML.load_file`; switch to `YAML.safe_load_file` or equivalent with explicit permitted classes, then verify current config examples still work.
-5. Add adapter/error-path smoke tests to the stable QA gate.
+4. Add adapter/error-path smoke tests to the stable QA gate.
    - Cover unsupported adapters, missing config keys, nested SQLite paths, MySQL dispatch behavior, and PostgreSQL behavior/de-scope.
    - This should prevent the currently documented DB modes from rotting silently while the SQLite happy path stays green.
-6. Refresh user-facing docs and setup scripts after DB support decisions.
+5. Refresh user-facing docs and setup scripts after DB support decisions.
    - Evidence: README has stale typos and claims (`postresql`, `postresql-devel`, line-wrapped `native`), `scripts/install_dependencies.sh` references old Fedora package names such as `mysql-utilities`, and docs still advertise DB adapters that are not green.
    - Update README, install script, and examples to match the support matrix established above.
 
 ## Done
+
+1. Fix or de-scope PostgreSQL support.
+   - Implemented `init_postgresql` using the existing `pg` dependency and `Sequel.postgres`.
+   - Added regression coverage for PostgreSQL connection option wiring without requiring a live PostgreSQL server.
+   - Verified with full `./scripts/check.sh`.
 
 1. Fix MySQL adapter support or remove it from advertised support.
    - Fixed `DB.connect` to dispatch documented `adapter: mysql` instead of misspelled `msqsql`.

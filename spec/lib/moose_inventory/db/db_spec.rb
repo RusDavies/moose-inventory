@@ -139,6 +139,40 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
   end
 
+  describe '.init_postgresql()' do
+    it 'uses the postgres Sequel adapter with configured connection settings' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+      postgresql_config = {
+        adapter: 'postgresql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        user: 'moose',
+        password: 'secret',
+      }
+
+      begin
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: postgresql_config }
+
+        expect(Sequel).to receive(:postgres).with(
+          user: 'moose',
+          password: 'secret',
+          host: 'localhost',
+          database: 'moose_inventory_test'
+        ).and_return(:postgresql_connection)
+
+        @db.init_postgresql
+        expect(@db.db).to eq(:postgresql_connection)
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+      end
+    end
+  end
+
   describe '.db' do
     it 'should be responsive' do
       expect(@db.respond_to?(:db)).to eq(true)
