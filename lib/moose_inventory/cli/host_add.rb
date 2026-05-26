@@ -4,6 +4,7 @@ require 'indentation'
 
 require_relative './formatter.rb'
 require_relative '../db/exceptions.rb'
+require_relative '../operations/add_hosts.rb'
 
 module Moose
   module Inventory
@@ -30,49 +31,9 @@ module Moose
           # Sanity
           abort_if_automatic_group(groups)
 
-          # Process
-          db.transaction do # Transaction start
-            fmt.reset_indent
-
-            names.each do |name|
-              puts "Add host '#{name}':"
-              fmt.puts 2, "- Creating host '#{name}'..."
-              host = db.models[:host].find(name: name)
-              groups_ds = nil
-              if host.nil?
-                host = db.models[:host].create(name: name)
-              else
-                fmt.warn "The host '#{name}' already exists, skipping creation.\n"
-                groups_ds = host.groups_dataset
-              end
-              fmt.puts 4, '- OK'
-
-              groups.each do |g|
-                next if g.nil? || g.empty?
-                fmt.puts 2, "- Adding association {host:#{name} <-> group:#{g}}..."
-                group = db.models[:group].find(name: g)
-                if group.nil?
-                  fmt.warn "The group '#{g}' doesn't exist, but will be created.\n"
-                  group = db.models[:group].create(name: g)
-                end
-                if association_exists?(groups_ds, g)
-                  fmt.warn "Association {host:#{name} <-> group:#{g}} already exists, skipping creation.\n"
-                else
-                  host.add_group(group)
-                end
-                fmt.puts 4, '- OK'
-              end
-
-              # Handle the automatic 'ungrouped' group
-              groups_ds = host.groups_dataset
-              if !groups_ds.nil? && groups_ds.count == 0
-                fmt.puts 2, "- Adding automatic association {host:#{name} <-> group:ungrouped}..."
-                host.add_group(automatic_group)
-                fmt.puts 4, '- OK'
-              end
-              fmt.puts 2, '- All OK'
-            end
-          end # Transaction end
+          Moose::Inventory::Operations::AddHosts
+            .new(db: db, formatter: fmt)
+            .call(names: names, groups: groups)
           puts 'Succeeded'
         end
       end
