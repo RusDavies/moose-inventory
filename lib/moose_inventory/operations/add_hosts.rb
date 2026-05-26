@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moose
   module Inventory
     module Operations
@@ -9,7 +11,7 @@ module Moose
       # inventory behavior easier to exercise without binding every domain test
       # to progress text.
       class AddHosts
-        AUTOMATIC_GROUP = 'ungrouped'.freeze
+        AUTOMATIC_GROUP = 'ungrouped'
         Event = Struct.new(:type, :payload, keyword_init: true)
         Result = Struct.new(:events, keyword_init: true)
 
@@ -84,7 +86,7 @@ module Moose
 
         def add_automatic_group_if_needed(host, host_name, events)
           groups_dataset = host.groups_dataset
-          return if groups_dataset.nil? || groups_dataset.count != 0
+          return if groups_dataset.nil? || groups_dataset.any?
 
           emit(events, :adding_automatic_group, host: host_name, group: AUTOMATIC_GROUP)
           host.add_group(automatic_group)

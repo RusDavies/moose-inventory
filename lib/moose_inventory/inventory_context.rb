@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moose
   module Inventory
     ##
@@ -6,14 +8,14 @@ module Moose
     # This gives new operation/service objects a small inventory-facing seam
     # without forcing the legacy CLI to stop using the DB singleton all at once.
     class InventoryContext
-      AUTOMATIC_GROUP = 'ungrouped'.freeze
+      AUTOMATIC_GROUP = 'ungrouped'
 
       def initialize(db: Moose::Inventory::DB)
         @db = db
       end
 
-      def transaction(&block)
-        db.transaction(&block)
+      def transaction(&)
+        db.transaction(&)
       end
 
       def find_host(name)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe Moose::Inventory::Operations::AddHosts do
@@ -5,7 +7,7 @@ RSpec.describe Moose::Inventory::Operations::AddHosts do
     @mockargs = [
       '--config', File.join(spec_root, 'config/config.yml'),
       '--format', 'yaml',
-      '--env', 'test',
+      '--env', 'test'
     ]
 
     Moose::Inventory::Config.init(@mockargs)
