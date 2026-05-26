@@ -52,7 +52,7 @@ Reviewed security-relevant surfaces and changes since the prior audit:
 - Impact: a release tag created from an unexpected commit or during a tooling/path issue could publish without the same dedicated SCA/secret-scan enforcement as CI.
 - Fix applied: release workflow now sets up Go with cache disabled, installs the pinned security CLIs via `scripts/ci/install_security_tools.sh`, runs native dependency installation with a 5-minute timeout, and runs `./scripts/check.sh` with `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1`.
 - Verification: full local required-tool gate passed after the workflow change.
-- Residual risk: release workflow can only be fully proven on the next real release tag because already-published `v1.0.9` must not be retagged.
+- Residual risk after later verification: trusted publishing was proven on release tag `v2.0`, but the workflow still has a false-negative path where post-publish waiting can fail if the RubyGems full index lags even after a successful publish.
 
 ## Reviewed areas with no actionable finding
 
@@ -68,7 +68,7 @@ Reviewed security-relevant surfaces and changes since the prior audit:
 - This was a local/source and CI/release workflow audit, not an active test against live external databases or RubyGems publishing.
 - GitHub code scanning is not configured, so there were no CodeQL/code-scanning results to review.
 - GitHub secret scanning is disabled for the repository; local `gitleaks` coverage was used instead.
-- The release trusted-publishing path still needs verification on the next real version tag.
+- The release trusted-publishing path was later verified on `v2.0`; the remaining limitation is that workflow success/failure still depends on RubyGems full-index propagation timing.
 
 ## Conclusion
 

@@ -65,6 +65,8 @@ The release workflow requires the GitHub environment name `release`. If that env
 
 The workflow verifies that the pushed tag version matches `Moose::Inventory::VERSION`, runs `./scripts/check.sh`, builds the gem through `rubygems/release-gem@v1`, and publishes using RubyGems trusted publishing/OIDC. No RubyGems API key should be stored in GitHub secrets for this workflow.
 
+Trusted-publishing verification was completed with release tag `v2.0` / gem version `2.0`. The gem published successfully to RubyGems via OIDC, but the workflow still finished red because the post-publish `rubygems-await` step timed out waiting for the RubyGems full index even though the gem was already available through the API/install path. Treat that as a workflow false-negative and fix the await behavior before assuming future red release runs mean publish failure.
+
 ## Verify the published version
 
 After the workflow succeeds:
