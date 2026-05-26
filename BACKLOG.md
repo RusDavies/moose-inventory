@@ -225,13 +225,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 6 done / 0 open.
+Code quality status counts: 7 done / 1 open.
 
 ## Open
 
-_No open code quality items._
+1. Extract the shared host/group dissociation flow behind `host rmgroup` and `group rmhost`.
+   - Mirror the new association-operation seam so removal logic, duplicate/missing checks, automatic `ungrouped` reattachment, and rendering stay decoupled.
+
 
 ## Done
+
+1. Extract the shared host/group association flow behind `host addgroup` and `group addhost`.
+   - Added `Moose::Inventory::Operations::AddAssociations` to own the shared association, auto-create, duplicate-check, and `ungrouped` removal behavior for existing primary entities.
+   - Converted `host addgroup` and `group addhost` into thinner adapters that retrieve the primary entity, delegate through `InventoryContext`, and render structured operation events.
+   - Added direct operation specs and expanded the targeted RuboCop gate to cover the new operation plus both adapter commands.
+   - Verified with focused specs and full `./scripts/check.sh`.
 
 1. Extract `group add` into the operation/context/event pattern.
    - Added `Moose::Inventory::Operations::AddGroups` with structured result/events and warning counts, mirroring the `host add` refactor pattern.
