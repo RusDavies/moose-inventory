@@ -1,5 +1,6 @@
 require 'thor'
 require_relative './formatter.rb'
+require_relative './helpers.rb'
 
 module Moose
   module Inventory
@@ -7,6 +8,8 @@ module Moose
       ##
       # Class implementing the "group" methods of the CLI
       class Group < Thor
+        include Moose::Inventory::Cli::Helpers
+
         require_relative 'group_add'
         require_relative 'group_get'
         require_relative 'group_list'

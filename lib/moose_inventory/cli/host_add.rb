@@ -18,28 +18,17 @@ module Moose
         # rubocop:disable Metrics/LineLength
         def add(*argv) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           # rubocop:enable Metrics/LineLength
-          if argv.empty?
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more.")
-          end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_missing_args(argv, 1, '1 or more')
 
           # Arguments
-          names = argv.uniq.map(&:downcase)
+          names = normalize_names(argv)
 
           # split(/\W+/) splits on hyphens too, which is not what we want
           # groups = options[:groups].downcase.split(/\W+/).uniq
-          options[:groups].nil? && options[:groups] = ''
-          groups = options[:groups].downcase.split(',').uniq
+          groups = csv_option_names(options[:groups])
 
           # Sanity
-          if groups.include?('ungrouped')
-            abort('ERROR: Cannot manually manipulate '\
-              "the automatic group 'ungrouped'.")
-          end
+          abort_if_automatic_group(groups)
 
           # Process
           db.transaction do # Transaction start
@@ -66,7 +55,7 @@ module Moose
                   fmt.warn "The group '#{g}' doesn't exist, but will be created.\n"
                   group = db.models[:group].create(name: g)
                 end
-                if !groups_ds.nil? && !groups_ds[name: g].nil?
+                if association_exists?(groups_ds, g)
                   fmt.warn "Association {host:#{name} <-> group:#{g}} already exists, skipping creation.\n"
                 else
                   host.add_group(group)
@@ -78,8 +67,7 @@ module Moose
               groups_ds = host.groups_dataset
               if !groups_ds.nil? && groups_ds.count == 0
                 fmt.puts 2, "- Adding automatic association {host:#{name} <-> group:ungrouped}..."
-                ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
-                host.add_group(ungrouped)
+                host.add_group(automatic_group)
                 fmt.puts 4, '- OK'
               end
               fmt.puts 2, '- All OK'

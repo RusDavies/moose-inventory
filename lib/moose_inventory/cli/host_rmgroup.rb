@@ -16,24 +16,14 @@ module Moose
         # rubocop:disable Metrics/LineLength
         def rmgroup(*args) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
           # rubocop:enable Metrics/LineLength
-          if args.length < 2
-            abort('ERROR: Wrong number of arguments, '\
-                  "#{args.length} for 2 or more.")
-          end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_missing_args(args, 2, '2 or more')
 
           # arguments
           name   = args[0].downcase
-          groups = args.slice(1, args.length - 1).uniq.map(&:downcase)
+          groups = normalize_names(args.slice(1, args.length - 1))
 
           # Sanity
-          if groups.include?('ungrouped')
-            abort 'ERROR: Cannot manually manipulate the automatic '\
-              'group \'ungrouped\'.'
-          end
+          abort_if_automatic_group(groups)
 
           # Transaction
           db.transaction do # Transaction start
@@ -52,7 +42,7 @@ module Moose
               fmt.puts 2, "- Remove association {host:#{name} <-> group:#{g}}..."
 
               # Check against existing associations
-              if groups_ds[name: g].nil?
+              unless association_exists?(groups_ds, g)
                 fmt.warn "Association {host:#{name} <-> group:#{g}} doesn't exist, skipping.\n"
                 fmt.puts 4, "- Doesn't exist, skipping."
               else
@@ -63,13 +53,12 @@ module Moose
             end
 
             # Handle 'ungrouped' group automation
-            if host.groups_dataset.count == 0
-              fmt.puts 2, '- Add automatic association '\
+            add_automatic_group_to_host_if_no_groups(
+              host,
+              indent: 2,
+              message: '- Add automatic association '\
                 "{host:#{name} <-> group:ungrouped}..."
-              ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
-              host.add_group(ungrouped) unless ungrouped.nil?
-              fmt.puts 4, '- OK'
-            end
+            )
             fmt.puts 2, '- All OK'
           end # End transaction
           puts 'Succeeded'

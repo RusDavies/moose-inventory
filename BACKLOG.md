@@ -74,16 +74,18 @@ Release readiness status counts: 12 done / 1 open.
 
 # Moose Inventory GitHub Issues Backlog
 
-GitHub issues status counts: 3 done / 1 open.
+GitHub issues status counts: 4 done / 0 open.
 
 ## Open
 
-1. [#13 Need to refactor](https://github.com/RusDavies/moose-inventory/issues/13)
-   - CLI command modules contain similar methods across host/group operations, for example `GroupAdd` and `HostAdd`-style flows.
-   - Existing code has historically needed complexity metric disables such as `Metrics/AbcSize` and `Metrics/CyclomaticComplexity`.
-   - Evaluate cost/benefit before doing a broad refactor; identify specific low-risk extraction targets and regression coverage needed.
+_No open GitHub issue items._
 
 ## Done
+
+1. [#13 Need to refactor](https://github.com/RusDavies/moose-inventory/issues/13)
+   - Added shared `Moose::Inventory::Cli::Helpers` for command argument validation, name normalization, CSV option parsing, automatic `ungrouped` validation, association checks, and automatic group membership maintenance.
+   - Refactored representative host/group association commands to use the helper layer while preserving existing CLI output and behavior.
+   - Verified with focused CLI specs and full `./scripts/check.sh`.
 
 1. [#12 Allow `group rm` to recursively delete orphaned child groups](https://github.com/RusDavies/moose-inventory/issues/12)
    - Kept default deletion conservative: `group rm NAME` removes only the named group and preserves child groups as root groups.
@@ -218,3 +220,31 @@ _No open modernization items._
    - Ansible-mode CLI specs now pass the fixture config when invoking the top-level CLI.
    - Updated the `--list` expectation for Ansible mode, which correctly includes empty `hosts` arrays.
    - Verified `bundle exec rspec --format documentation`: 242 examples, 0 failures; line coverage 95.16%.
+
+---
+
+# Moose Inventory Code Quality Backlog
+
+Code quality status counts: 1 done / 4 open.
+
+## Open
+
+1. Extract domain operation/service objects behind the Thor commands.
+   - Candidate operations: add host, add group, associate host/groups, dissociate host/groups, remove group, remove group child.
+   - Keep the current CLI output stable while moving business rules out of Thor classes.
+
+1. Introduce an inventory context or repository facade around DB access.
+   - Start as a wrapper over the existing DB singleton, then use it to reduce direct `Moose::Inventory::DB` coupling in command code.
+
+1. Separate structured operation results from CLI rendering.
+   - Have domain operations return events/results, then let the CLI formatter render progress/warnings.
+   - This should make behavior tests less dependent on exact progress text where domain behavior is the real concern.
+
+1. Reintroduce a small modern lint/complexity gate.
+   - Prefer a targeted RuboCop config for new/refactored code first, rather than forcing the whole inherited codebase through a style grinder in one pass.
+
+## Done
+
+1. Extract shared CLI helpers for low-risk issue #13 refactor.
+   - Added helper methods for common validation, normalization, association checks, and automatic `ungrouped` membership handling.
+   - Refactored selected host/group CLI commands without changing user-visible output.

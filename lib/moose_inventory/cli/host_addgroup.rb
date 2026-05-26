@@ -16,24 +16,14 @@ module Moose
         def addgroup(*args) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
           # rubocop:enable Metrics/LineLength
           # Sanity
-          if args.length < 2
-            abort('ERROR: Wrong number of arguments, '\
-              "#{args.length} for 2 or more.")
-          end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_missing_args(args, 2, '2 or more')
 
           # Arguments
           name   = args[0].downcase
-          groups = args.slice(1, args.length - 1).uniq.map(&:downcase)
+          groups = normalize_names(args.slice(1, args.length - 1))
 
           # Sanity
-          if groups.include?('ungrouped')
-            abort 'ERROR: Cannot manually manipulate the automatic '\
-              'group \'ungrouped\'.'
-          end
+          abort_if_automatic_group(groups)
 
           # Transaction
           db.transaction do # Transaction start
@@ -53,7 +43,7 @@ module Moose
               fmt.puts 2,  "- Add association {host:#{name} <-> group:#{g}}..."
 
               # Check against existing associations
-              if !groups_ds[name: g].nil?
+              if association_exists?(groups_ds, g)
                 fmt.warn "Association {host:#{name} <-> group:#{g}} already exists, skipping."
                 fmt.puts 4, '- Already exists, skipping.'
               else
@@ -71,13 +61,12 @@ module Moose
             end
 
             # Handle 'ungrouped' group automation
-            unless groups_ds[name: 'ungrouped'].nil?
-              fmt.puts 2, '- Remove automatic association '\
+            remove_automatic_group_from_host(
+              host,
+              indent: 2,
+              message: '- Remove automatic association '\
                 "{host:#{name} <-> group:ungrouped}..."
-              ungrouped = db.models[:group].find(name: 'ungrouped')
-              host.remove_group(ungrouped) unless ungrouped.nil?
-              fmt.puts 4, '- OK'
-            end
+            )
             fmt.puts 2, '- All OK'
           end # Transaction end
           puts 'Succeeded'

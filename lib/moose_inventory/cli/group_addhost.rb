@@ -12,23 +12,14 @@ module Moose
              'Associate a host HOSTNAME with the group NAME'
         def addhost(*args) # rubocop:disable Metrics/AbcSize
           # Sanity
-          if args.length < 2
-            abort("ERROR: Wrong number of arguments, #{args.length} "\
-              'for 2 or more.')
-          end
+          abort_if_missing_args(args, 2, '2 or more')
 
           # Arguments
           name  = args[0].downcase
-          hosts = args.slice(1, args.length - 1).uniq.map(&:downcase)
+          hosts = normalize_names(args.slice(1, args.length - 1))
 
           # Sanity
-          if name == 'ungrouped'
-            abort("ERROR: Cannot manually manipulate the automatic group 'ungrouped'.")
-          end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_automatic_group([name])
 
           # Transaction
           warn_count = 0
@@ -42,13 +33,12 @@ module Moose
               fmt.puts 4, '- OK'
 
               # Associate group with the hosts
-              ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
               hosts_ds = group.hosts_dataset
               hosts.each do |h|
                 fmt.puts 2, "- add association {group:#{name} <-> host:#{h}}..."
 
                 # Check against existing associations
-                unless hosts_ds[name: h].nil?
+                if association_exists?(hosts_ds, h)
                   warn_count += 1
                   fmt.warn "Association {group:#{name} <-> host:#{h}} already"\
                     " exists, skipping.\n"
@@ -71,11 +61,12 @@ module Moose
                 fmt.puts 4, '- OK'
 
                 # Remove the host from the ungrouped group, if necessary
-                next if host.groups_dataset[name: 'ungrouped'].nil?
-                fmt.puts 2, '- remove automatic association '\
-                  "{group:ungrouped <-> host:#{h}}..."
-                host.remove_group(ungrouped)
-                fmt.puts 4, '- OK'
+                remove_automatic_group_from_host(
+                  host,
+                  indent: 2,
+                  message: '- remove automatic association '\
+                    "{group:ungrouped <-> host:#{h}}..."
+                )
               end
               fmt.puts 2, '- all OK'
             end # Transaction end
