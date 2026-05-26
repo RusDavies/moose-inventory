@@ -56,7 +56,7 @@ moose_ops:
     host:     "localhost"
     database: "water"
     user:     "duck"
-    password: "quack"
+    password_env: "MOOSE_INVENTORY_MYSQL_PASSWORD"
 
 another_example_section:
   db:
@@ -64,7 +64,7 @@ another_example_section:
     host:     "localhost"
     database: "grass"
     user:     "cow"
-    password: "moo"
+    password_env: "MOOSE_INVENTORY_POSTGRES_PASSWORD"
 
 ```
 
@@ -78,7 +78,16 @@ At present,  each environment section contains only a **db** subsection, describ
 
 Each **db** section must include an **adapter** parameter. Currently supported adapter types are *sqlite3*, *mysql*, and *postgresql*. The test suite exercises SQLite with a local database file and includes adapter dispatch/error-path smoke coverage for MySQL and PostgreSQL without requiring live database servers.
 
-Additional parameters are also required in the **db** subsection, depending on the adapter type. For the *sqlite3* adapter only a **file** parameter is required; parent directories are created automatically. For both *mysql* and *postgresql*, **host**, **database**, **user**, and **password** are required.
+Additional parameters are also required in the **db** subsection, depending on the adapter type. For the *sqlite3* adapter only a **file** parameter is required; parent directories are created automatically. For both *mysql* and *postgresql*, **host**, **database**, **user**, and either **password_env** or **password** are required.
+
+Prefer **password_env** for MySQL and PostgreSQL configuration. Its value is the name of an environment variable that contains the database password, which keeps reusable configuration files from carrying plaintext credentials:
+
+```sh
+export MOOSE_INVENTORY_MYSQL_PASSWORD='use-a-real-secret-here'
+moose-inventory --env moose_ops host list
+```
+
+The older **password** key is still supported for compatibility, but avoid committing configuration files that contain database passwords. If you must use **password**, keep that configuration file outside version control and restrict its file permissions.
 
 
 ## Usage
@@ -382,7 +391,6 @@ The check script runs the RSpec suite and enforces the SimpleCov coverage minimu
 
 
     
-
 
 
 

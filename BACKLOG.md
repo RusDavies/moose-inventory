@@ -41,15 +41,9 @@ Release readiness status counts: 5 done / 2 open.
 
 # Moose Inventory GitHub Issues Backlog
 
-GitHub issues status counts: 0 done / 4 open.
+GitHub issues status counts: 1 done / 3 open.
 
 ## Open
-
-1. [#14 Passwords in config files](https://github.com/RusDavies/moose-inventory/issues/14)
-   - README examples currently show database passwords stored directly in configuration files.
-   - Determine whether Moose Inventory supports reading credentials from environment variables today.
-   - If not, decide whether to add environment-variable credential support or at least document safer credential-handling guidance.
-   - Update README/config examples so they do not accidentally encourage secret-in-repo bad practice.
 
 1. [#13 Need to refactor](https://github.com/RusDavies/moose-inventory/issues/13)
    - CLI command modules contain similar methods across host/group operations, for example `GroupAdd` and `HostAdd`-style flows.
@@ -67,7 +61,11 @@ GitHub issues status counts: 0 done / 4 open.
 
 ## Done
 
-_No GitHub issue backlog items completed yet._
+1. [#14 Passwords in config files](https://github.com/RusDavies/moose-inventory/issues/14)
+   - Added `password_env` support for MySQL and PostgreSQL database configuration while preserving the existing `password` key for compatibility.
+   - Added regression coverage for missing password configuration, unset password environment variables, and environment-backed MySQL/PostgreSQL connection passwords.
+   - Updated README examples to use `password_env` instead of plaintext sample passwords and added credential-handling guidance.
+   - Verified with full `./scripts/check.sh`.
 
 ---
 
