@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'fileutils'
 require 'tmpdir'
@@ -5,17 +7,23 @@ require 'tmpdir'
 RSpec.describe 'Moose::Inventory::DB' do
   def with_db_config(db_config)
     saved_db = @db.instance_variable_get(:@db)
+    saved_models = @db.instance_variable_get(:@models)
+    saved_exceptions = @db.instance_variable_get(:@exceptions)
     saved_settings = @config._settings.dup
 
     begin
-      @db.instance_variable_set(:@db, nil)
+      @db.reset_runtime_state
+      @db.init_exceptions
       @config._settings.clear
       @config._settings[:config] = { db: db_config }
       yield
     ensure
       current_db = @db.instance_variable_get(:@db)
       current_db.disconnect if current_db.respond_to?(:disconnect)
+      @db.reset_runtime_state
       @db.instance_variable_set(:@db, saved_db)
+      @db.instance_variable_set(:@models, saved_models)
+      @db.instance_variable_set(:@exceptions, saved_exceptions)
       @config._settings.clear
       @config._settings.merge!(saved_settings)
     end
@@ -28,9 +36,9 @@ RSpec.describe 'Moose::Inventory::DB' do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -69,29 +77,12 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
 
     it 'raises a Moose DB exception for unsupported adapters' do
-      saved_db = @db.instance_variable_get(:@db)
-      saved_models = @db.instance_variable_get(:@models)
-      saved_exceptions = @db.instance_variable_get(:@exceptions)
-      saved_settings = @config._settings.dup
-
-      begin
-        @db.instance_variable_set(:@db, nil)
-        @db.instance_variable_set(:@models, nil)
-        @db.instance_variable_set(:@exceptions, nil)
-        @config._settings.clear
-        @config._settings[:config] = { db: { adapter: 'unsupported' } }
-
+      with_db_config(adapter: 'unsupported') do
         expect { @db.init }.to raise_error(
           Moose::Inventory::DB::MooseDBException,
           /database adapter unsupported is not yet supported/
         )
         expect(@db.exceptions[:moose]).to eq(Moose::Inventory::DB::MooseDBException)
-      ensure
-        @db.instance_variable_set(:@db, saved_db)
-        @db.instance_variable_set(:@models, saved_models)
-        @db.instance_variable_set(:@exceptions, saved_exceptions)
-        @config._settings.clear
-        @config._settings.merge!(saved_settings)
       end
     end
   end
@@ -99,6 +90,28 @@ RSpec.describe 'Moose::Inventory::DB' do
   describe '.init_exceptions()' do
     it 'is responsive' do
       expect(@db.respond_to?(:init_exceptions)).to eq(true)
+    end
+  end
+
+  describe '.reset_runtime_state()' do
+    it 'clears cached db, models, and exceptions' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_models = @db.instance_variable_get(:@models)
+      saved_exceptions = @db.instance_variable_get(:@exceptions)
+
+      @db.instance_variable_set(:@db, :fake_db)
+      @db.instance_variable_set(:@models, { fake: true })
+      @db.instance_variable_set(:@exceptions, { fake: true })
+
+      @db.reset_runtime_state
+
+      expect(@db.db).to be_nil
+      expect(@db.models).to be_nil
+      expect(@db.exceptions).to be_nil
+
+      @db.instance_variable_set(:@db, saved_db)
+      @db.instance_variable_set(:@models, saved_models)
+      @db.instance_variable_set(:@exceptions, saved_exceptions)
     end
   end
 
@@ -146,18 +159,20 @@ RSpec.describe 'Moose::Inventory::DB' do
 
     it 'creates nested parent directories for configured database files' do
       saved_db = @db.instance_variable_get(:@db)
+      saved_models = @db.instance_variable_get(:@models)
+      saved_exceptions = @db.instance_variable_get(:@exceptions)
       saved_settings = @config._settings.dup
       tmpdir = Dir.mktmpdir('moose-inventory-sqlite')
       nested_dbfile = File.join(tmpdir, 'one', 'two', 'inventory.db')
 
       begin
-        @db.instance_variable_set(:@db, nil)
+        @db.reset_runtime_state
         @config._settings.clear
         @config._settings[:config] = {
           db: {
             adapter: 'sqlite3',
-            file: nested_dbfile,
-          },
+            file: nested_dbfile
+          }
         }
 
         @db.init_sqlite3
@@ -167,7 +182,10 @@ RSpec.describe 'Moose::Inventory::DB' do
       ensure
         current_db = @db.instance_variable_get(:@db)
         current_db.disconnect if current_db.respond_to?(:disconnect)
+        @db.reset_runtime_state
         @db.instance_variable_set(:@db, saved_db)
+        @db.instance_variable_set(:@models, saved_models)
+        @db.instance_variable_set(:@exceptions, saved_exceptions)
         @config._settings.clear
         @config._settings.merge!(saved_settings)
         FileUtils.remove_entry(tmpdir) if tmpdir && Dir.exist?(tmpdir)
@@ -207,13 +225,13 @@ RSpec.describe 'Moose::Inventory::DB' do
     it 'uses a mysql password from the configured environment variable' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
-      saved_password = ENV['MOOSE_INVENTORY_MYSQL_PASSWORD']
+      saved_password = ENV.fetch('MOOSE_INVENTORY_MYSQL_PASSWORD', nil)
       mysql_config = {
         adapter: 'mysql',
         host: 'localhost',
         database: 'moose_inventory_test',
         user: 'moose',
-        password_env: 'MOOSE_INVENTORY_MYSQL_PASSWORD',
+        password_env: 'MOOSE_INVENTORY_MYSQL_PASSWORD'
       }
 
       begin
@@ -251,7 +269,7 @@ RSpec.describe 'Moose::Inventory::DB' do
         host: 'localhost',
         database: 'moose_inventory_test',
         user: 'moose',
-        password: 'secret',
+        password: 'secret'
       }
 
       begin
@@ -292,7 +310,7 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
 
     it 'raises a Moose DB exception when password_env points to an unset variable' do
-      saved_password = ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD']
+      saved_password = ENV.fetch('MOOSE_INVENTORY_POSTGRES_PASSWORD', nil)
       ENV.delete('MOOSE_INVENTORY_POSTGRES_PASSWORD')
 
       begin
@@ -316,13 +334,13 @@ RSpec.describe 'Moose::Inventory::DB' do
     it 'uses a postgresql password from the configured environment variable' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
-      saved_password = ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD']
+      saved_password = ENV.fetch('MOOSE_INVENTORY_POSTGRES_PASSWORD', nil)
       postgresql_config = {
         adapter: 'postgresql',
         host: 'localhost',
         database: 'moose_inventory_test',
         user: 'moose',
-        password_env: 'MOOSE_INVENTORY_POSTGRES_PASSWORD',
+        password_env: 'MOOSE_INVENTORY_POSTGRES_PASSWORD'
       }
 
       begin
@@ -360,7 +378,7 @@ RSpec.describe 'Moose::Inventory::DB' do
         host: 'localhost',
         database: 'moose_inventory_test',
         user: 'moose',
-        password: 'secret',
+        password: 'secret'
       }
 
       begin
@@ -455,7 +473,6 @@ RSpec.describe 'Moose::Inventory::DB' do
       # Reset the DB
       @db.reset
 
-      #
       hosts = @db.models[:host].all
       expect(hosts.count).to eq(0)
 
@@ -505,7 +522,7 @@ RSpec.describe 'Moose::Inventory::DB' do
           count[:items] = count[:items] + 1
           @db.models[:host].create(name: "rollback-#{count[:items]}")
         end
-        fail Sequel::Rollback, 'Test error' #
+        raise Sequel::Rollback, 'Test error'
       end
 
       hosts = @db.models[:host].all
@@ -524,7 +541,7 @@ RSpec.describe 'Moose::Inventory::DB' do
       begin
         actual = runner do
           @db.transaction do
-            fail @db.exceptions[:moose], 'Trace regression target'
+            raise @db.exceptions[:moose], 'Trace regression target'
           end
         end
       ensure
@@ -546,7 +563,7 @@ RSpec.describe 'Moose::Inventory::DB' do
       begin
         actual = runner do
           @db.transaction do
-            fail @db.exceptions[:moose], 'Trace regression target'
+            raise @db.exceptions[:moose], 'Trace regression target'
           end
         end
       ensure

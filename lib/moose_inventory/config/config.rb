@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Configuration
 
 require 'yaml'
@@ -11,16 +13,15 @@ module Moose
       extend self
       # rubocop:enable Style/ModuleFunction
 
-      @_argv     = []
+      @_argv = []
       @_confopts = {}
       @_settings = {}
 
-      attr_reader :_argv
-      attr_reader :_confopts
-      attr_reader :_settings
+      attr_reader :_argv, :_confopts, :_settings
 
       #----------------------
       def self.init(args)
+        reset_runtime_state
         @_argv = args.dup
 
         top_level_help
@@ -28,6 +29,16 @@ module Moose
         ansible_args
         resolve_config_file
         load
+      end
+
+      def self.reset_runtime_state
+        @_argv = []
+        @_confopts = default_confopts
+        @_settings = {}
+      end
+
+      def self.default_confopts
+        { env: '', format: 'json', ansible: false, trace: false }
       end
 
       #----------------------
@@ -51,50 +62,26 @@ module Moose
         # -- trace       => Enable more complete exceptions for db transactions
         #                   Default is not to trace.
 
-        @_confopts = { env: '', format: 'json', ansible: false, trace: false }
-
-        # Check for two-part flags
-        %w(config env format).each do |var|
-          @_argv.each_with_index do |val, index|
-            next if val != "--#{var}"
-            @_confopts[var.to_sym] = @_argv[index + 1]
-            1.downto(0) { |offset| @_argv.delete_at(index + offset) }
-            break
-          end
-        end
-
-        # Check for one-part flags
-        %w(ansible trace).each do |var|
-          @_argv.each_with_index do |val, index|
-            next if val != "--#{var}"
-            @_confopts[var.to_sym] = true
-            @_argv.delete_at(index)
-            break
-          end
-        end
-
-        # Sanity
-        # - Ansible output format must be json - pjson is permitted, but yaml is not.
-        if @_confopts[:ansible] == true
-          unless @_confopts[:format] =~ /p|pjson|j|json/
-            @_confopts[:format] = 'json'
-          end
-        end
+        extract_value_flags(%w[config env format])
+        extract_boolean_flags(%w[ansible trace])
+        normalize_ansible_format!
       end
 
       #----------------------
       def self.top_level_help
-        if @_argv[0] == 'help'
-          puts 'Global flags:'
-          printf '  %-31s %-10s', '--ansible', "# Force Ansible mode (automatically set when using ansible flags)\n"
-          printf '  %-31s %-10s', '--config FILE', "# Specifies a configuration file to use\n"
-          printf '  %-31s %-10s', '--env ENV', "# Specifies the environment section of the config to use\n"
-          printf '  %-31s %-10s', '--format yaml|json|pjson', "# Format for the output of 'get', 'list', and 'listvars' subcommands\n"
-          printf '  %-31s %-10s', '--trace', "# Enable more complete exception dumps for database transactions\n"
-          puts "\nAnsible flags:"
-          printf '  %-31s %-10s', '--host HOSTNAME', "# Retrieves host variables for the specified host (alias for 'host listvars HOSTNAME')\n"
-          printf '  %-31s %-10s', '--list', "# Retrieves the list of groups (alias for 'group list')\n\n"
-        end
+        return unless @_argv[0] == 'help'
+
+        puts 'Global flags:'
+        printf '  %-31s %-10s', '--ansible', "# Force Ansible mode (automatically set when using ansible flags)\n"
+        printf '  %-31s %-10s', '--config FILE', "# Specifies a configuration file to use\n"
+        printf '  %-31s %-10s', '--env ENV', "# Specifies the environment section of the config to use\n"
+        printf '  %-31s %-10s', '--format yaml|json|pjson',
+               "# Format for the output of 'get', 'list', and 'listvars' subcommands\n"
+        printf '  %-31s %-10s', '--trace', "# Enable more complete exception dumps for database transactions\n"
+        puts "\nAnsible flags:"
+        printf '  %-31s %-10s', '--host HOSTNAME',
+               "# Retrieves host variables for the specified host (alias for 'host listvars HOSTNAME')\n"
+        printf '  %-31s %-10s', '--list', "# Retrieves the list of groups (alias for 'group list')\n\n"
       end
 
       #----------------------
@@ -108,95 +95,132 @@ module Moose
 
         case @_argv[0]
         when '--list'
-          @_confopts[:ansible] = true
-          @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/
-          @_argv.clear
-          @_argv.concat(%w(group list)).flatten
+          apply_ansible_alias!(%w[group list])
         when '--host'
-          @_confopts[:ansible] = true
-          @_confopts[:format] = 'json' unless @_confopts[:format] =~ /p|pjson|j|json/
           host = @_argv[1]
-          @_argv.clear
-          @_argv.concat(['host', 'listvars', host.to_s]).flatten
+          apply_ansible_alias!(['host', 'listvars', host.to_s])
         end
       end
 
       #----------------------
       def self.resolve_config_file
-        if !@_confopts[:config].nil?
-          path = File.expand_path(@_confopts[:config])
-          if File.exist?(path)
-            @_confopts[:config] = path
-          else
-            fail("The configuration file #{path} does not exist")
-          end
-        else
-          possibles = ['./.moose-tools/inventory/config',
-                       '~/.moose-tools/inventory/config',
-                       '~/local/etc/moose-tools/inventory/config',
-                       '/etc/moose-tools/inventory/config']
-          possibles.each do |f|
-            file = File.expand_path(f)
-            @_confopts[:config] = file if File.exist?(file)
-          end
-        end
+        explicit_path = @_confopts[:config]
+        @_confopts[:config] = if explicit_path.nil?
+                                find_default_config_file
+                              else
+                                validated_config_path(explicit_path)
+                              end
 
-        if @_confopts[:config].nil?
-          fail('No configuration either given or found in standard locations.')
-        end
+        raise('No configuration either given or found in standard locations.') if @_confopts[:config].nil?
       end
 
       #----------------------
       def self.symbolize_keys(hash)
-        # rubocop:disable Style/EachWithObject
-        hash.inject({}) do |result, (key, value)|
-          new_key = case key
-                    when String then key.to_sym
-                    else key
-                    end
-          new_value = case value
-                      when Hash then symbolize_keys(value)
-                      else value
-                      end
-          result[new_key] = new_value
-          result
+        hash.each_with_object({}) do |(key, value), result|
+          result[symbolize_key(key)] = value.is_a?(Hash) ? symbolize_keys(value) : value
         end
-        # rubocop:enable Style/EachWithObject
       end
 
       #----------------------
-      # rubocop:disable PerceivedComplexity
-      # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
       def self.load
-        newsets = symbolize_keys(YAML.safe_load_file(
-          @_confopts[:config],
-          aliases: false,
-          permitted_classes: [],
-          permitted_symbols: []
-        ))
-
+        newsets = load_config_file(@_confopts[:config])
         path = @_confopts[:config]
 
-        # Get the "general" section
-        @_settings[:general] = newsets[:general]
-        @_settings[:general].nil? && fail("Missing 'general' root in #{path}")
+        @_settings[:general] = fetch_general_settings(newsets, path)
 
-        # Get the config for the correct environment
-
-        if @_confopts[:env] && !@_confopts[:env].empty?
-          env = @_confopts[:env]
-          @_settings[:config] = newsets[@_confopts[:env].to_sym]
-        else
-          env = @_settings[:general][:defaultenv]
-          (env.nil? || env.empty?) && fail("No defaultenv set in #{path}")
-          @_settings[:config] = newsets[env.to_sym]
-        end
-
-        @_settings[:config].nil? && fail("Missing '#{env}' root in #{path}")
-
-        # And now we should have a valid config stuffed into @_options[:config]
+        env, settings = resolve_environment_settings(newsets, path)
+        @_settings[:config] = settings
+        @_settings[:config].nil? && raise("Missing '#{env}' root in #{path}")
       end
-      # rubocop:enable Metrics/CyclomaticComplexity, Metrics/AbcSize
+
+      def self.load_config_file(path)
+        symbolize_keys(YAML.safe_load_file(
+                         path,
+                         aliases: false,
+                         permitted_classes: [],
+                         permitted_symbols: []
+                       ))
+      end
+
+      def self.fetch_general_settings(newsets, path)
+        general = newsets[:general]
+        general.nil? && raise("Missing 'general' root in #{path}")
+        general
+      end
+
+      def self.resolve_environment_settings(newsets, path)
+        env = selected_environment(newsets, path)
+        [env, newsets[env.to_sym]]
+      end
+
+      def self.selected_environment(newsets, path)
+        return @_confopts[:env] if @_confopts[:env] && !@_confopts[:env].empty?
+
+        env = newsets.dig(:general, :defaultenv)
+        (env.nil? || env.empty?) && raise("No defaultenv set in #{path}")
+        env
+      end
+
+      def self.standard_config_paths
+        ['./.moose-tools/inventory/config',
+         '~/.moose-tools/inventory/config',
+         '~/local/etc/moose-tools/inventory/config',
+         '/etc/moose-tools/inventory/config']
+      end
+
+      def self.find_default_config_file
+        standard_config_paths.map { |path| File.expand_path(path) }.find do |path|
+          File.exist?(path)
+        end
+      end
+
+      def self.validated_config_path(path)
+        expanded = File.expand_path(path)
+        raise("The configuration file #{expanded} does not exist") unless File.exist?(expanded)
+
+        expanded
+      end
+
+      def self.extract_value_flags(flags)
+        flags.each { |flag| extract_value_flag(flag) }
+      end
+
+      def self.extract_value_flag(flag)
+        index = @_argv.index("--#{flag}")
+        return if index.nil?
+
+        @_confopts[flag.to_sym] = @_argv[index + 1]
+        @_argv.slice!(index, 2)
+      end
+
+      def self.extract_boolean_flags(flags)
+        flags.each { |flag| extract_boolean_flag(flag) }
+      end
+
+      def self.extract_boolean_flag(flag)
+        index = @_argv.index("--#{flag}")
+        return if index.nil?
+
+        @_confopts[flag.to_sym] = true
+        @_argv.delete_at(index)
+      end
+
+      def self.normalize_ansible_format!
+        return unless @_confopts[:ansible] == true
+        return if @_confopts[:format] =~ /p|pjson|j|json/
+
+        @_confopts[:format] = 'json'
+      end
+
+      def self.apply_ansible_alias!(argv)
+        @_confopts[:ansible] = true
+        normalize_ansible_format!
+        @_argv = argv
+      end
+
+      def self.symbolize_key(key)
+        key.is_a?(String) ? key.to_sym : key
+      end
     end
   end
 end

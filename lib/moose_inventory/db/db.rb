@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'sequel'
 require 'json'
 
-require_relative './exceptions.rb'
+require_relative 'exceptions'
 
 module Moose
   module Inventory
@@ -12,53 +14,78 @@ module Moose
       extend self
       # rubocop:enable Style/ModuleFunction
 
-      @db         = nil
-      @models     = nil
+      @db = nil
+      @models = nil
       @exceptions = nil
+      attr_reader :db, :models, :exceptions
 
-      attr_reader :db
-      attr_reader :models
-      attr_reader :exceptions
+      TABLE_DEFINITIONS = {
+        hosts: lambda do |db|
+          db.create_table(:hosts) do
+            primary_key :id
+            column :name, :text, unique: true
+          end
+        end,
+        hostvars: lambda do |db|
+          db.create_table(:hostvars) do
+            primary_key :id
+            foreign_key :host_id
+            column :name, :text
+            column :value, :text
+          end
+        end,
+        groups: lambda do |db|
+          db.create_table(:groups) do
+            primary_key :id
+            column :name, :text, unique: true
+          end
+        end,
+        groups_groups: lambda do |db|
+          db.create_table(:groups_groups) do
+            primary_key :id
+            foreign_key :parent_id, :groups
+            foreign_key :child_id, :groups
+          end
+        end,
+        groupvars: lambda do |db|
+          db.create_table(:groupvars) do
+            primary_key :id
+            foreign_key :group_id
+            column :name, :text
+            column :value, :text
+          end
+        end,
+        groups_hosts: lambda do |db|
+          db.create_table(:groups_hosts) do
+            primary_key :id
+            foreign_key :host_id, :hosts
+            foreign_key :group_id, :groups
+          end
+        end
+      }.freeze
+
+      MODEL_KEYS = {
+        host: :Host,
+        hostvar: :Hostvar,
+        group: :Group,
+        groupvar: :Groupvar
+      }.freeze
 
       #----------------------
       def self.init
         init_exceptions
-
-        # If we allow init more than once, then the db connection is remade,
-        # which changes Sequel:DATABASES[0], thereby invalidating the sequel
-        # models.  This causes unexpected behavour. That is to say, because
-        # of the way Sequel initializes models, this method is not idempotent.
-        # In our single-shot application, this shouldn't be a problem. However,
-        # our unit tests like to call init multiple times, which borks things.
-        # So, we allow init only once, gated by whether @db is nil. In effect,
-        # this means we pool the DB connection for the life of the application.
-        # Again, not a problem for our one-shot app, but it may be an issue in
-        # long-running code. Personally, I don't like this pooling regime -
-        # perhaps I'm not understanding how it's supposed to be used?
-        #
-        # QUESTION: can the models be refreshed, to make then again valid? What if
-        #       we "load" instead of "require" the models?
-        # ANSWER: Nope, still borks even if we use a load.
-        #
-        # @db = nil            # <- fails for unit tests
-        return unless @db.nil? # <- works for unit tests
+        return unless @db.nil?
 
         Sequel::Model.plugin :json_serializer
         connect
         create_tables
+        bind_models!
+      end
 
-        # Make our models work
-        Sequel::DATABASES[0] = @db
-        require_relative 'models'
-        # load( load_dir = File.join(File.dirname(__FILE__), "models.rb") )
-
-        # For convenience
-        @models = {}
-        @models[:host]     = Moose::Inventory::DB::Host
-        @models[:hostvar]  = Moose::Inventory::DB::Hostvar
-        @models[:group]    = Moose::Inventory::DB::Group
-        @models[:groupvar] = Moose::Inventory::DB::Groupvar
-
+      def self.reset_runtime_state
+        @db = nil
+        @models = nil
+        @exceptions = nil
       end
 
       #--------------------
@@ -68,52 +95,24 @@ module Moose
       end
 
       #--------------------
-      def self.transaction
-        fail('Database connection has not been established') if @db.nil?
+      def self.transaction(&)
+        raise('Database connection has not been established') if @db.nil?
 
         tries = 0
 
         begin
-          @db.transaction(savepoint: true) do
-            yield
-          end
-
+          @db.transaction(savepoint: true, &)
         rescue Sequel::DatabaseError => e
-          # We want to rescue Sqlite3::BusyException.  But, sequel catches that
-          # and re-raises it as Sequel::DatabaseError, with a message referencing
-          # the original exception class
+          raise unless busy_database_error?(e)
 
-          # We look into e, to see whether it is a BusyException.  If not,
-          # we re-raise immediately.
-          raise unless e.message.include?('BusyException')
-
-          # Looks like a BusyException, so we retry, after a random delay.
           tries += 1
-          case tries
-          when 1..10
-            if Moose::Inventory::Config._confopts[:trace] == true
-              $stderr.puts e.message
-            end
-            sleep rand
-            retry
-          else
-            warn('The database appears to be locked by another process, and '\
-                 " did not become free after #{tries} tries. Giving up. ")
-
-            # TODO: Some useful advice to the user, as to what to do about this error.
-            raise
-          end
-
+          retry_busy_transaction(e, tries)
+          retry
         rescue @exceptions[:moose] => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
 
-          if Moose::Inventory::Config._confopts[:trace] == true
-            $stderr.puts e.full_message(highlight: false, order: :top)
-            abort("ERROR: #{e.message}")
-          else
-            abort("ERROR: #{e.message}")
-          end
-
+          warn e.full_message(highlight: false, order: :top) if Moose::Inventory::Config._confopts[:trace] == true
+          abort("ERROR: #{e.message}")
         rescue Exception => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
           raise e
@@ -122,100 +121,75 @@ module Moose
 
       #--------------------
       def self.reset
-        fail('Database connection has not been established') if @db.nil?
-        # @debug << 'reset'
+        raise('Database connection has not been established') if @db.nil?
+
         purge
         create_tables
       end
 
       #===============================
 
-      private
-
-      #--------------------
-      def self.purge # rubocop:disable Metrics/AbcSize
-        adapter = Moose::Inventory::Config._settings[:config][:db][:adapter]
-        adapter.downcase!
-
-        if adapter == 'sqlite3'
-          # HACK: SQLite3 supposedly supports CASCADE, see
-          # https://www.sqlite.org/foreignkeys.html#fk_actions
-          # However, when we do a drop_table with :cascade=>true
-          # on an sqlite3 database, it throws errors regarding
-          # foreign keys constraints. Instead, the following is
-          # less efficient, but does work.
-
-          Group.all.each do |g|
-            g.remove_all_hosts
-            g.remove_all_groupvars
-            g.remove_all_children
-            g.destroy
-          end
-
-          Host.all.each do |h|
-            h.remove_all_groups
-            h.remove_all_hostvars
-            h.destroy
-          end
-
-          Groupvar.all.each(&:destroy)
-          Hostvar.all.each(&:destroy)
-
-        else
-          @db.drop_table(:hosts, :hostvars,
-                         :groups, :groupvars, :group_hosts,
-                         if_exists: true, cascade: true)
+      def self.bind_models!
+        Sequel::DATABASES[0] = @db
+        require_relative 'models'
+        @models = MODEL_KEYS.transform_values do |name|
+          Moose::Inventory::DB.const_get(name)
         end
       end
 
+      def self.busy_database_error?(error)
+        error.message.include?('BusyException')
+      end
+
+      def self.retry_busy_transaction(error, tries)
+        if tries <= 10
+          warn error.message if Moose::Inventory::Config._confopts[:trace] == true
+          sleep rand
+          return
+        end
+
+        warn('The database appears to be locked by another process, and ' \
+             "did not become free after #{tries} tries. Giving up. ")
+        raise error
+      end
+
       #--------------------
-      def self.create_tables # rubocop:disable Metrics/AbcSize
-        unless @db.table_exists? :hosts
-          @db.create_table(:hosts) do
-            primary_key :id
-            column :name, :text, unique: true
-          end
+      def self.purge
+        return purge_sqlite_associations if sqlite_adapter?
+
+        @db.drop_table(:hosts, :hostvars,
+                       :groups, :groupvars, :group_hosts,
+                       if_exists: true, cascade: true)
+      end
+
+      def self.sqlite_adapter?
+        normalized_adapter == 'sqlite3'
+      end
+
+      def self.purge_sqlite_associations
+        Group.all.each do |group|
+          group.remove_all_hosts
+          group.remove_all_groupvars
+          group.remove_all_children
+          group.destroy
         end
 
-        unless @db.table_exists? :hostvars
-          @db.create_table(:hostvars) do
-            primary_key :id
-            foreign_key :host_id
-            column :name, :text
-            column :value, :text
-          end
+        Host.all.each do |host|
+          host.remove_all_groups
+          host.remove_all_hostvars
+          host.destroy
         end
 
-        unless @db.table_exists? :groups
-          @db.create_table(:groups) do
-            primary_key :id
-            column :name, :text, unique: true
-          end
-        end
+        Groupvar.all.each(&:destroy)
+        Hostvar.all.each(&:destroy)
+      end
 
-        unless @db.table_exists? :groups_groups
-          @db.create_table(:groups_groups) do
-            primary_key :id
-            foreign_key :parent_id, :groups
-            foreign_key :child_id,  :groups
-          end
-        end
+      #--------------------
+      def self.create_tables
+        TABLE_DEFINITIONS.each do |table_name, definition|
+          next if @db.table_exists?(table_name)
 
-        unless @db.table_exists? :groupvars
-          @db.create_table(:groupvars) do
-            primary_key :id
-            foreign_key :group_id
-            column :name, :text
-            column :value, :text
-          end
-        end
-
-        unless @db.table_exists? :groups_hosts
-          @db.create_table(:groups_hosts) do
-            primary_key :id
-            foreign_key :host_id,  :hosts
-            foreign_key :group_id, :groups
-          end
+          definition.call(@db)
         end
       end
 
@@ -223,61 +197,51 @@ module Moose
       def self.connect
         return unless @db.nil?
 
-        adapter = Moose::Inventory::Config._settings[:config][:db][:adapter]
-        adapter.downcase!
-
-        case adapter
+        case normalized_adapter
         when 'sqlite3'
           init_sqlite3
-
         when 'mysql'
           init_mysql
-
         when 'postgresql'
           init_postgresql
-
         else
-          fail @exceptions[:moose],
-               "database adapter #{adapter} is not yet supported."
+          raise @exceptions[:moose],
+                "database adapter #{normalized_adapter} is not yet supported."
         end
       end
 
+      def self.config_db_settings
+        Moose::Inventory::Config._settings[:config][:db]
+      end
+
+      def self.normalized_adapter
+        config_db_settings[:adapter].downcase
+      end
+
       #--------------------
-      def self.init_sqlite3 # rubocop:disable Metrics/AbcSize
+      def self.init_sqlite3
         require 'sqlite3'
         require 'fileutils'
+        init_exceptions
 
-        # Quick check that expected keys are at least present & sensible
-        config = Moose::Inventory::Config._settings[:config][:db]
-        [:file].each do |key|
-          if config[key].nil?
-            fail @exceptions[:moose],
-                 "Expected key #{key} missing in sqlite3 configuration"
-          end
-        end
-        config[:file].empty? && fail("SQLite3 DB 'file' cannot be empty")
+        config = config_db_settings
+        ensure_required_config_keys!(config, [:file], 'sqlite3')
+        raise("SQLite3 DB 'file' cannot be empty") if config[:file].empty?
 
-        # Make sure the directory exists
         dbfile = File.expand_path(config[:file])
         dbdir = File.dirname(dbfile)
-        FileUtils.mkdir_p(dbdir) unless Dir.exist?(dbdir)
+        FileUtils.mkdir_p(dbdir)
 
-        # Create and/or open the database file
         @db = Sequel.sqlite(dbfile)
       end
 
       #--------------------
       def self.init_mysql
         require 'mysql2'
+        init_exceptions
 
-        # Quick check that expected keys are at least present
-        config = Moose::Inventory::Config._settings[:config][:db]
-        [:host, :database, :user].each do |key|
-          if config[key].nil?
-            fail @exceptions[:moose],
-                 "Expected key #{key} missing in mysql configuration"
-          end
-        end
+        config = config_db_settings
+        ensure_required_config_keys!(config, %i[host database user], 'mysql')
         password = db_password(config, 'mysql')
 
         @db = Sequel.mysql2(user: config[:user],
@@ -289,15 +253,10 @@ module Moose
       #--------------------
       def self.init_postgresql
         require 'pg'
+        init_exceptions
 
-        # Quick check that expected keys are at least present
-        config = Moose::Inventory::Config._settings[:config][:db]
-        [:host, :database, :user].each do |key|
-          if config[key].nil?
-            fail @exceptions[:moose],
-                 "Expected key #{key} missing in postgresql configuration"
-          end
-        end
+        config = config_db_settings
+        ensure_required_config_keys!(config, %i[host database user], 'postgresql')
         password = db_password(config, 'postgresql')
 
         @db = Sequel.postgres(user: config[:user],
@@ -306,19 +265,28 @@ module Moose
                               database: config[:database])
       end
 
+      def self.ensure_required_config_keys!(config, keys, adapter)
+        keys.each do |key|
+          next unless config[key].nil?
+
+          raise @exceptions[:moose],
+                "Expected key #{key} missing in #{adapter} configuration"
+        end
+      end
+
       #--------------------
       def self.db_password(config, adapter)
         return config[:password] unless config[:password].nil?
 
         if config[:password_env].nil?
-          fail @exceptions[:moose],
-               "Expected key password or password_env missing in #{adapter} configuration"
+          raise @exceptions[:moose],
+                "Expected key password or password_env missing in #{adapter} configuration"
         end
 
         password = ENV.fetch(config[:password_env].to_s, nil)
         if password.nil? || password.empty?
-          fail @exceptions[:moose],
-               "Environment variable #{config[:password_env]} is not set for #{adapter} password"
+          raise @exceptions[:moose],
+                "Environment variable #{config[:password_env]} is not set for #{adapter} password"
         end
 
         password

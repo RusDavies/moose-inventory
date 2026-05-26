@@ -234,16 +234,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 12 done / 1 open.
+Code quality status counts: 13 done / 0 open.
 
 ## Open
 
-1. Tame remaining global DB/config singleton complexity.
-   - `Moose::Inventory::DB` and `Config` still carry a lot of module-level state, broad responsibilities, and RuboCop suppressions.
-   - `db.rb` still contains the lingering user-advice TODO/HACK comments and large methods like `purge`, `create_tables`, and `init_sqlite3`.
-   - The next cleanup slice should reduce module-function/global-state coupling and make DB/config behavior more explicit and testable.
+_No open code-quality items._
 
 ## Done
+
+1. Tame remaining global DB/config singleton complexity.
+   - Refactored `Moose::Inventory::Config` to reset runtime state explicitly on `init`, factor default options / flag parsing / config-path resolution / environment selection into smaller helper methods, and expose more explicit configuration-loading behavior without changing CLI semantics.
+   - Refactored `Moose::Inventory::DB` to centralize table definitions, model binding, adapter normalization, required-key validation, and busy-transaction retry handling, while adding `reset_runtime_state` so tests no longer have to manually juggle as much module instance state.
+   - Expanded regression coverage in `spec/lib/moose_inventory/config/config_spec.rb` and `spec/lib/moose_inventory/db/db_spec.rb`, and extended the targeted RuboCop gate to cover these files with narrow legacy-file exclusions for module/spec length and existing help-formatting patterns.
+   - Verified with focused config/DB specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Extract read-only host/group query commands behind a thin query seam.
    - Added `Moose::Inventory::Operations::QueryInventory` as a context-backed read layer for `host get`, `group get`, `host list`, `group list`, `host listvars`, and `group listvars`.
