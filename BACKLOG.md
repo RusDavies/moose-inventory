@@ -234,14 +234,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 11 done / 2 open.
+Code quality status counts: 12 done / 1 open.
 
 ## Open
-
-1. Extract read-only host/group query commands behind a thin query seam.
-   - `host get`, `group get`, `host list`, `group list`, `host listvars`, and `group listvars` still reach directly into the DB singleton from CLI classes.
-   - They are lower risk than the write-path commands but still keep rendering, lookup, and data-shaping tangled together.
-   - Introduce a small query layer or context-backed read facade so CLI commands become thin renderers.
 
 1. Tame remaining global DB/config singleton complexity.
    - `Moose::Inventory::DB` and `Config` still carry a lot of module-level state, broad responsibilities, and RuboCop suppressions.
@@ -249,6 +244,12 @@ Code quality status counts: 11 done / 2 open.
    - The next cleanup slice should reduce module-function/global-state coupling and make DB/config behavior more explicit and testable.
 
 ## Done
+
+1. Extract read-only host/group query commands behind a thin query seam.
+   - Added `Moose::Inventory::Operations::QueryInventory` as a context-backed read layer for `host get`, `group get`, `host list`, `group list`, `host listvars`, and `group listvars`.
+   - Converted those CLI commands into thinner adapters that normalize input, delegate query shaping, preserve the existing YAML/JSON/Ansible output, and keep warnings/argument errors spec-compatible.
+   - Added direct query operation coverage in `spec/lib/moose_inventory/operations/query_inventory_spec.rb` and expanded the targeted RuboCop scope for the new seam.
+   - Verified with focused query/CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Extract host/group variable mutation commands into operations.
    - Added `Moose::Inventory::Operations::AddVariables` and `RemoveVariables` to own shared host/group variable validation, lookup, create/update/delete behavior, and structured event emission.

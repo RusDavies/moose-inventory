@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 
-require_relative './formatter.rb'
-require_relative '../db/exceptions.rb'
+require_relative '../inventory_context'
+require_relative '../operations/query_inventory'
 
 module Moose
   module Inventory
@@ -13,61 +15,38 @@ module Moose
         #==========================
         desc 'listvar', 'List all variables associated with the group'
         def listvars(*argv)
-          # Convenience
           confopts = Moose::Inventory::Config._confopts
 
-          # Note, the Ansible spects don't call for a "--group GROUPNAME" method.
-          # So, strictly, there is no Ansible compatibility for this method.
-          # Instead, the Ansible compatibility included herein is for consistency
-          # with the "hosts listvars" method, which services the Ansible
-          # "--host HOSTNAME" specs.
-
-          # sanity
           if confopts[:ansible] == true
-            if argv.length != 1
-              abort('ERROR: Wrong number of arguments for Ansible mode, '\
-                    "#{args.length} for 1.")
-            end
+            abort_if_wrong_ansible_arg_count(argv, 1)
           else
-            if argv.empty?
-              abort('ERROR: Wrong number of arguments, '\
-                    "#{args.length} for 1 or more.")
-            end
+            abort_if_missing_args(argv, 1, '1 or more')
           end
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          names = normalize_names(argv)
+          results = query_inventory.list_group_vars(names: names, ansible: confopts[:ansible] == true)
 
-          # Arguments
-          names = argv.uniq.map(&:downcase)
-
-          # process
-          results = {}
-
-          if confopts[:ansible] == true
-            # This is the implementation per Ansible specs
-            name = names.first
-            group = db.models[:group].find(name: name)
-            if group.nil?
-              fmt.warn "The Group #{name} does not exist."
-            else
-              group.groupvars_dataset.each do |gv|
-                results[gv[:name].to_sym] = gv[:value]
-              end
-            end
-          else
-            # This our more flexible implementation
-            names.each do |name|
-              group = db.models[:group].find(name: name)
-              next if group.nil?
-              results[name.to_sym] = {}
-              group.groupvars_dataset.each do |gv|
-                results[name.to_sym][gv[:name].to_sym] = gv[:value]
-              end
-            end
+          if confopts[:ansible] == true && query_context.find_group(names.first).nil?
+            fmt.warn "The Group #{names.first} does not exist."
           end
+
           fmt.dump(results)
+        end
+
+        private
+
+        def abort_if_wrong_ansible_arg_count(args, expected)
+          return if args.length == expected
+
+          abort("ERROR: Wrong number of arguments for Ansible mode, #{args.length} for #{expected}.")
+        end
+
+        def query_inventory
+          Moose::Inventory::Operations::QueryInventory.new(context: query_context)
+        end
+
+        def query_context
+          Moose::Inventory::InventoryContext.new(db: db)
         end
       end
     end

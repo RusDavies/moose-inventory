@@ -9,6 +9,10 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Max: 25
 
+Metrics/ClassLength:
+  Exclude:
+    - lib/moose_inventory/operations/query_inventory.rb
+
 Metrics/CyclomaticComplexity:
   Max: 7
 
@@ -25,6 +29,7 @@ Metrics/BlockLength:
     - spec/lib/moose_inventory/operations/remove_groups_spec.rb
     - spec/lib/moose_inventory/operations/add_variables_spec.rb
     - spec/lib/moose_inventory/operations/remove_variables_spec.rb
+    - spec/lib/moose_inventory/operations/query_inventory_spec.rb
 
 Style/Documentation:
   Enabled: false

@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative '../inventory_context'
+require_relative '../operations/query_inventory'
 
 module Moose
   module Inventory
@@ -10,43 +13,18 @@ module Moose
         #==========================
         desc 'list',
              'List the groups, together with any associated hosts and groupvars'
-        def list # rubocop:disable Metrics/AbcSize
-          # Convenience
-          db = Moose::Inventory::DB
+        def list
           confopts = Moose::Inventory::Config._confopts
+          results = query_inventory.list_groups(ansible: confopts[:ansible] == true)
+          fmt.dump(results)
+        end
 
-          # Process
-          results = {}
-          db.models[:group].all.each do |group|
-            hosts = group.hosts_dataset.map(:name)
+        private
 
-            # Hide the automatic ungrouped group, if it's empty
-            next if group[:name] == 'ungrouped' && hosts.empty?
-
-            children = group.children_dataset.map(:name)
-
-            groupvars = {}
-            group.groupvars_dataset.each do |gv|
-              groupvars[gv[:name].to_sym] = gv[:value]
-            end
-
-            results[group[:name].to_sym] = {}
-            unless hosts.empty? && (confopts[:ansible] != true)
-              results[group[:name].to_sym][:hosts] = hosts
-            end
-
-            unless children.empty?
-              results[group[:name].to_sym][:children] = children
-            end
-
-            next if groupvars.empty?
-            if confopts[:ansible] == true
-              results[group[:name].to_sym][:vars] = groupvars
-            else
-              results[group[:name].to_sym][:groupvars] = groupvars
-            end
-          end
-          Formatter.out(results)
+        def query_inventory
+          Moose::Inventory::Operations::QueryInventory.new(
+            context: Moose::Inventory::InventoryContext.new(db: db)
+          )
         end
       end
     end

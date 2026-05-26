@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative '../inventory_context'
+require_relative '../operations/query_inventory'
 
 module Moose
   module Inventory
@@ -8,47 +11,19 @@ module Moose
       # Implementation of the "group get" method of the CLI
       class Group
         desc 'get GROUP_1 [GROUP_2 ...]', 'Get groups GROUP_n from the inventory'
-        def get(*argv) # rubocop:disable Metrics/AbcSize
-          if argv.empty?
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more")
-          end
+        def get(*argv)
+          abort("ERROR: Wrong number of arguments, #{argv.length} for 1 or more") if argv.empty?
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          names = normalize_names(argv)
+          fmt.dump(query_inventory.get_groups(names: names))
+        end
 
-          # Arguments
-          names = argv.uniq.map(&:downcase)
+        private
 
-          # Process
-          results = {}
-          names.each do |name|
-            group = db.models[:group].find(name: name)
-
-            next if group.nil?
-            hosts = group.hosts_dataset.map(:name)
-
-            children = group.children_dataset.map(:name)
-
-            groupvars = {}
-            group.groupvars_dataset.each do |gv|
-              groupvars[gv[:name].to_sym] = gv[:value]
-            end
-
-            results[group[:name].to_sym] = {}
-            results[group[:name].to_sym][:hosts] = hosts unless hosts.empty?
-
-            unless children.empty?
-              results[group[:name].to_sym][:children] = children
-            end
-
-            unless groupvars.empty?
-              results[group[:name].to_sym][:groupvars] = groupvars
-            end
-          end
-
-          fmt.dump(results)
+        def query_inventory
+          Moose::Inventory::Operations::QueryInventory.new(
+            context: Moose::Inventory::InventoryContext.new(db: db)
+          )
         end
       end
     end
