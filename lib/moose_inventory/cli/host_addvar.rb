@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 
-require_relative './formatter.rb'
-require_relative '../db/exceptions.rb'
+require_relative '../inventory_context'
+require_relative '../operations/add_variables'
 
 module Moose
   module Inventory
@@ -12,64 +14,52 @@ module Moose
       class Host
         #==========================
         desc 'addvar', 'Add a variable to the host'
-        # rubocop:disable Metrics/LineLength
-        def addvar(*args) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
-          # rubocop:enable Metrics/LineLength
-          if args.length < 2
-            abort('ERROR: Wrong number of arguments, '\
-                  "#{args.length} for 2 or more.")
-          end
+        def addvar(*args)
+          abort_if_missing_args(args, 2, '2 or more')
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
-
-          # Arguments
           name = args[0].downcase
           vars = args.slice(1, args.length - 1).uniq
+          operation = Moose::Inventory::Operations::AddVariables.new(
+            context: Moose::Inventory::InventoryContext.new(db: db),
+            entity_type: :host,
+            emitter: host_addvar_emitter(name, vars)
+          )
 
-          # Transaction
-          db.transaction do # Transaction start
-            puts "Add variables '#{vars.join(',')}' to host '#{name}':"
-
-            fmt.puts 2, "- retrieve host '#{name}'..."
-            host = db.models[:host].find(name: name)
-            if host.nil?
-              fail db.exceptions[:moose],
-                   "The host '#{name}' does not exist."
-            end
-            fmt.puts 4, '- OK'
-
-            hostvars_ds = host.hostvars_dataset
-            vars.each do |v|
-              fmt.puts 2, "- add variable '#{v}'..."
-              vararray = v.split('=')
-              if v.start_with?('=') || v.end_with?('=') || vararray.length != 2
-                fail db.exceptions[:moose],
-                     "Incorrect format in '{#{v}}'. Expected 'key=value'."
-              end
-
-              # Check against existing associations
-              hostvar = hostvars_ds[name: vararray[0]]
-              if !hostvar.nil?
-                unless hostvar[:value] == vararray[1]
-                  fmt.puts 4, '- already exists, applying as an update...'
-                  update = db.models[:hostvar].find(id: hostvar[:id])
-                  update[:value] = vararray[1]
-                  update.save
-                end
-              else
-                # hostvar doesn't exist, so create and associate
-                hostvar = db.models[:hostvar].create(name: vararray[0],
-                                                     value: vararray[1])
-                host.add_hostvar(hostvar)
-              end
-              fmt.puts 4, '- OK'
-            end
-            fmt.puts 2, '- all OK'
-          end # Transaction end
+          db.transaction do
+            operation.call(name: name, vars: vars)
+          end
 
           puts 'Succeeded.'
+        end
+
+        private
+
+        def host_addvar_emitter(name, vars)
+          lambda do |event|
+            render_addvar_event(
+              event,
+              entity_label: 'host',
+              entity_name: name,
+              variables_label: vars.join(',')
+            )
+          end
+        end
+
+        def render_addvar_event(event, entity_label:, entity_name:, variables_label:)
+          case event.type
+          when :entity_started
+            puts "Add variables '#{variables_label}' to #{entity_label} '#{entity_name}':"
+          when :retrieving_entity
+            fmt.puts 2, "- retrieve #{entity_label} '#{event.payload[:name]}'..."
+          when :adding_variable
+            fmt.puts 2, "- add variable '#{event.payload[:variable]}'..."
+          when :updating_existing_variable
+            fmt.puts 4, '- already exists, applying as an update...'
+          when :entity_complete
+            fmt.puts 2, '- all OK'
+          when :ok
+            fmt.puts event.payload[:indent], '- OK'
+          end
         end
       end
     end
