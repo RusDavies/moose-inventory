@@ -225,13 +225,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 1 done / 4 open.
+Code quality status counts: 2 done / 3 open.
 
 ## Open
-
-1. Extract domain operation/service objects behind the Thor commands.
-   - Candidate operations: add host, add group, associate host/groups, dissociate host/groups, remove group, remove group child.
-   - Keep the current CLI output stable while moving business rules out of Thor classes.
 
 1. Introduce an inventory context or repository facade around DB access.
    - Start as a wrapper over the existing DB singleton, then use it to reduce direct `Moose::Inventory::DB` coupling in command code.
@@ -244,6 +240,11 @@ Code quality status counts: 1 done / 4 open.
    - Prefer a targeted RuboCop config for new/refactored code first, rather than forcing the whole inherited codebase through a style grinder in one pass.
 
 ## Done
+
+1. Extract first domain operation behind a Thor command.
+   - Added `Moose::Inventory::Operations::AddHosts` as the first operation/service object behind the CLI.
+   - Converted `host add` into a thin adapter that validates/normalizes CLI input and delegates inventory mutation to the operation.
+   - Preserved existing `host add` output and behavior under focused specs and full `./scripts/check.sh`.
 
 1. Extract shared CLI helpers for low-risk issue #13 refactor.
    - Added helper methods for common validation, normalization, association checks, and automatic `ungrouped` membership handling.
