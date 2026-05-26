@@ -1,15 +1,20 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 7 done / 1 open.
+Release readiness status counts: 8 done / 1 open.
 
 ## Open
 
-1. Configure RubyGems trusted publisher for the existing gem.
-   - Repository-side trusted publishing workflow is present in `.github/workflows/release.yml`.
-   - A RubyGems owner must configure the `moose-inventory` gem trusted publisher on RubyGems.org for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
-   - After RubyGems is configured, verify with the next real version tag; do not retag already-published `v1.0.9`.
+1. Verify RubyGems trusted publishing with the next real release tag.
+   - RubyGems trusted publisher is configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
+   - Verify the full trusted-publishing path when publishing the next real version tag.
+   - Do not retag already-published `v1.0.9`.
 
 ## Done
+
+1. Configure RubyGems trusted publisher for the existing gem.
+   - Repository-side trusted publishing workflow is present in `.github/workflows/release.yml`.
+   - RubyGems trusted publisher is configured for the `moose-inventory` gem with repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
+   - Evidence: RubyGems trusted publisher page shows GitHub Actions for `RusDavies/moose-inventory`, workflow `release.yml`, environment `release`.
 
 1. Add GitHub Actions RubyGems trusted publishing.
    - Added `.github/workflows/release.yml` triggered by `v*` tags.
