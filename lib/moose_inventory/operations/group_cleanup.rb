@@ -26,10 +26,6 @@ module Moose
           destroy_group(group, events, indent: 4)
         end
 
-        private
-
-        attr_reader :context, :emitter
-
         def destroy_group(group, events, indent:)
           group.hosts_dataset.each do |host|
             next unless host.groups_dataset.one?
@@ -45,6 +41,10 @@ module Moose
           group.destroy
           emit(events, :ok, indent: indent + 2)
         end
+
+        private
+
+        attr_reader :context, :emitter
 
         def emit(events, type, payload = {})
           emitter.call(events, type, payload)
