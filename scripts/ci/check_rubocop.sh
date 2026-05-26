@@ -9,6 +9,7 @@ bundle exec rubocop \
   lib/moose_inventory/operations/remove_associations.rb \
   lib/moose_inventory/operations/group_cleanup.rb \
   lib/moose_inventory/operations/group_child_relations.rb \
+  lib/moose_inventory/operations/remove_groups.rb \
   lib/moose_inventory/cli/helpers.rb \
   lib/moose_inventory/cli/host_add.rb \
   lib/moose_inventory/cli/group_add.rb \
@@ -18,8 +19,10 @@ bundle exec rubocop \
   lib/moose_inventory/cli/group_rmhost.rb \
   lib/moose_inventory/cli/group_addchild.rb \
   lib/moose_inventory/cli/group_rmchild.rb \
+  lib/moose_inventory/cli/group_rm.rb \
   spec/lib/moose_inventory/operations/add_hosts_spec.rb \
   spec/lib/moose_inventory/operations/add_groups_spec.rb \
   spec/lib/moose_inventory/operations/add_associations_spec.rb \
   spec/lib/moose_inventory/operations/remove_associations_spec.rb \
-  spec/lib/moose_inventory/operations/group_child_relations_spec.rb
+  spec/lib/moose_inventory/operations/group_child_relations_spec.rb \
+  spec/lib/moose_inventory/operations/remove_groups_spec.rb

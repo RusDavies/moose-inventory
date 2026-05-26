@@ -225,15 +225,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 9 done / 1 open.
+Code quality status counts: 10 done / 0 open.
 
 ## Open
 
-1. Extract `group rm` to reuse the new group-cleanup / relation-operation seam.
-   - Wire top-level group deletion through the same operation/event path so recursive orphan cleanup and host `ungrouped` reattachment stop being half-legacy, half-refactored.
+_No open code quality items._
 
 
 ## Done
+
+1. Extract `group rm` to reuse the new group-cleanup / relation-operation seam.
+   - Added `Moose::Inventory::Operations::RemoveGroups` and reused `GroupCleanup` so top-level group deletion, recursive orphan cleanup, and host `ungrouped` reattachment now run through structured operation events instead of bespoke Thor logic.
+   - Converted `group rm` into a thinner adapter over `InventoryContext`, preserving `--recursive` behavior and existing CLI output.
+   - Added direct operation specs and expanded the targeted RuboCop gate to cover the new removal operation and adapter.
+   - Verified with focused specs and full `./scripts/check.sh`.
 
 1. Extract the shared group-parent/child association flow behind `group addchild` and `group rmchild`.
    - Added `Moose::Inventory::Operations::GroupChildRelations` and `GroupCleanup` to own parent/child link creation, dissociation, and recursive orphan-group cleanup with structured events.
