@@ -225,15 +225,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 8 done / 1 open.
+Code quality status counts: 9 done / 1 open.
 
 ## Open
 
-1. Extract the shared group-parent/child association flow behind `group addchild` and `group rmchild`.
-   - Apply the same operation/context/event seam to parent-child group links so add/remove edge logic and orphan-handling rules stop living directly in the Thor commands.
+1. Extract `group rm` to reuse the new group-cleanup / relation-operation seam.
+   - Wire top-level group deletion through the same operation/event path so recursive orphan cleanup and host `ungrouped` reattachment stop being half-legacy, half-refactored.
 
 
 ## Done
+
+1. Extract the shared group-parent/child association flow behind `group addchild` and `group rmchild`.
+   - Added `Moose::Inventory::Operations::GroupChildRelations` and `GroupCleanup` to own parent/child link creation, dissociation, and recursive orphan-group cleanup with structured events.
+   - Converted `group addchild` and `group rmchild` into thinner adapters over `InventoryContext`, including `--delete-orphans` behavior without leaving the recursion logic buried in the CLI layer.
+   - Added direct operation specs and expanded the targeted RuboCop gate to cover the new parent/child relation seam.
+   - Verified with focused specs and full `./scripts/check.sh`.
 
 1. Extract the shared host/group dissociation flow behind `host rmgroup` and `group rmhost`.
    - Added `Moose::Inventory::Operations::RemoveAssociations` to own shared dissociation, missing-association handling, and automatic `ungrouped` reattachment behavior for existing primary entities.
