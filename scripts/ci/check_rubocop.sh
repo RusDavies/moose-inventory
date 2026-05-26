@@ -2,6 +2,8 @@
 set -euo pipefail
 
 bundle exec rubocop \
+  lib/moose_inventory/config/config.rb \
+  lib/moose_inventory/db/db.rb \
   lib/moose_inventory/inventory_context.rb \
   lib/moose_inventory/operations/add_hosts.rb \
   lib/moose_inventory/operations/add_groups.rb \
@@ -41,4 +43,6 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/remove_groups_spec.rb \
   spec/lib/moose_inventory/operations/add_variables_spec.rb \
   spec/lib/moose_inventory/operations/remove_variables_spec.rb \
-  spec/lib/moose_inventory/operations/query_inventory_spec.rb
+  spec/lib/moose_inventory/operations/query_inventory_spec.rb \
+  spec/lib/moose_inventory/config/config_spec.rb \
+  spec/lib/moose_inventory/db/db_spec.rb

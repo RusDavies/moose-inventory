@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe 'Moose::Inventory::Config' do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -23,6 +25,17 @@ RSpec.describe 'Moose::Inventory::Config' do
     it 'should be responsive' do
       result = @config.respond_to?(:init)
       expect(result).to eq(true)
+    end
+
+    it 'resets runtime state before parsing new arguments' do
+      @config.init(@mockargs)
+      @config._settings[:junk] = true
+      @config._argv << '--junk'
+
+      @config.init(['--config', @mockarg_parts[:config]])
+
+      expect(@config._settings[:junk]).to be_nil
+      expect(@config._argv).not_to include('--junk')
     end
   end
 

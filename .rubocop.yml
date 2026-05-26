@@ -13,6 +13,11 @@ Metrics/ClassLength:
   Exclude:
     - lib/moose_inventory/operations/query_inventory.rb
 
+Metrics/ModuleLength:
+  Exclude:
+    - lib/moose_inventory/config/config.rb
+    - lib/moose_inventory/db/db.rb
+
 Metrics/CyclomaticComplexity:
   Max: 7
 
@@ -21,6 +26,8 @@ Metrics/PerceivedComplexity:
 
 Metrics/BlockLength:
   Exclude:
+    - spec/lib/moose_inventory/config/config_spec.rb
+    - spec/lib/moose_inventory/db/db_spec.rb
     - spec/lib/moose_inventory/operations/add_hosts_spec.rb
     - spec/lib/moose_inventory/operations/add_groups_spec.rb
     - spec/lib/moose_inventory/operations/add_associations_spec.rb
@@ -33,3 +40,11 @@ Metrics/BlockLength:
 
 Style/Documentation:
   Enabled: false
+
+Style/FormatStringToken:
+  Exclude:
+    - lib/moose_inventory/config/config.rb
+
+Lint/RescueException:
+  Exclude:
+    - lib/moose_inventory/db/db.rb
