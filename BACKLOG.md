@@ -1,6 +1,6 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 11 done / 1 open.
+Release readiness status counts: 12 done / 1 open.
 
 ## Open
 
@@ -10,6 +10,11 @@ Release readiness status counts: 11 done / 1 open.
    - Do not retag already-published `v1.0.9`.
 
 ## Done
+
+1. Align release workflow with required CI security tooling.
+   - Security audit rerun found that `.github/workflows/release.yml` ran `./scripts/check.sh` without installing or requiring the dedicated security tools, meaning tag-based releases could skip `gitleaks`/`osv-scanner` enforcement if those tools were absent.
+   - Added Go setup with cache disabled, installed pinned security tools through `scripts/ci/install_security_tools.sh`, required `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1` during the release check gate, and added the same native-dependency timeout used by CI.
+   - Documented the rerun in `docs/security-audit-2026-05-26-rerun.md`; final trusted-publishing proof remains gated on the next real release tag.
 
 1. Add manual GitHub Actions CI trigger and harden CI runner setup.
    - Added `workflow_dispatch` to `.github/workflows/ci.yml` so CI can be manually triggered when push events fail to enqueue during a GitHub Actions incident.
