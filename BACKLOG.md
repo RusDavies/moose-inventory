@@ -1,6 +1,6 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 9 done / 1 open.
+Release readiness status counts: 11 done / 1 open.
 
 ## Open
 
@@ -10,6 +10,17 @@ Release readiness status counts: 9 done / 1 open.
    - Do not retag already-published `v1.0.9`.
 
 ## Done
+
+1. Add manual GitHub Actions CI trigger and harden CI runner setup.
+   - Added `workflow_dispatch` to `.github/workflows/ci.yml` so CI can be manually triggered when push events fail to enqueue during a GitHub Actions incident.
+   - Verified both push-triggered CI and manual `workflow_dispatch` CI runs succeeded on `master`.
+   - Disabled unused `actions/setup-go` caching for the Go-based security tools so the workflow no longer emits a missing-`go.mod` cache warning.
+   - Added a timeout to the native dependency installation step so runner package-manager stalls fail fast instead of hanging the matrix indefinitely.
+
+1. Diagnose missing GitHub Actions runs after security-tooling merge.
+   - Confirmed the affected commits were pushed and visible on GitHub, with GitHub PushEvents recorded but no check runs created.
+   - Confirmed the workflow was active and visible, and GitHub Actions was degraded during the missing-run window due to platform-side authentication/startup issues.
+   - Conclusion: the missing runs were caused by a GitHub Actions incident, not by the repository workflow configuration.
 
 1. Install optional local/CI security audit tools.
    - Added `bundler-audit` as a development dependency and wired it into `scripts/ci/check_security.sh`.
