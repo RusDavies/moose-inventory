@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative 'formatter'
+require_relative '../inventory_context'
+require_relative '../operations/group_child_relations'
 
 module Moose
   module Inventory
@@ -10,77 +14,90 @@ module Moose
         #==========================
         desc 'addchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Associate one or more child-groups CHILDGROUP_n with PARENTGROUP'
-        def addchild(*_argv)
-          # Sanity check
-          if args.length < 2
-            abort("ERROR: Wrong number of arguments, #{args.length} "\
-              'for 2 or more.')
-          end
+        def addchild(*argv)
+          abort_if_missing_args(argv, 2, '2 or more')
 
-          # Arguments
-          pname = args[0].downcase
-          cnames = args.slice(1, args.length - 1).uniq.map(&:downcase)
+          pname = argv[0].downcase
+          cnames = normalize_names(argv.slice(1, argv.length - 1))
 
-          # Sanity
-          if pname == 'ungrouped' || cnames.include?('ungrouped')
-            abort("ERROR: Cannot manually manipulate the automatic group 'ungrouped'.")
-          end
+          abort_if_automatic_group([pname] + cnames)
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          result = add_children_to_group(pname, cnames)
 
-          # Transaction
-          warn_count = 0
-          begin
-            db.transaction do # Transaction start
-              puts "Associate parent group '#{pname}' with child group(s) '#{cnames.join(',')}':"
-              # Get the target group
-              fmt.puts 2, "- retrieve group '#{pname}'..."
-              pgroup = db.models[:group].find(name: pname)
-              if pgroup.nil?
-                abort("ERROR: The group '#{pname}' does not exist.")
-              end
-              fmt.puts 4, '- OK'
-
-              # Associate parent group with the child groups
-
-              groups_ds = pgroup.children_dataset
-              cnames.each do |cname|
-                fmt.puts 2, "- add association {group:#{pname} <-> group:#{cname}}..."
-
-                # Check against existing associations
-                unless groups_ds[name: cname].nil?
-                  warn_count += 1
-                  fmt.warn "Association {group:#{pname} <-> group:#{cname}}}"\
-                    " already exists, skipping.\n"
-                  fmt.puts 4, '- already exists, skipping.'
-                  fmt.puts 4, '- OK'
-                  next
-                 end
-
-                # Add new association
-                cgroup = db.models[:group].find(name: cname)
-                if cgroup.nil?
-                  warn_count += 1
-                  fmt.warn "Group '#{cname}' does not exist and will be created.\n"
-                  fmt.puts 4, '- child group does not exist, creating now...'
-                  cgroup = db.models[:group].create(name: cname)
-                  fmt.puts 6, '- OK'
-                end
-                pgroup.add_child(cgroup)
-                fmt.puts 4, '- OK'
-              end
-              fmt.puts 2, '- all OK'
-            end # Transaction end
-          rescue db.exceptions[:moose] => e
-            abort("ERROR: #{e}")
-          end
-          if warn_count == 0
+          if result.warning_count.zero?
             puts 'Succeeded.'
           else
             puts 'Succeeded, with warnings.'
           end
+        end
+
+        private
+
+        def add_children_to_group(parent_name, child_names)
+          context = Moose::Inventory::InventoryContext.new(db: db)
+          operation = Moose::Inventory::Operations::GroupChildRelations.new(context: context)
+
+          begin
+            db.transaction do
+              puts "Associate parent group '#{parent_name}' with child group(s) '#{child_names.join(',')}':"
+              parent_group = fetch_existing_group_for_child_relation(context, parent_name)
+              result = operation.add_children(
+                parent_group: parent_group,
+                parent_name: parent_name,
+                child_names: child_names
+              )
+              render_addchild_events(result.events)
+              fmt.puts 2, '- all OK'
+              return result
+            end
+          rescue db.exceptions[:moose] => e
+            abort("ERROR: #{e}")
+          end
+        end
+
+        def fetch_existing_group_for_child_relation(context, name)
+          fmt.puts 2, "- retrieve group '#{name}'..."
+          group = context.find_group(name)
+          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
+
+          fmt.puts 4, '- OK'
+          group
+        end
+
+        def render_addchild_events(events)
+          events.each { |event| render_addchild_event(event) }
+        end
+
+        def render_addchild_event(event)
+          payload = event.payload
+
+          return render_addchild_warning(event.type, payload) if addchild_warning?(event.type)
+          return render_addchild_existing(payload) if event.type == :already_exists_skipping
+
+          case event.type
+          when :adding_child_association
+            fmt.puts 2, "- add association {group:#{payload[:parent]} <-> group:#{payload[:child]}}..."
+          when :child_group_creating_now
+            fmt.puts 4, '- child group does not exist, creating now...'
+          when :ok
+            fmt.puts payload[:indent], '- OK'
+          end
+        end
+
+        def addchild_warning?(type)
+          %i[child_association_exists child_group_missing].include?(type)
+        end
+
+        def render_addchild_warning(type, payload)
+          if type == :child_association_exists
+            fmt.warn "Association {group:#{payload[:parent]} <-> group:#{payload[:child]}}} already exists, skipping.\n"
+          else
+            fmt.warn "Group '#{payload[:name]}' does not exist and will be created.\n"
+          end
+        end
+
+        def render_addchild_existing(payload)
+          fmt.puts payload[:indent], '- already exists, skipping.'
         end
       end
     end
