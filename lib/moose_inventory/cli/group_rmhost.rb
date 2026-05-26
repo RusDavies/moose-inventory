@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative 'formatter'
+require_relative '../inventory_context'
+require_relative '../operations/remove_associations'
 
 module Moose
   module Inventory
@@ -10,66 +14,78 @@ module Moose
         #==========================
         desc 'rmhost GROUPNAME HOSTNAME_1 [HOSTNAME_2 ...]',
              'Dissociate the hosts HOSTNAME_n from the group NAME'
-        # rubocop:disable Metrics/LineLength
-        def rmhost(*args) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/CyclomaticComplexity
-          # rubocop:enable Metrics/LineLength
-          # Sanity
+        def rmhost(*args)
           abort_if_missing_args(args, 2, '2 or more')
 
-          # Arguments
           name = args[0].downcase
           hosts = normalize_names(args.slice(1, args.length - 1))
 
-          # Sanity
           abort_if_automatic_group([name])
 
-          # Transaction
-          warn_count = 0
-          begin
-            db.transaction do # Transaction start
-              # Get the target group
-              puts "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':"
-              fmt.puts 2, "- retrieve group '#{name}'..."
-              group = db.models[:group].find(name: name)
-              abort("ERROR: The group '#{name}' does not exist.") if group.nil?
-              fmt.puts 4, '- OK'
+          result = remove_hosts_from_group(name, hosts)
 
-              # dissociate group from the hosts
-              hosts_ds = group.hosts_dataset
-              hosts.each do |h|
-                fmt.puts 2, "- remove association {group:#{name} <-> host:#{h}}..."
-
-                # Check against existing associations
-                unless association_exists?(hosts_ds, h)
-                  warn_count += 1
-                  fmt.warn "Association {group:#{name} <-> host:#{h}} doesn't"\
-                    " exist, skipping.\n"
-                  fmt.puts 4, '- doesn\'t exist, skipping.'
-                  fmt.puts 4, '- OK'
-                  next
-                end
-
-                host = db.models[:host].find(name: h)
-                group.remove_host(host) unless host.nil?
-                fmt.puts 4, '- OK'
-
-                # Add the host to the ungrouped group if not in any other group
-                add_automatic_group_to_host_if_no_groups(
-                  host,
-                  indent: 2,
-                  message: "- add automatic association {group:ungrouped <-> host:#{h}}..."
-                )
-              end
-              fmt.puts 2, '- all OK'
-            end # Transaction end
-          rescue db.exceptions[:moose] => e
-            abort("ERROR: #{e.message}")
-          end
-          if warn_count == 0
+          if result.warning_count.zero?
             puts 'Succeeded.'
           else
             puts 'Succeeded, with warnings.'
           end
+        end
+
+        private
+
+        def remove_hosts_from_group(name, hosts)
+          context = Moose::Inventory::InventoryContext.new(db: db)
+          operation = Moose::Inventory::Operations::RemoveAssociations.new(context: context)
+
+          begin
+            db.transaction do
+              puts "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':"
+              group = fetch_existing_group_for_rmhost(context, name)
+              result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts)
+              render_group_rmhost_events(result.events)
+              fmt.puts 2, '- all OK'
+              return result
+            end
+          rescue db.exceptions[:moose] => e
+            abort("ERROR: #{e.message}")
+          end
+        end
+
+        def fetch_existing_group_for_rmhost(context, name)
+          fmt.puts 2, "- retrieve group '#{name}'..."
+          group = context.find_group(name)
+          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
+
+          fmt.puts 4, '- OK'
+          group
+        end
+
+        def render_group_rmhost_events(events)
+          events.each { |event| render_group_rmhost_event(event) }
+        end
+
+        def render_group_rmhost_event(event)
+          payload = event.payload
+
+          return render_group_rmhost_warning(payload) if event.type == :group_host_association_missing
+          return render_group_rmhost_missing(payload) if event.type == :missing_skipping
+
+          case event.type
+          when :removing_group_host_association
+            fmt.puts 2, "- remove association {group:#{payload[:group]} <-> host:#{payload[:host]}}..."
+          when :adding_automatic_group
+            fmt.puts 2, "- add automatic association {group:ungrouped <-> host:#{payload[:host]}}..."
+          when :ok
+            fmt.puts payload[:indent], '- OK'
+          end
+        end
+
+        def render_group_rmhost_warning(payload)
+          fmt.warn "Association {group:#{payload[:group]} <-> host:#{payload[:host]}} doesn't exist, skipping.\n"
+        end
+
+        def render_group_rmhost_missing(payload)
+          fmt.puts payload[:indent], "- doesn't exist, skipping."
         end
       end
     end
