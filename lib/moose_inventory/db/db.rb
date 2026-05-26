@@ -92,7 +92,7 @@ module Moose
           case tries
           when 1..10
             if Moose::Inventory::Config._confopts[:trace] == true
-              STDERR.puts e.message
+              $stderr.puts e.message
             end
             sleep rand
             retry
@@ -108,8 +108,8 @@ module Moose
           warn 'An error occurred during a transaction, any changes have been rolled back.'
 
           if Moose::Inventory::Config._confopts[:trace] == true
-            STDERR.puts $ERROR_INFO.backtrace
-            abort("ERROR: #{e}")
+            $stderr.puts e.full_message(highlight: false, order: :top)
+            abort("ERROR: #{e.message}")
           else
             abort("ERROR: #{e.message}")
           end
