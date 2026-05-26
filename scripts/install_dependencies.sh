@@ -4,6 +4,8 @@ set -euo pipefail
 sudo dnf groupinstall -y "C Development Tools and Libraries" "Development Tools"
 sudo dnf install -y \
             ansible \
+            gitleaks \
+            golang \
             ruby \
             ruby-devel \
             rubygem-bundler \

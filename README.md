@@ -384,7 +384,15 @@ Run the local verification gate before committing changes:
 ./scripts/check.sh
 ```
 
-The check script runs the RSpec suite and enforces the SimpleCov coverage minimum.
+The check script runs the RSpec suite, enforces the SimpleCov coverage minimum, checks file permissions, queries OSV for locked RubyGems advisories, runs `bundler-audit`, runs `gitleaks` when available, and builds/smoke-tests the packaged gem.
+
+Optional Go-based security tools used by CI can be installed locally with:
+
+```shell
+./scripts/ci/install_security_tools.sh
+```
+
+That installs `gitleaks` and `osv-scanner` into `tmp/security-tools/bin` unless they are already on `PATH`. Fedora users can also run `./scripts/install_dependencies.sh` to install the native build dependencies and packaged `gitleaks`; `bundler-audit` is installed through Bundler.
 
 ## Contributing
 1. Fork it (https://github.com/RusDavies/moose-inventory/fork )
