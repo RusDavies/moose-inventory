@@ -11,8 +11,8 @@ Release readiness status counts: 6 done / 1 open.
 ## Done
 
 1. Resolve GitHub Actions Node.js 20 deprecation warning.
-   - Added `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` to the CI workflow so JavaScript actions run on Node.js 24 before GitHub's forced default switch.
-   - Verified with full `./scripts/check.sh` and a post-merge GitHub Actions run.
+   - Updated the CI workflow to use `actions/checkout@v5`, which runs on the Node.js 24 runtime.
+   - Verified with full `./scripts/check.sh` and a post-merge GitHub Actions run with no Node.js 20 deprecation annotations.
 
 1. Decide and declare the supported Ruby version floor.
    - Set `spec.required_ruby_version` to `>= 3.2` in the gemspec.
