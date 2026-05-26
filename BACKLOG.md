@@ -225,13 +225,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 5 done / 0 open.
+Code quality status counts: 6 done / 0 open.
 
 ## Open
 
 _No open code quality items._
 
 ## Done
+
+1. Extract `group add` into the operation/context/event pattern.
+   - Added `Moose::Inventory::Operations::AddGroups` with structured result/events and warning counts, mirroring the `host add` refactor pattern.
+   - Converted `group add` into a thin Thor adapter that validates input, delegates through `InventoryContext`, and renders operation events without changing CLI behavior.
+   - Added direct operation specs and extended the targeted RuboCop scope to cover the new operation/adapter/spec files.
+   - Verified with focused specs and full `./scripts/check.sh`.
 
 1. Reintroduce a small modern lint/complexity gate.
    - Added RuboCop as a development dependency and a targeted `.rubocop.yml` for the newly refactored seam instead of the whole legacy tree.

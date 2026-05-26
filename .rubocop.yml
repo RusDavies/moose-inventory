@@ -18,6 +18,7 @@ Metrics/PerceivedComplexity:
 Metrics/BlockLength:
   Exclude:
     - spec/lib/moose_inventory/operations/add_hosts_spec.rb
+    - spec/lib/moose_inventory/operations/add_groups_spec.rb
 
 Style/Documentation:
   Enabled: false
