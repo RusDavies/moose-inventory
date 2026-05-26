@@ -272,15 +272,16 @@ module Moose
 
         # Quick check that expected keys are at least present
         config = Moose::Inventory::Config._settings[:config][:db]
-        [:host, :database, :user, :password].each do |key|
+        [:host, :database, :user].each do |key|
           if config[key].nil?
             fail @exceptions[:moose],
                  "Expected key #{key} missing in mysql configuration"
           end
         end
+        password = db_password(config, 'mysql')
 
         @db = Sequel.mysql2(user: config[:user],
-                            password: config[:password],
+                            password: password,
                             host: config[:host],
                             database: config[:database])
       end
@@ -291,17 +292,36 @@ module Moose
 
         # Quick check that expected keys are at least present
         config = Moose::Inventory::Config._settings[:config][:db]
-        [:host, :database, :user, :password].each do |key|
+        [:host, :database, :user].each do |key|
           if config[key].nil?
             fail @exceptions[:moose],
                  "Expected key #{key} missing in postgresql configuration"
           end
         end
+        password = db_password(config, 'postgresql')
 
         @db = Sequel.postgres(user: config[:user],
-                              password: config[:password],
+                              password: password,
                               host: config[:host],
                               database: config[:database])
+      end
+
+      #--------------------
+      def self.db_password(config, adapter)
+        return config[:password] unless config[:password].nil?
+
+        if config[:password_env].nil?
+          fail @exceptions[:moose],
+               "Expected key password or password_env missing in #{adapter} configuration"
+        end
+
+        password = ENV.fetch(config[:password_env].to_s, nil)
+        if password.nil? || password.empty?
+          fail @exceptions[:moose],
+               "Environment variable #{config[:password_env]} is not set for #{adapter} password"
+        end
+
+        password
       end
     end
   end

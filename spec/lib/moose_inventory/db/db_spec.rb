@@ -190,6 +190,59 @@ RSpec.describe 'Moose::Inventory::DB' do
       end
     end
 
+    it 'raises a Moose DB exception when password and password_env are missing' do
+      with_db_config(
+        adapter: 'mysql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        user: 'moose'
+      ) do
+        expect { @db.init_mysql }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /Expected key password or password_env missing in mysql configuration/
+        )
+      end
+    end
+
+    it 'uses a mysql password from the configured environment variable' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+      saved_password = ENV['MOOSE_INVENTORY_MYSQL_PASSWORD']
+      mysql_config = {
+        adapter: 'mysql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        user: 'moose',
+        password_env: 'MOOSE_INVENTORY_MYSQL_PASSWORD',
+      }
+
+      begin
+        ENV['MOOSE_INVENTORY_MYSQL_PASSWORD'] = 'env-secret'
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: mysql_config }
+
+        expect(Sequel).to receive(:mysql2).with(
+          user: 'moose',
+          password: 'env-secret',
+          host: 'localhost',
+          database: 'moose_inventory_test'
+        ).and_return(:mysql2_connection)
+
+        @db.init_mysql
+        expect(@db.db).to eq(:mysql2_connection)
+      ensure
+        if saved_password.nil?
+          ENV.delete('MOOSE_INVENTORY_MYSQL_PASSWORD')
+        else
+          ENV['MOOSE_INVENTORY_MYSQL_PASSWORD'] = saved_password
+        end
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
+      end
+    end
+
     it 'uses the mysql2 Sequel adapter with configured connection settings' do
       saved_db = @db.instance_variable_get(:@db)
       saved_settings = @config._settings.dup
@@ -235,6 +288,67 @@ RSpec.describe 'Moose::Inventory::DB' do
           Moose::Inventory::DB::MooseDBException,
           /Expected key user missing in postgresql configuration/
         )
+      end
+    end
+
+    it 'raises a Moose DB exception when password_env points to an unset variable' do
+      saved_password = ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD']
+      ENV.delete('MOOSE_INVENTORY_POSTGRES_PASSWORD')
+
+      begin
+        with_db_config(
+          adapter: 'postgresql',
+          host: 'localhost',
+          database: 'moose_inventory_test',
+          user: 'moose',
+          password_env: 'MOOSE_INVENTORY_POSTGRES_PASSWORD'
+        ) do
+          expect { @db.init_postgresql }.to raise_error(
+            Moose::Inventory::DB::MooseDBException,
+            /Environment variable MOOSE_INVENTORY_POSTGRES_PASSWORD is not set for postgresql password/
+          )
+        end
+      ensure
+        ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD'] = saved_password unless saved_password.nil?
+      end
+    end
+
+    it 'uses a postgresql password from the configured environment variable' do
+      saved_db = @db.instance_variable_get(:@db)
+      saved_settings = @config._settings.dup
+      saved_password = ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD']
+      postgresql_config = {
+        adapter: 'postgresql',
+        host: 'localhost',
+        database: 'moose_inventory_test',
+        user: 'moose',
+        password_env: 'MOOSE_INVENTORY_POSTGRES_PASSWORD',
+      }
+
+      begin
+        ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD'] = 'env-secret'
+        @db.instance_variable_set(:@db, nil)
+        @config._settings.clear
+        @config._settings[:config] = { db: postgresql_config }
+
+        expect(Sequel).to receive(:postgres).with(
+          user: 'moose',
+          password: 'env-secret',
+          host: 'localhost',
+          database: 'moose_inventory_test'
+        ).and_return(:postgresql_connection)
+
+        @db.init_postgresql
+        expect(@db.db).to eq(:postgresql_connection)
+      ensure
+        if saved_password.nil?
+          ENV.delete('MOOSE_INVENTORY_POSTGRES_PASSWORD')
+        else
+          ENV['MOOSE_INVENTORY_POSTGRES_PASSWORD'] = saved_password
+        end
+        @db.instance_variable_set(:@db, saved_db)
+        @config._settings.clear
+        @config._settings.merge!(saved_settings)
       end
     end
 
