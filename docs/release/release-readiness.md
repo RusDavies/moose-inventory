@@ -36,7 +36,7 @@ The release workflow runs when a `v*` tag is pushed. It:
 4. Runs the full local `./scripts/check.sh` gate.
 5. Publishes the gem with `rubygems/release-gem@v1` using RubyGems trusted publishing/OIDC.
 
-RubyGems must also have a trusted publisher configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`; otherwise the workflow cannot receive a short-lived publish token.
+RubyGems has a trusted publisher configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`, so the workflow can request a short-lived publish token when a real release tag is pushed.
 
 ## Package sanity expectations
 

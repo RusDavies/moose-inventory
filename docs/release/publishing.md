@@ -8,20 +8,13 @@ The preferred publishing path is GitHub Actions trusted publishing from reviewed
 
 The repository side is `.github/workflows/release.yml`.
 
-Before the workflow can publish, a RubyGems owner must configure a trusted publisher for the existing `moose-inventory` gem on RubyGems.org:
+RubyGems has a trusted publisher configured for the existing `moose-inventory` gem on RubyGems.org with these values:
 
 - Repository owner: `RusDavies`
 - Repository name: `moose-inventory`
 - Workflow filename: `release.yml`
 - Environment: `release`
-- Workflow repository owner/name: leave blank, because the workflow lives in this repository
-
-RubyGems setup path:
-
-1. Sign in to RubyGems.org as a `moose-inventory` owner.
-2. Open the `moose-inventory` gem page.
-3. Open **Trusted publishers**.
-4. Create a GitHub Actions trusted publisher with the values above.
+- Workflow repository owner/name: blank, because the workflow lives in this repository
 
 The release workflow requires the GitHub environment name `release`. If that environment has protection rules, approve the deployment when releasing.
 
