@@ -22,7 +22,7 @@ module Moose
 
           names = normalize_names(argv)
           results = query_inventory.get_hosts(names: names)
-          fmt.dump(results)
+          fmt.dump(results, output_format)
         end
 
         private

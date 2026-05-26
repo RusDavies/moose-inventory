@@ -15,7 +15,7 @@ module Moose
           abort("ERROR: Wrong number of arguments, #{argv.length} for 1 or more") if argv.empty?
 
           names = normalize_names(argv)
-          fmt.dump(query_inventory.get_groups(names: names))
+          fmt.dump(query_inventory.get_groups(names: names), output_format)
         end
 
         private

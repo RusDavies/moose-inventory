@@ -4,6 +4,8 @@
 
 require 'yaml'
 
+require_relative '../runtime_options'
+
 module Moose
   module Inventory
     ##
@@ -16,6 +18,7 @@ module Moose
       @_argv = []
       @_confopts = {}
       @_settings = {}
+      @runtime_options = nil
 
       attr_reader :_argv, :_confopts, :_settings
 
@@ -29,16 +32,46 @@ module Moose
         ansible_args
         resolve_config_file
         load
+        refresh_runtime_options
       end
 
       def self.reset_runtime_state
         @_argv = []
         @_confopts = default_confopts
         @_settings = {}
+        @runtime_options = nil
       end
 
       def self.default_confopts
         { env: '', format: 'json', ansible: false, trace: false }
+      end
+
+      def self.runtime_options
+        @runtime_options ||= build_runtime_options
+      end
+
+      def self.application_args
+        runtime_options.argv
+      end
+
+      def self.output_format
+        runtime_options.output_format
+      end
+
+      def self.ansible?
+        runtime_options.ansible? || @_confopts[:ansible] == true
+      end
+
+      def self.trace_enabled?
+        runtime_options.trace? || @_confopts[:trace] == true
+      end
+
+      def self.db_settings
+        @_settings[:config][:db]
+      end
+
+      def self._runtime_options
+        @runtime_options
       end
 
       #----------------------
@@ -216,6 +249,23 @@ module Moose
         @_confopts[:ansible] = true
         normalize_ansible_format!
         @_argv = argv
+      end
+
+      def self.refresh_runtime_options
+        @runtime_options = build_runtime_options
+      end
+
+      def self.build_runtime_options
+        Moose::Inventory::RuntimeOptions.new(
+          argv: @_argv.dup,
+          config: @_confopts[:config],
+          env: @_confopts[:env],
+          format: @_confopts[:format],
+          flags: {
+            ansible: @_confopts[:ansible],
+            trace: @_confopts[:trace]
+          }
+        )
       end
 
       def self.symbolize_key(key)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -33,7 +35,7 @@ RSpec.describe Moose::Inventory::Cli::Formatter do
       actual = runner { @formatter.out(test, 'json') }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
-      desired[:STDOUT] = test.to_json + "\n"
+      desired[:STDOUT] = "#{test.to_json}\n"
 
       expected(actual, desired)
     end
@@ -44,7 +46,7 @@ RSpec.describe Moose::Inventory::Cli::Formatter do
       actual = runner { @formatter.out(test, 'prettyjson') }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
-      desired[:STDOUT] = JSON.pretty_generate(test) + "\n"
+      desired[:STDOUT] = "#{JSON.pretty_generate(test)}\n"
 
       expected(actual, desired)
     end
@@ -56,6 +58,15 @@ RSpec.describe Moose::Inventory::Cli::Formatter do
 
       desired = { aborted: true, STDOUT: '', STDERR: '' }
       desired[:STDERR] = "Output format 'unknown-type' is not yet supported.\n"
+
+      expected(actual, desired)
+    end
+
+    it 'info() prints the provided message instead of a literal placeholder' do
+      actual = runner { @formatter.info(2, 'hello world') }
+
+      desired = { aborted: false, STDOUT: '', STDERR: '' }
+      desired[:STDOUT] = '  INFO: hello world'
 
       expected(actual, desired)
     end

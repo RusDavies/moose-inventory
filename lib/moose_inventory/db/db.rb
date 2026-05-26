@@ -111,7 +111,7 @@ module Moose
         rescue @exceptions[:moose] => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
 
-          warn e.full_message(highlight: false, order: :top) if Moose::Inventory::Config._confopts[:trace] == true
+          warn e.full_message(highlight: false, order: :top) if Moose::Inventory::Config.trace_enabled?
           abort("ERROR: #{e.message}")
         rescue Exception => e
           warn 'An error occurred during a transaction, any changes have been rolled back.'
@@ -143,7 +143,7 @@ module Moose
 
       def self.retry_busy_transaction(error, tries)
         if tries <= 10
-          warn error.message if Moose::Inventory::Config._confopts[:trace] == true
+          warn error.message if Moose::Inventory::Config.trace_enabled?
           sleep rand
           return
         end
@@ -211,7 +211,7 @@ module Moose
       end
 
       def self.config_db_settings
-        Moose::Inventory::Config._settings[:config][:db]
+        Moose::Inventory::Config.db_settings
       end
 
       def self.normalized_adapter

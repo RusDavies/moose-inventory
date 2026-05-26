@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -7,9 +9,9 @@ RSpec.describe Moose::Inventory::Cli::Host do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -36,13 +38,13 @@ RSpec.describe Moose::Inventory::Cli::Host do
   describe 'rm' do
     #---------------
     it 'Host.rm() should be responsive' do
-      result = @host.instance_methods(false).include?(:rm)
+      result = @host.method_defined?(:rm, false)
       expect(result).to eq(true)
     end
 
     #---------------
     it '<missing argument> ... should abort with an error' do
-      actual = runner { @app.start(%w(host rm)) }
+      actual = runner { @app.start(%w[host rm]) }
 
       # Check output
       desired = { aborted: true, STDERR: '', STDOUT: '' }
@@ -59,15 +61,15 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       # no items in the db
       name = 'fake'
-      actual = runner { @app.start(%W(host rm #{name})) }
+      actual = runner { @app.start(%W[host rm #{name}]) }
 
       desired = {}
       desired[:STDOUT] =
-        "Remove host '#{name}':\n"\
-        "  - Retrieve host '#{name}'...\n"\
-        "    - No such host, skipping.\n"\
-        "    - OK\n"\
-        "  - All OK\n"\
+        "Remove host '#{name}':\n  " \
+        "- Retrieve host '#{name}'...\n    " \
+        "- No such host, skipping.\n    " \
+        "- OK\n  " \
+        "- All OK\n" \
         "Succeeded, with warnings.\n"
       desired[:STDERR] =
         "WARNING: Host '#{name}' does not exist, skipping.\n"
@@ -80,17 +82,17 @@ RSpec.describe Moose::Inventory::Cli::Host do
       name = 'test1'
       @db.models[:host].create(name: name)
 
-      actual = runner { @app.start(%W(host rm #{name})) }
+      actual = runner { @app.start(%W[host rm #{name}]) }
 
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Remove host '#{name}':\n"\
-        "  - Retrieve host '#{name}'...\n"\
-        "    - OK\n"\
-        "  - Destroy host '#{name}'...\n"\
-        "    - OK\n"\
-        "  - All OK\n"\
+        "Remove host '#{name}':\n  " \
+        "- Retrieve host '#{name}'...\n    " \
+        "- OK\n  " \
+        "- Destroy host '#{name}'...\n    " \
+        "- OK\n  " \
+        "- All OK\n" \
         "Succeeded.\n"
 
       expected(actual, desired)
@@ -102,26 +104,25 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
     #---------------
     it 'HOST1 HOST2 ... should remove multiple hosts' do
-      names = %w(host1 host2 host3)
+      names = %w[host1 host2 host3]
       names.each do |name|
         @db.models[:host].create(name: name)
       end
 
-      actual = runner { @app.start(%w(host rm) + names) }
+      actual = runner { @app.start(%w[host rm] + names) }
 
       # Check output
       desired = { aborted: false, STDERR: '', STDOUT: '' }
       names.each do |name|
         desired[:STDOUT] = desired[:STDOUT] +
-                           "Remove host '#{name}':\n"\
-                           "  - Retrieve host '#{name}'...\n"\
-                           "    - OK\n"\
-                           "  - Destroy host '#{name}'...\n"\
-                           "    - OK\n"\
-                           "  - All OK\n"
+                           "Remove host '#{name}':\n  " \
+                           "- Retrieve host '#{name}'...\n    " \
+                           "- OK\n  " \
+                           "- Destroy host '#{name}'...\n    " \
+                           "- OK\n  " \
+                           "- All OK\n"
       end
-      desired[:STDOUT] = desired[:STDOUT] +
-                         "Succeeded.\n"
+      desired[:STDOUT] = "#{desired[:STDOUT]}Succeeded.\n"
       expected(actual, desired)
 
       # Check db

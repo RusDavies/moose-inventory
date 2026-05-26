@@ -18,7 +18,7 @@ module Moose
         Moose::Inventory::DB.init
 
         # Start the main application
-        Moose::Inventory::Cli::Application.start(Moose::Inventory::Config._argv)
+        Moose::Inventory::Cli::Application.start(Moose::Inventory::Config.application_args)
       end
     end
   end

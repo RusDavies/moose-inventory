@@ -14,9 +14,8 @@ module Moose
         desc 'list',
              'List the groups, together with any associated hosts and groupvars'
         def list
-          confopts = Moose::Inventory::Config._confopts
-          results = query_inventory.list_groups(ansible: confopts[:ansible] == true)
-          fmt.dump(results)
+          results = query_inventory.list_groups(ansible: ansible_mode?)
+          fmt.dump(results, output_format)
         end
 
         private

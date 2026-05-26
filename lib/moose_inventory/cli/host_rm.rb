@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 
-require_relative './formatter.rb'
-require_relative '../db/exceptions.rb'
+require_relative '../inventory_context'
+require_relative '../operations/remove_hosts'
 
 module Moose
   module Inventory
@@ -13,48 +15,57 @@ module Moose
         #==========================
         desc 'rm HOSTNAME_1 [HOSTNAME_2 ...]',
              'Remove hosts HOSTNAME_n from the inventory'
-        def rm(*argv) # rubocop:disable Metrics/AbcSize
-          #
-          # Sanity
-          if argv.empty?
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more.")
+        def rm(*argv)
+          abort_if_missing_args(argv, 1, '1 or more')
+
+          result = remove_hosts_operation.call(names: normalize_names(argv))
+          render_remove_hosts_events(result.events)
+
+          puts(result.warning_count.zero? ? 'Succeeded.' : 'Succeeded, with warnings.')
+        rescue db.exceptions[:moose] => e
+          abort("ERROR: #{e}")
+        end
+
+        private
+
+        def remove_hosts_operation
+          Moose::Inventory::Operations::RemoveHosts.new(
+            context: Moose::Inventory::InventoryContext.new(db: db)
+          )
+        end
+
+        def render_remove_hosts_events(events)
+          events.each { |event| render_remove_hosts_event(event) }
+        end
+
+        def render_remove_hosts_event(event)
+          payload = event.payload
+
+          return render_host_rm_progress(event.type, payload) if host_rm_progress_event?(event.type)
+          return render_host_rm_warning(payload) if event.type == :host_missing
+          return fmt.puts(payload[:indent], '- No such host, skipping.') if event.type == :missing_skipping
+          return fmt.puts(payload[:indent], '- OK') if event.type == :ok
+
+          fmt.puts 2, '- All OK' if event.type == :host_complete
+        end
+
+        def host_rm_progress_event?(type)
+          %i[host_started retrieving_host destroying_host].include?(type)
+        end
+
+        def render_host_rm_progress(type, payload)
+          case type
+          when :host_started
+            puts "Remove host '#{payload[:name]}':"
+          when :retrieving_host
+            fmt.puts 2, "- Retrieve host '#{payload[:name]}'..."
+          when :destroying_host
+            fmt.puts 2, "- Destroy host '#{payload[:name]}'..."
           end
+        end
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
-
-          # Arguments
-          names = argv.uniq.map(&:downcase)
-
-          # Transaction
-          warn_count = 0
-          db.transaction do # Transaction start
-            names.each do |name|
-              puts "Remove host '#{name}':"
-              fmt.puts 2, "- Retrieve host '#{name}'..."
-              host = db.models[:host].find(name: name)
-              if host.nil?
-                warn_count += 1
-                fmt.warn "Host '#{name}' does not exist, skipping.\n"
-                fmt.puts 4, '- No such host, skipping.'
-              end
-              fmt.puts 4, '- OK'
-              unless host.nil?
-                fmt.puts 2, "- Destroy host '#{name}'..."
-                host.remove_all_groups
-                host.destroy
-                fmt.puts 4, '- OK'
-              end
-              fmt.puts 2, '- All OK'
-            end
-          end # Transaction end
-          if warn_count == 0
-            puts 'Succeeded.'
-          else
-            puts 'Succeeded, with warnings.'
-          end
+        def render_host_rm_warning(payload)
+          fmt.warn "Host '#{payload[:name]}' does not exist, skipping.\n"
         end
       end
     end

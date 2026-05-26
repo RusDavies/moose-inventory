@@ -37,6 +37,15 @@ RSpec.describe 'Moose::Inventory::Config' do
       expect(@config._settings[:junk]).to be_nil
       expect(@config._argv).not_to include('--junk')
     end
+
+    it 'builds a runtime options object from the resolved arguments' do
+      @config.init(@mockargs)
+
+      expect(@config.runtime_options.argv).to eq([])
+      expect(@config.runtime_options.output_format).to eq('yaml')
+      expect(@config.runtime_options.ansible?).to eq(false)
+      expect(@config.application_args).to eq([])
+    end
   end
 
   # ._configopts

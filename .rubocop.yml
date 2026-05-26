@@ -26,6 +26,8 @@ Metrics/PerceivedComplexity:
 
 Metrics/BlockLength:
   Exclude:
+    - spec/lib/moose_inventory/cli/formatter_spec.rb
+    - spec/lib/moose_inventory/cli/host_rm_spec.rb
     - spec/lib/moose_inventory/config/config_spec.rb
     - spec/lib/moose_inventory/db/db_spec.rb
     - spec/lib/moose_inventory/operations/add_hosts_spec.rb
@@ -35,6 +37,7 @@ Metrics/BlockLength:
     - spec/lib/moose_inventory/operations/group_child_relations_spec.rb
     - spec/lib/moose_inventory/operations/remove_groups_spec.rb
     - spec/lib/moose_inventory/operations/add_variables_spec.rb
+    - spec/lib/moose_inventory/operations/remove_hosts_spec.rb
     - spec/lib/moose_inventory/operations/remove_variables_spec.rb
     - spec/lib/moose_inventory/operations/query_inventory_spec.rb
 
