@@ -516,5 +516,53 @@ RSpec.describe 'Moose::Inventory::DB' do
 
       expect(count[:final]).to eq(count[:initial])
     end
+
+    it 'prints concise Moose DB transaction errors by default' do
+      saved_trace = @config._confopts[:trace]
+      @config._confopts[:trace] = false
+
+      begin
+        actual = runner do
+          @db.transaction do
+            fail @db.exceptions[:moose], 'Trace regression target'
+          end
+        end
+      ensure
+        @config._confopts[:trace] = saved_trace
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to eq(
+        "An error occurred during a transaction, any changes have been rolled back.\n" \
+        "ERROR: Trace regression target\n"
+      )
+    end
+
+    it 'prints the Moose DB exception backtrace when trace is enabled' do
+      saved_trace = @config._confopts[:trace]
+      @config._confopts[:trace] = true
+
+      begin
+        actual = runner do
+          @db.transaction do
+            fail @db.exceptions[:moose], 'Trace regression target'
+          end
+        end
+      ensure
+        @config._confopts[:trace] = saved_trace
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to include(
+        "An error occurred during a transaction, any changes have been rolled back.\n"
+      )
+      expect(actual[:STDERR]).to include('Moose::Inventory::DB::MooseDBException')
+      expect(actual[:STDERR]).to include('Trace regression target')
+      expect(actual[:STDERR]).to include('spec/lib/moose_inventory/db/db_spec.rb')
+      expect(actual[:STDERR]).to include("ERROR: Trace regression target\n")
+      expect(actual[:STDERR]).not_to include('NoMethodError')
+    end
   end
 end

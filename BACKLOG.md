@@ -52,7 +52,7 @@ Release readiness status counts: 8 done / 1 open.
 
 # Moose Inventory GitHub Issues Backlog
 
-GitHub issues status counts: 1 done / 3 open.
+GitHub issues status counts: 2 done / 2 open.
 
 ## Open
 
@@ -65,12 +65,13 @@ GitHub issues status counts: 1 done / 3 open.
    - Decide product semantics for recursive group deletion: default behavior, explicit switch, safety prompts/flags, and how to distinguish intentional tree deletion from accidental orphan cleanup.
    - If implemented, add tests for `group rm` and `group rmchild` orphan-child behavior, root-group handling, and host `ungrouped` behavior.
 
-1. [#4 `--trace` doesn't do what it claims](https://github.com/RusDavies/moose-inventory/issues/4)
-   - Reproduce current `--trace` behavior and confirm whether exceptions/backtraces are still truncated.
-   - Fix trace handling so transaction errors emit useful full exception/backtrace information when `--trace` is enabled while preserving concise default errors.
-   - Add regression coverage for both trace and non-trace error output.
-
 ## Done
+
+1. [#4 `--trace` doesn't do what it claims](https://github.com/RusDavies/moose-inventory/issues/4)
+   - Reproduced the broken trace path: `--trace` attempted to print `$ERROR_INFO.backtrace` without requiring `English`, causing a secondary `NoMethodError` instead of a clean trace dump.
+   - Fixed Moose DB transaction trace handling to emit the actual exception full message/backtrace while preserving concise default errors.
+   - Added regression coverage for both trace and non-trace Moose DB transaction errors.
+   - Verified with full `./scripts/check.sh`.
 
 1. [#14 Passwords in config files](https://github.com/RusDavies/moose-inventory/issues/14)
    - Added `password_env` support for MySQL and PostgreSQL database configuration while preserving the existing `password` key for compatibility.
