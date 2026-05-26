@@ -1,14 +1,20 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 6 done / 1 open.
+Release readiness status counts: 7 done / 1 open.
 
 ## Open
 
-1. Add GitHub Actions RubyGems trusted publishing.
-   - Manual publishing is documented in `docs/release/publishing.md`.
-   - Future improvement: configure RubyGems trusted publishing, publish from reviewed `v*` tags, and avoid long-lived RubyGems API keys on developer machines.
+1. Configure RubyGems trusted publisher for the existing gem.
+   - Repository-side trusted publishing workflow is present in `.github/workflows/release.yml`.
+   - A RubyGems owner must configure the `moose-inventory` gem trusted publisher on RubyGems.org for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
+   - After RubyGems is configured, verify with the next real version tag; do not retag already-published `v1.0.9`.
 
 ## Done
+
+1. Add GitHub Actions RubyGems trusted publishing.
+   - Added `.github/workflows/release.yml` triggered by `v*` tags.
+   - The workflow verifies the tag matches `Moose::Inventory::VERSION`, runs `./scripts/check.sh`, and publishes with `rubygems/release-gem@v1` using OIDC/trusted publishing.
+   - Updated `docs/release/publishing.md` and `docs/release/release-readiness.md` with trusted publishing release instructions and RubyGems setup requirements.
 
 1. Resolve GitHub Actions Node.js 20 deprecation warning.
    - Updated the CI workflow to use `actions/checkout@v5`, which runs on the Node.js 24 runtime.

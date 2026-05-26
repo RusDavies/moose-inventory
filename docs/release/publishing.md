@@ -1,14 +1,31 @@
 # Publishing to RubyGems
 
-This project has historically been published manually to RubyGems as [`moose-inventory`](https://rubygems.org/gems/moose-inventory).
+This project is published to RubyGems as [`moose-inventory`](https://rubygems.org/gems/moose-inventory).
 
-At the time this document was added:
+The preferred publishing path is GitHub Actions trusted publishing from reviewed `v*` tags. Manual publishing remains documented as a fallback only.
 
-- The latest published RubyGems version was `1.0.8`.
-- The repository version was `1.0.9` in `lib/moose_inventory/version.rb`.
-- The repository had CI for checks, but no GitHub Actions publishing workflow.
+## Trusted publishing setup
 
-## Release checklist
+The repository side is `.github/workflows/release.yml`.
+
+Before the workflow can publish, a RubyGems owner must configure a trusted publisher for the existing `moose-inventory` gem on RubyGems.org:
+
+- Repository owner: `RusDavies`
+- Repository name: `moose-inventory`
+- Workflow filename: `release.yml`
+- Environment: `release`
+- Workflow repository owner/name: leave blank, because the workflow lives in this repository
+
+RubyGems setup path:
+
+1. Sign in to RubyGems.org as a `moose-inventory` owner.
+2. Open the `moose-inventory` gem page.
+3. Open **Trusted publishers**.
+4. Create a GitHub Actions trusted publisher with the values above.
+
+The release workflow requires the GitHub environment name `release`. If that environment has protection rules, approve the deployment when releasing.
+
+## Trusted publishing release checklist
 
 1. Start from a clean `master` branch.
 
@@ -25,7 +42,7 @@ At the time this document was added:
    gem info moose-inventory --remote --all
    ```
 
-   If the repository version is already higher than the latest RubyGems version, you can publish it as-is after checks pass. If not, bump `lib/moose_inventory/version.rb` first and commit that change before publishing.
+   If the repository version is not higher than the latest RubyGems version, bump `lib/moose_inventory/version.rb` first and commit that change before releasing.
 
 3. Run the local release gate.
 
@@ -33,55 +50,57 @@ At the time this document was added:
    ./scripts/check.sh
    ```
 
-   This runs the spec suite, whitespace checks, executable-permission checks, OSV dependency advisory checks, and gem package sanity checks.
-
 4. Push the release commit and wait for CI to pass.
 
    ```bash
    git push origin master
    ```
 
-   Do not publish to RubyGems until the GitHub Actions CI run for the pushed commit is green.
+5. Create and push the release tag from the exact commit to publish.
 
-5. Build the gem from the exact commit you intend to release.
+   ```bash
+   git tag -a v1.0.10 -m "Release moose-inventory 1.0.10"
+   git push origin v1.0.10
+   ```
+
+6. Watch the `Release gem` workflow.
+
+   ```bash
+   gh run list --workflow release.yml --limit 5
+   gh run watch <run-id> --exit-status
+   ```
+
+The workflow verifies that the pushed tag version matches `Moose::Inventory::VERSION`, runs `./scripts/check.sh`, builds the gem through `rubygems/release-gem@v1`, and publishes using RubyGems trusted publishing/OIDC. No RubyGems API key should be stored in GitHub secrets for this workflow.
+
+## Verify the published version
+
+After the workflow succeeds:
+
+```bash
+gem info moose-inventory --remote --all
+gem install moose-inventory -v 1.0.10
+moose-inventory --help
+```
+
+Use the actual released version in place of `1.0.10`.
+
+## Manual fallback
+
+Manual publishing should only be used if trusted publishing is unavailable and a RubyGems owner explicitly chooses to publish from a local machine.
+
+1. Run `./scripts/check.sh`.
+2. Build the gem from the exact commit intended for release.
 
    ```bash
    rm -rf pkg tmp/pkg tmp/package-sanity
    gem build moose-inventory.gemspec
    ```
 
-   The output should be named like `moose-inventory-1.0.9.gem`.
-
-6. Inspect the built gem metadata if desired.
+3. Push the built gem.
 
    ```bash
-   gem specification moose-inventory-1.0.9.gem name version executables require_paths files --yaml
+   gem push moose-inventory-1.0.10.gem
    ```
-
-7. Publish to RubyGems.
-
-   ```bash
-   gem push moose-inventory-1.0.9.gem
-   ```
-
-   If RubyGems auth is not already configured, `gem push` will prompt for credentials or an API key.
-
-8. Verify the published version.
-
-   ```bash
-   gem info moose-inventory --remote --all
-   gem install moose-inventory -v 1.0.9
-   moose-inventory --help
-   ```
-
-9. Tag the release after RubyGems confirms it is live.
-
-   ```bash
-   git tag -a v1.0.9 -m "Release v1.0.9"
-   git push origin v1.0.9
-   ```
-
-## Authentication notes
 
 Prefer a scoped RubyGems API key over an old global key:
 
@@ -95,19 +114,3 @@ Check credential file permissions with:
 ls -l ~/.gem/credentials
 chmod 0600 ~/.gem/credentials
 ```
-
-## Current publishing model
-
-Publishing is manual. There is no automated release workflow in this repository yet.
-
-A future improvement would be to configure RubyGems trusted publishing through GitHub Actions so releases can be published from a tagged, reviewed workflow without long-lived RubyGems API keys on a developer machine.
-
-Suggested future workflow:
-
-1. Add RubyGems trusted publishing for this repository and gem.
-2. Add a GitHub Actions workflow triggered by `v*` tags.
-3. Have the workflow run `./scripts/check.sh`.
-4. Build the gem.
-5. Publish via trusted publishing only if the tag version matches `Moose::Inventory::VERSION`.
-
-Until that is implemented, use the manual process above.
