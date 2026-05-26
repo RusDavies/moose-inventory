@@ -1,0 +1,23 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.2
+
+Metrics/AbcSize:
+  Max: 32
+
+Metrics/MethodLength:
+  Max: 25
+
+Metrics/CyclomaticComplexity:
+  Max: 7
+
+Metrics/PerceivedComplexity:
+  Max: 8
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/lib/moose_inventory/operations/add_hosts_spec.rb
+
+Style/Documentation:
+  Enabled: false

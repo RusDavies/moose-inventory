@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Moose
   module Inventory
     module Cli
       ##
       # Shared helpers for Thor command classes.
       module Helpers
-        AUTOMATIC_GROUP = 'ungrouped'.freeze
+        AUTOMATIC_GROUP = 'ungrouped'
 
         private
 

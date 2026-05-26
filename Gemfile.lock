@@ -13,6 +13,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    ast (2.4.3)
     bigdecimal (4.1.2)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -21,10 +22,20 @@ GEM
     docile (1.4.1)
     indentation (0.1.1)
     json (2.19.5)
+    language_server-protocol (3.17.0.5)
+    lint_roller (1.1.0)
     mysql2 (0.5.7)
       bigdecimal
+    parallel (2.1.0)
+    parser (3.3.11.1)
+      ast (~> 2.4.1)
+      racc
     pg (1.6.3-x86_64-linux)
+    prism (1.9.0)
+    racc (1.8.1)
+    rainbow (3.1.1)
     rake (13.4.2)
+    regexp_parser (2.12.0)
     rspec (3.13.2)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -38,6 +49,21 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
+    rubocop (1.86.2)
+      json (~> 2.3)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.1.0)
+      parallel (>= 1.10)
+      parser (>= 3.3.0.2)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 2.9.3, < 3.0)
+      rubocop-ast (>= 1.49.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.49.1)
+      parser (>= 3.3.7.2)
+      prism (~> 1.7)
+    ruby-progressbar (1.13.0)
     sequel (5.104.0)
       bigdecimal
     simplecov (0.22.0)
@@ -48,6 +74,9 @@ GEM
     simplecov_json_formatter (0.1.4)
     sqlite3 (2.9.4-x86_64-linux-gnu)
     thor (1.5.0)
+    unicode-display_width (3.2.0)
+      unicode-emoji (~> 4.1)
+    unicode-emoji (4.2.0)
 
 PLATFORMS
   x86_64-linux
@@ -58,6 +87,7 @@ DEPENDENCIES
   moose-inventory!
   rake (>= 13.0, < 14)
   rspec (~> 3)
+  rubocop (>= 1.72, < 2)
   simplecov (~> 0)
 
 BUNDLED WITH

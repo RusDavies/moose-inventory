@@ -225,14 +225,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 4 done / 1 open.
+Code quality status counts: 5 done / 0 open.
 
 ## Open
 
-1. Reintroduce a small modern lint/complexity gate.
-   - Prefer a targeted RuboCop config for new/refactored code first, rather than forcing the whole inherited codebase through a style grinder in one pass.
+_No open code quality items._
 
 ## Done
+
+1. Reintroduce a small modern lint/complexity gate.
+   - Added RuboCop as a development dependency and a targeted `.rubocop.yml` for the newly refactored seam instead of the whole legacy tree.
+   - Added `scripts/ci/check_rubocop.sh` and wired it into `./scripts/check.sh` so lint/complexity checks run in the standard local and CI gate.
+   - Kept the initial lint scope focused on the context/operation/helper/adapter files and direct operation spec, with thresholds strict enough to catch drift without forcing a repo-wide cleanup right now.
 
 1. Separate first structured operation result from CLI rendering.
    - Changed `Moose::Inventory::Operations::AddHosts` to return structured `Result`/`Event` objects instead of writing directly to stdout/stderr.

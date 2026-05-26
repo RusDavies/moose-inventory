@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 require 'indentation'
 
-require_relative './formatter.rb'
-require_relative '../db/exceptions.rb'
-require_relative '../inventory_context.rb'
-require_relative '../operations/add_hosts.rb'
+require_relative 'formatter'
+require_relative '../db/exceptions'
+require_relative '../inventory_context'
+require_relative '../operations/add_hosts'
 
 module Moose
   module Inventory
@@ -17,9 +19,7 @@ module Moose
         desc 'add HOSTNAME_1 [HOSTNAME_2 ...]',
              'Add a hosts HOSTNAME_n to the inventory'
         option :groups
-        # rubocop:disable Metrics/LineLength
-        def add(*argv) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
-          # rubocop:enable Metrics/LineLength
+        def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
 
           # Arguments
@@ -62,7 +62,10 @@ module Moose
           when :group_missing_created
             fmt.warn "The group '#{payload[:name]}' doesn't exist, but will be created.\n"
           when :association_exists
-            fmt.warn "Association {host:#{payload[:host]} <-> group:#{payload[:group]}} already exists, skipping creation.\n"
+            fmt.warn(
+              "Association {host:#{payload[:host]} <-> group:#{payload[:group]}} " \
+              "already exists, skipping creation.\n"
+            )
           when :adding_automatic_group
             fmt.puts 2, "- Adding automatic association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
           when :host_complete
