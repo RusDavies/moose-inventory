@@ -25,10 +25,20 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
 
+      - name: Set up Go for security tools
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.25.x'
+          cache: false
+
       - name: Install native build dependencies
+        timeout-minutes: 5
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential default-libmysqlclient-dev libpq-dev libsqlite3-dev
+
+      - name: Install security audit tools
+        run: ./scripts/ci/install_security_tools.sh
 
       - name: Verify tag matches gem version
         run: |
@@ -40,6 +50,8 @@ jobs:
           fi
 
       - name: Run local check gate
+        env:
+          MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS: '1'
         run: ./scripts/check.sh
 
       - name: Publish gem to RubyGems
