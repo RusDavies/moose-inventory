@@ -1,0 +1,9 @@
+title = "moose-inventory gitleaks config"
+
+[allowlist]
+description = "Ignore generated/local audit artifacts that are not part of the packaged source surface."
+paths = [
+  '''^\.openclaw-security-audit/''',
+  '''^spec/reports/''',
+  '''^tmp/''',
+]

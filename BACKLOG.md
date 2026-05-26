@@ -1,6 +1,6 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 8 done / 2 open.
+Release readiness status counts: 9 done / 1 open.
 
 ## Open
 
@@ -9,12 +9,13 @@ Release readiness status counts: 8 done / 2 open.
    - Verify the full trusted-publishing path when publishing the next real version tag.
    - Do not retag already-published `v1.0.9`.
 
-1. Install optional local/CI security audit tools.
-   - Add setup guidance and/or CI wiring for missing audit tools noted in the 2026-05-26 security audit: `gitleaks` or `trufflehog` for dedicated secret scanning, plus `bundler-audit` and/or `osv-scanner` for broader dependency advisory coverage.
-   - Decide whether each tool should be a required CI gate, an optional local developer tool, or both.
-   - Keep generated coverage and package-sanity artifacts excluded from scanner paths.
-
 ## Done
+
+1. Install optional local/CI security audit tools.
+   - Added `bundler-audit` as a development dependency and wired it into `scripts/ci/check_security.sh`.
+   - Added `scripts/ci/install_security_tools.sh` to install pinned `gitleaks` and `osv-scanner` CLI tools into `tmp/security-tools/bin` when they are not already on `PATH`.
+   - Added `scripts/ci/check_secrets.sh` and `.gitleaks.toml` so generated audit, coverage, and package-sanity artifacts stay out of dedicated secret scans.
+   - Updated GitHub Actions CI to install the Go-based audit tools and require them during `./scripts/check.sh`; local runs skip missing optional tools unless `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1` is set.
 
 1. Configure RubyGems trusted publisher for the existing gem.
    - Repository-side trusted publishing workflow is present in `.github/workflows/release.yml`.

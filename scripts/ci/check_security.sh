@@ -48,3 +48,21 @@ if findings:
         print(f'- {name} {version}: {vuln_id} {summary}', file=sys.stderr)
     sys.exit(1)
 PY
+
+bundle exec bundle-audit check --update
+
+BIN_DIR="${MOOSE_INVENTORY_SECURITY_TOOLS_BIN:-$PWD/tmp/security-tools/bin}"
+if command -v osv-scanner >/dev/null 2>&1; then
+  OSV_SCANNER=(osv-scanner)
+elif [ -x "$BIN_DIR/osv-scanner" ]; then
+  OSV_SCANNER=("$BIN_DIR/osv-scanner")
+else
+  if [ "${MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS:-0}" = "1" ]; then
+    echo "osv-scanner is required but was not found. Run scripts/ci/install_security_tools.sh first." >&2
+    exit 2
+  fi
+  echo "osv-scanner not found; skipping osv-scanner lockfile scan."
+  exit 0
+fi
+
+"${OSV_SCANNER[@]}" scan source --lockfile Gemfile.lock .
