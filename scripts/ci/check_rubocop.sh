@@ -4,6 +4,7 @@ set -euo pipefail
 bundle exec rubocop \
   lib/moose_inventory/config/config.rb \
   lib/moose_inventory/db/db.rb \
+  lib/moose_inventory/runtime_options.rb \
   lib/moose_inventory/inventory_context.rb \
   lib/moose_inventory/operations/add_hosts.rb \
   lib/moose_inventory/operations/add_groups.rb \
@@ -14,7 +15,9 @@ bundle exec rubocop \
   lib/moose_inventory/operations/remove_groups.rb \
   lib/moose_inventory/operations/add_variables.rb \
   lib/moose_inventory/operations/remove_variables.rb \
+  lib/moose_inventory/operations/remove_hosts.rb \
   lib/moose_inventory/operations/query_inventory.rb \
+  lib/moose_inventory/cli/formatter.rb \
   lib/moose_inventory/cli/helpers.rb \
   lib/moose_inventory/cli/host_add.rb \
   lib/moose_inventory/cli/group_add.rb \
@@ -27,6 +30,7 @@ bundle exec rubocop \
   lib/moose_inventory/cli/group_rm.rb \
   lib/moose_inventory/cli/host_addvar.rb \
   lib/moose_inventory/cli/host_rmvar.rb \
+  lib/moose_inventory/cli/host_rm.rb \
   lib/moose_inventory/cli/group_addvar.rb \
   lib/moose_inventory/cli/group_rmvar.rb \
   lib/moose_inventory/cli/host_get.rb \
@@ -43,6 +47,9 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/remove_groups_spec.rb \
   spec/lib/moose_inventory/operations/add_variables_spec.rb \
   spec/lib/moose_inventory/operations/remove_variables_spec.rb \
+  spec/lib/moose_inventory/operations/remove_hosts_spec.rb \
   spec/lib/moose_inventory/operations/query_inventory_spec.rb \
+  spec/lib/moose_inventory/cli/formatter_spec.rb \
+  spec/lib/moose_inventory/cli/host_rm_spec.rb \
   spec/lib/moose_inventory/config/config_spec.rb \
   spec/lib/moose_inventory/db/db_spec.rb

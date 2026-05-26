@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'yaml'
 require 'indentation'
@@ -5,23 +7,17 @@ require 'indentation'
 module Moose
   module Inventory
     module Cli
-      ##
-      # TODO: Documentation
       module Formatter
         # rubocop:disable Style/ModuleFunction
         extend self
         # rubocop:enable Style/ModuleFunction
 
-        def self.dump(arg, format = nil)
+        def self.dump(arg, format = 'json')
           out(arg, format)
         end
 
-        def self.out(arg, format = nil)
+        def self.out(arg, format = 'json')
           return if arg.nil?
-
-          if format.nil?
-            format = Moose::Inventory::Config._confopts[:format].downcase
-          end
 
           case format
           when 'yaml', 'y'
@@ -50,7 +46,7 @@ module Moose
           when 'STDOUT'
             $stdout.puts msg.indent(indent)
           when 'STDERR'
-            $stderr.puts msg.indent(indent)
+            $stderr.print("#{msg.indent(indent)}\n")
           else
             abort("Output stream '#{stream}' is not known.")
           end
@@ -67,12 +63,12 @@ module Moose
           end
         end
 
-        def info(_indent, _msg, stream = 'STDOUT')
+        def info(indent, msg, stream = 'STDOUT')
           case stream
           when 'STDOUT'
-            $stdout.print 'INFO: {msg}'
+            $stdout.print "INFO: #{msg}".indent(indent)
           when 'STDERR'
-            $stderr.print 'INFO: {msg}'
+            $stderr.print "INFO: #{msg}".indent(indent)
           else
             abort("Output stream '#{stream}' is not known.")
           end

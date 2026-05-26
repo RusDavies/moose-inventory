@@ -18,6 +18,18 @@ module Moose
           Moose::Inventory::Cli::Formatter
         end
 
+        def runtime_options
+          Moose::Inventory::Config.runtime_options
+        end
+
+        def output_format
+          runtime_options.output_format
+        end
+
+        def ansible_mode?
+          runtime_options.ansible?
+        end
+
         def normalize_names(values)
           values.uniq.map(&:downcase)
         end

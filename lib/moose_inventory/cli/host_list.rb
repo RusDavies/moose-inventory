@@ -14,7 +14,7 @@ module Moose
       class Host
         desc 'list', 'List the contents of the inventory by host'
         def list
-          fmt.dump(query_inventory.list_hosts)
+          fmt.dump(query_inventory.list_hosts, output_format)
         end
 
         private

@@ -15,22 +15,20 @@ module Moose
         #==========================
         desc 'listvar', 'List all variables associated with the group'
         def listvars(*argv)
-          confopts = Moose::Inventory::Config._confopts
-
-          if confopts[:ansible] == true
+          if ansible_mode?
             abort_if_wrong_ansible_arg_count(argv, 1)
           else
             abort_if_missing_args(argv, 1, '1 or more')
           end
 
           names = normalize_names(argv)
-          results = query_inventory.list_group_vars(names: names, ansible: confopts[:ansible] == true)
+          results = query_inventory.list_group_vars(names: names, ansible: ansible_mode?)
 
-          if confopts[:ansible] == true && query_context.find_group(names.first).nil?
+          if ansible_mode? && query_context.find_group(names.first).nil?
             fmt.warn "The Group #{names.first} does not exist."
           end
 
-          fmt.dump(results)
+          fmt.dump(results, output_format)
         end
 
         private

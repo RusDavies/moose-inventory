@@ -234,13 +234,31 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 13 done / 0 open.
+Code quality status counts: 16 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Fix formatter output bug and make output format explicit at command call sites.
+   - Fixed `Moose::Inventory::Cli::Formatter.info` so it prints the provided message instead of the literal placeholder string `INFO: {msg}`.
+   - Removed the formatter's implicit reach-in to global config for output format; query-style CLI commands now pass the resolved output format explicitly when calling `fmt.dump`.
+   - Added regression coverage in `spec/lib/moose_inventory/cli/formatter_spec.rb` and extended the targeted RuboCop gate to cover the formatter and its spec.
+   - Verified with focused formatter/query CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
+
+1. Extract `host rm` into the operation/context/event seam.
+   - Added `Moose::Inventory::Operations::RemoveHosts` to own host lookup, warning accounting, removal, and structured event emission.
+   - Converted `host rm` into a thinner Thor adapter that validates input, delegates through `InventoryContext`, renders structured events, and preserves existing CLI output.
+   - Added direct operation coverage in `spec/lib/moose_inventory/operations/remove_hosts_spec.rb` and expanded the targeted RuboCop scope accordingly.
+   - Verified with focused `host rm`/operation specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
+
+1. Introduce a small runtime-options object for resolved CLI state.
+   - Added `Moose::Inventory::RuntimeOptions` so resolved argv/format/ansible/trace state is represented as a value object instead of the last few command/query paths reaching directly into `Config._confopts`.
+   - Updated `Moose::Inventory::Config` to expose `runtime_options`, `application_args`, `output_format`, `ansible?`, `trace_enabled?`, and `db_settings`, and rewired CLI/DB call sites to use those methods.
+   - Updated the top-level CLI entrypoint to launch Thor using `Config.application_args` instead of directly reading `Config._argv`.
+   - Verified with focused config/query/CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Tame remaining global DB/config singleton complexity.
    - Refactored `Moose::Inventory::Config` to reset runtime state explicitly on `init`, factor default options / flag parsing / config-path resolution / environment selection into smaller helper methods, and expose more explicit configuration-loading behavior without changing CLI semantics.
