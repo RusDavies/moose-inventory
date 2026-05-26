@@ -52,7 +52,7 @@ Release readiness status counts: 8 done / 1 open.
 
 # Moose Inventory GitHub Issues Backlog
 
-GitHub issues status counts: 2 done / 2 open.
+GitHub issues status counts: 3 done / 1 open.
 
 ## Open
 
@@ -61,11 +61,15 @@ GitHub issues status counts: 2 done / 2 open.
    - Existing code has historically needed complexity metric disables such as `Metrics/AbcSize` and `Metrics/CyclomaticComplexity`.
    - Evaluate cost/benefit before doing a broad refactor; identify specific low-risk extraction targets and regression coverage needed.
 
-1. [#12 Allow `group rm` to recursively delete orphaned child groups](https://github.com/RusDavies/moose-inventory/issues/12)
-   - Decide product semantics for recursive group deletion: default behavior, explicit switch, safety prompts/flags, and how to distinguish intentional tree deletion from accidental orphan cleanup.
-   - If implemented, add tests for `group rm` and `group rmchild` orphan-child behavior, root-group handling, and host `ungrouped` behavior.
-
 ## Done
+
+1. [#12 Allow `group rm` to recursively delete orphaned child groups](https://github.com/RusDavies/moose-inventory/issues/12)
+   - Kept default deletion conservative: `group rm NAME` removes only the named group and preserves child groups as root groups.
+   - Added explicit `group rm --recursive NAME` to delete descendant groups only when they become orphaned by the removal.
+   - Added explicit `group rmchild --delete-orphans PARENT CHILD...` to remove parent-child associations and delete orphaned child subtrees.
+   - Preserved groups that still have another parent outside the removed edge/subtree.
+   - Preserved host safety by moving hosts whose last group is deleted to `ungrouped`.
+   - Added regression coverage for recursive deletion, shared-parent preservation, and host fallback to `ungrouped`.
 
 1. [#4 `--trace` doesn't do what it claims](https://github.com/RusDavies/moose-inventory/issues/4)
    - Reproduced the broken trace path: `--trace` attempted to print `$ERROR_INFO.backtrace` without requiring `English`, causing a secondary `NoMethodError` instead of a clean trace dump.

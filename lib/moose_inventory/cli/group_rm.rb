@@ -8,9 +8,13 @@ module Moose
       # Implementation of "group rm" methods of the CLI
       class Group
         #==========================
+        option :recursive,
+               type: :boolean,
+               default: false,
+               desc: 'Also delete child groups that become orphaned'
         desc 'rm NAME',
              'Remove a group NAME from the inventory'
-        def rm(*argv) # rubocop:disable Metrics/AbcSize
+        def rm(*argv) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
           #
           # Sanity
           if argv.empty?
@@ -57,25 +61,12 @@ module Moose
                 groups_ds.each do |child|
                   fmt.puts 2, "- Remove association {group:#{name} <-> group:#{child.name}}..."
                   group.remove_child(child)
-                  # TODO: Should we propagate the delete to orphaned children?
                   fmt.puts 4, '- OK'
+                  delete_orphaned_group(child, db, fmt) if options[:recursive]
                 end
 
-                # Handle automatic group for any associated hosts
-                hosts_ds = group.hosts_dataset
-                hosts_ds.each do |host|
-                  host_groups_ds = host.groups_dataset
-                  next unless host_groups_ds.count == 1 # We're the only group
-                  fmt.puts 2, "- Adding automatic association {group:ungrouped <-> host:#{host[:name]}}..."
-                  ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
-                  host.add_group(ungrouped)
-                  fmt.puts 4, '- OK'
-                end
                 # Remove the group
-                fmt.puts 2, "- Destroy group '#{name}'..."
-                group.remove_all_hosts
-                group.destroy
-                fmt.puts 4, '- OK'
+                destroy_group(group, db, fmt)
               end
               fmt.puts 2, '- All OK'
             end
@@ -85,6 +76,41 @@ module Moose
           else
             puts 'Succeeded, with warnings.'
           end
+        end
+
+        private
+
+        def delete_orphaned_group(group, db, fmt)
+          return if group.name == 'ungrouped'
+          return unless group.parents_dataset.count.zero?
+
+          fmt.puts 2, "- Recursively delete orphaned group '#{group.name}'..."
+          group.children_dataset.each do |child|
+            fmt.puts 4, "- Remove association {group:#{group.name} <-> group:#{child.name}}..."
+            group.remove_child(child)
+            fmt.puts 6, '- OK'
+            delete_orphaned_group(child, db, fmt)
+          end
+          destroy_group(group, db, fmt, indent: 4)
+        end
+
+        def destroy_group(group, db, fmt, indent: 2)
+          group.hosts_dataset.each do |host|
+            host_groups_ds = host.groups_dataset
+            next unless host_groups_ds.count == 1 # We're the only group
+
+            fmt.puts indent,
+                     "- Adding automatic association {group:ungrouped <-> host:#{host[:name]}}..."
+            ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
+            host.add_group(ungrouped)
+            fmt.puts indent + 2, '- OK'
+          end
+
+          fmt.puts indent, "- Destroy group '#{group.name}'..."
+          group.remove_all_groupvars
+          group.remove_all_hosts
+          group.destroy
+          fmt.puts indent + 2, '- OK'
         end
       end
     end

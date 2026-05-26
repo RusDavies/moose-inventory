@@ -9,6 +9,10 @@ module Moose
       # Implemention of the "group rmchild" methods of the CLI
       class Group
         #==========================
+        option :delete_orphans,
+               type: :boolean,
+               default: false,
+               desc: 'Delete child groups that become orphaned'
         desc 'rmchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Dissociate one or more child-groups CHILDGROUP_n from PARENTGROUP'
         def rmchild(*_argv)
@@ -63,6 +67,7 @@ module Moose
                 cgroup = db.models[:group].find(name: cname)
                 pgroup.remove_child(cgroup)
                 fmt.puts 4, '- OK'
+                delete_orphaned_group(cgroup, db, fmt) if options[:delete_orphans]
               end
               fmt.puts 2, '- all OK'
             end # Transaction end

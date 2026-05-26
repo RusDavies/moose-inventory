@@ -169,5 +169,50 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       expected(actual, desired)
     end
+
+    #------------------------
+    it 'GROUP CHILDGROUP --delete-orphans ... should delete orphaned child groups recursively' do
+      runner { @app.start(%w(group add parent)) }
+      runner { @app.start(%w(group add child --hosts child-host)) }
+      runner { @app.start(%w(group add grandchild)) }
+      runner { @app.start(%w(group addchild parent child)) }
+      runner { @app.start(%w(group addchild child grandchild)) }
+
+      actual = runner do
+        @app.start(%w(group rmchild --delete-orphans parent child))
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include("- Recursively delete orphaned group 'child'...\n")
+      expect(actual[:STDOUT]).to include("- Recursively delete orphaned group 'grandchild'...\n")
+
+      expect(@db.models[:group].find(name: 'parent')).not_to be_nil
+      %w(child grandchild).each do |name|
+        expect(@db.models[:group].find(name: name)).to be_nil
+      end
+
+      host = @db.models[:host].find(name: 'child-host')
+      expect(host.groups_dataset[name: 'ungrouped']).not_to be_nil
+    end
+
+    #------------------------
+    it 'GROUP CHILDGROUP --delete-orphans ... should preserve child groups with another parent' do
+      runner { @app.start(%w(group add parent other-parent)) }
+      runner { @app.start(%w(group addchild parent child)) }
+      runner { @app.start(%w(group addchild other-parent child)) }
+
+      actual = runner do
+        @app.start(%w(group rmchild --delete-orphans parent child))
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+
+      child = @db.models[:group].find(name: 'child')
+      expect(child).not_to be_nil
+      expect(child.parents_dataset[name: 'parent']).to be_nil
+      expect(child.parents_dataset[name: 'other-parent']).not_to be_nil
+    end
   end
 end
