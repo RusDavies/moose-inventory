@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative 'formatter'
+require_relative '../inventory_context'
+require_relative '../operations/add_groups'
 
 module Moose
   module Inventory
@@ -10,78 +14,96 @@ module Moose
         #==========================
         desc 'add NAME', 'Add a group NAME to the inventory'
         option :hosts
-        # rubocop:disable Metrics/LineLength
-        def add(*argv) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
-          # rubocop:enable Metrics/LineLength
+        def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
 
-          # Arguments
           names = normalize_names(argv)
           hosts = csv_option_names(options[:hosts])
 
-          # sanity
           abort_if_automatic_group(
             names,
             "ERROR: Cannot manually manipulate the automatic group 'ungrouped'\n"
           )
 
-          # Transaction
-          warn_count = 0
-          db.transaction do # Transaction start
-            names.each do |name|
-              # Add the group
-              puts "Add group '#{name}':"
-              group = db.models[:group].find(name: name)
-              hosts_ds = nil
-              fmt.puts 2, '- create group...'
-              if group.nil?
-                group = db.models[:group].create(name: name)
-                fmt.puts 4, '- OK'
-              else
-                warn_count += 1
-                fmt.warn "Group '#{name}' already exists, skipping creation.\n"
-                fmt.puts 4, '- already exists, skipping.'
-                hosts_ds = group.hosts_dataset
-                fmt.puts 4, '- OK'
-              end
+          result = Moose::Inventory::Operations::AddGroups
+                   .new(context: Moose::Inventory::InventoryContext.new(db: db))
+                   .call(names: names, hosts: hosts)
+          render_add_groups_events(result.events)
 
-              # Associate with hosts
-              hosts.each do |h|
-                next if h.nil? || h.empty?
-                fmt.puts 2, "- add association {group:#{name} <-> host:#{h}}..."
-                host = db.models[:host].find(name: h)
-                if host.nil?
-                  warn_count += 1
-                  fmt.warn "Host '#{h}' doesn't exist, but will be created.\n"
-                  fmt.puts 4, "- host doesn't exist, creating now..."
-                  host = db.models[:host].create(name: h)
-                  fmt.puts 6, '- OK'
-                end
-                if association_exists?(hosts_ds, h)
-                  warn_count += 1
-                  fmt.warn "Association {group:#{name} <-> host:#{h}}"\
-                    " already exists, skipping creation.\n"
-                  fmt.puts 4, '- already exists, skipping.'
-                else
-                  group.add_host(host)
-                end
-                fmt.puts 4, '- OK'
-
-                # Handle the host's automatic 'ungrouped' group
-                remove_automatic_group_from_host(
-                  host,
-                  indent: 2,
-                  message: '- remove automatic association {group:ungrouped'\
-                    " <-> host:#{h}}..."
-                )
-              end
-              fmt.puts 2, '- all OK'
-            end
-          end # Transaction end
-          if warn_count == 0
+          if result.warning_count.zero?
             puts 'Succeeded'
           else
             puts 'Succeeded, with warnings.'
+          end
+        end
+
+        private
+
+        def render_add_groups_events(events)
+          events.each { |event| render_add_groups_event(event) }
+        end
+
+        def render_add_groups_event(event)
+          payload = event.payload
+
+          return render_add_groups_event_puts(event.type, payload) if puts_event?(event.type)
+          return render_add_groups_event_warn(event.type, payload) if warn_event?(event.type)
+
+          render_add_groups_event_fmt(event.type, payload)
+        end
+
+        def puts_event?(type)
+          type == :group_started
+        end
+
+        def warn_event?(type)
+          %i[group_exists host_missing_created association_exists].include?(type)
+        end
+
+        def render_add_groups_event_puts(type, payload)
+          puts "Add group '#{payload[:name]}':" if type == :group_started
+        end
+
+        def render_add_groups_event_warn(type, payload)
+          case type
+          when :group_exists
+            fmt.warn "Group '#{payload[:name]}' already exists, skipping creation.\n"
+          when :host_missing_created
+            fmt.warn "Host '#{payload[:name]}' doesn't exist, but will be created.\n"
+          when :association_exists
+            fmt.warn(
+              "Association {group:#{payload[:group]} <-> host:#{payload[:host]}} " \
+              "already exists, skipping creation.\n"
+            )
+          end
+        end
+
+        def render_add_groups_event_fmt(type, payload)
+          return render_add_groups_event_status(type, payload) if status_event?(type)
+
+          case type
+          when :creating_group
+            fmt.puts 2, '- create group...'
+          when :adding_association
+            fmt.puts 2, "- add association {group:#{payload[:group]} <-> host:#{payload[:host]}}..."
+          when :host_creating_now
+            fmt.puts 4, '- host doesn\'t exist, creating now...'
+          when :removing_automatic_group
+            fmt.puts 2, "- remove automatic association {group:ungrouped <-> host:#{payload[:host]}}..."
+          when :group_complete
+            fmt.puts 2, '- all OK'
+          end
+        end
+
+        def status_event?(type)
+          %i[already_exists_skipping ok].include?(type)
+        end
+
+        def render_add_groups_event_status(type, payload)
+          if type == :already_exists_skipping
+            fmt.puts payload[:indent], '- already exists, skipping.'
+          else
+            fmt.puts payload[:indent], '- OK'
           end
         end
       end
