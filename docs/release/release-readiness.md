@@ -24,6 +24,20 @@ GitHub Actions workflow: `.github/workflows/ci.yml`.
 
 It installs native headers needed by the DB gems, runs the same `./scripts/check.sh` gate used locally, and tests the maintained Ruby version range through the GitHub Actions matrix.
 
+## Trusted publishing gate
+
+GitHub Actions workflow: `.github/workflows/release.yml`.
+
+The release workflow runs when a `v*` tag is pushed. It:
+
+1. Checks out the repository using `actions/checkout@v5`.
+2. Installs Ruby and native database build dependencies.
+3. Fails if the tag version does not match `Moose::Inventory::VERSION`.
+4. Runs the full local `./scripts/check.sh` gate.
+5. Publishes the gem with `rubygems/release-gem@v1` using RubyGems trusted publishing/OIDC.
+
+RubyGems must also have a trusted publisher configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`; otherwise the workflow cannot receive a short-lived publish token.
+
 ## Package sanity expectations
 
 `package_sanity.sh` validates that the built gem includes at least:

@@ -1,0 +1,46 @@
+name: Release gem
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential default-libmysqlclient-dev libpq-dev libsqlite3-dev
+
+      - name: Verify tag matches gem version
+        run: |
+          version="$(ruby -e "require './lib/moose_inventory/version'; puts Moose::Inventory::VERSION")"
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$tag" != "$version" ]; then
+            echo "Tag v$tag does not match gem version $version" >&2
+            exit 1
+          fi
+
+      - name: Run local check gate
+        run: ./scripts/check.sh
+
+      - name: Publish gem to RubyGems
+        uses: rubygems/release-gem@v1
