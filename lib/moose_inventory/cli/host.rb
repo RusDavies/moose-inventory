@@ -2,6 +2,7 @@ require 'thor'
 require 'json'
 
 require_relative './formatter.rb'
+require_relative './helpers.rb'
 require_relative '../db/exceptions.rb'
 
 module Moose
@@ -10,6 +11,8 @@ module Moose
       ##
       # Class implementing the "host" methods of the CLI
       class Host < Thor
+        include Moose::Inventory::Cli::Helpers
+
         require_relative 'host_add'
         require_relative 'host_get'
         require_relative 'host_list'

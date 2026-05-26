@@ -17,22 +17,16 @@ module Moose
         def rm(*argv) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
           #
           # Sanity
-          if argv.empty?
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more.")
-           end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_missing_args(argv, 1, '1 or more')
 
           # Arguments
-          names = argv.uniq.map(&:downcase)
+          names = normalize_names(argv)
 
           # sanity
-          if names.include?('ungrouped')
-            abort("Cannot manually manipulate the automatic group 'ungrouped'\n")
-          end
+          abort_if_automatic_group(
+            names,
+            "Cannot manually manipulate the automatic group 'ungrouped'\n"
+          )
 
           # Transaction
           warn_count = 0
@@ -81,7 +75,7 @@ module Moose
         private
 
         def delete_orphaned_group(group, db, fmt)
-          return if group.name == 'ungrouped'
+          return if group.name == Helpers::AUTOMATIC_GROUP
           return unless group.parents_dataset.count.zero?
 
           fmt.puts 2, "- Recursively delete orphaned group '#{group.name}'..."
@@ -101,8 +95,7 @@ module Moose
 
             fmt.puts indent,
                      "- Adding automatic association {group:ungrouped <-> host:#{host[:name]}}..."
-            ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
-            host.add_group(ungrouped)
+            host.add_group(automatic_group)
             fmt.puts indent + 2, '- OK'
           end
 

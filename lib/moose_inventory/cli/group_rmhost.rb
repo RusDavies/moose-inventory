@@ -14,22 +14,14 @@ module Moose
         def rmhost(*args) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity, Metrics/MethodLength, Metrics/CyclomaticComplexity
           # rubocop:enable Metrics/LineLength
           # Sanity
-          if args.length < 2
-            abort("ERROR: Wrong number of arguments, #{args.length} for 2 or more.")
-          end
+          abort_if_missing_args(args, 2, '2 or more')
 
           # Arguments
           name = args[0].downcase
-          hosts = args.slice(1, args.length - 1).uniq.map(&:downcase)
+          hosts = normalize_names(args.slice(1, args.length - 1))
 
           # Sanity
-          if name == 'ungrouped'
-            abort("ERROR: Cannot manually manipulate the automatic group 'ungrouped'.")
-          end
-
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
+          abort_if_automatic_group([name])
 
           # Transaction
           warn_count = 0
@@ -43,13 +35,12 @@ module Moose
               fmt.puts 4, '- OK'
 
               # dissociate group from the hosts
-              ungrouped = db.models[:group].find_or_create(name: 'ungrouped')
               hosts_ds = group.hosts_dataset
               hosts.each do |h|
                 fmt.puts 2, "- remove association {group:#{name} <-> host:#{h}}..."
 
                 # Check against existing associations
-                if hosts_ds[name: h].nil?
+                unless association_exists?(hosts_ds, h)
                   warn_count += 1
                   fmt.warn "Association {group:#{name} <-> host:#{h}} doesn't"\
                     " exist, skipping.\n"
@@ -63,10 +54,11 @@ module Moose
                 fmt.puts 4, '- OK'
 
                 # Add the host to the ungrouped group if not in any other group
-                next unless host.groups_dataset.count == 0
-                fmt.puts 2, "- add automatic association {group:ungrouped <-> host:#{h}}..."
-                host.add_group(ungrouped)
-                fmt.puts 4, '- OK'
+                add_automatic_group_to_host_if_no_groups(
+                  host,
+                  indent: 2,
+                  message: "- add automatic association {group:ungrouped <-> host:#{h}}..."
+                )
               end
               fmt.puts 2, '- all OK'
             end # Transaction end
