@@ -1,6 +1,6 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 8 done / 1 open.
+Release readiness status counts: 8 done / 2 open.
 
 ## Open
 
@@ -8,6 +8,11 @@ Release readiness status counts: 8 done / 1 open.
    - RubyGems trusted publisher is configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
    - Verify the full trusted-publishing path when publishing the next real version tag.
    - Do not retag already-published `v1.0.9`.
+
+1. Install optional local/CI security audit tools.
+   - Add setup guidance and/or CI wiring for missing audit tools noted in the 2026-05-26 security audit: `gitleaks` or `trufflehog` for dedicated secret scanning, plus `bundler-audit` and/or `osv-scanner` for broader dependency advisory coverage.
+   - Decide whether each tool should be a required CI gate, an optional local developer tool, or both.
+   - Keep generated coverage and package-sanity artifacts excluded from scanner paths.
 
 ## Done
 
