@@ -1,18 +1,18 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 5 done / 2 open.
+Release readiness status counts: 6 done / 1 open.
 
 ## Open
-
-1. Resolve GitHub Actions Node.js 20 deprecation warning.
-   - Current CI passes, but GitHub warns that `actions/checkout@v4` is running on Node.js 20 and Node.js 24 will become the default.
-   - Review available `actions/checkout` updates or GitHub-recommended configuration, then update the workflow so CI stays warning-free before Node.js 20 removal.
 
 1. Add GitHub Actions RubyGems trusted publishing.
    - Manual publishing is documented in `docs/release/publishing.md`.
    - Future improvement: configure RubyGems trusted publishing, publish from reviewed `v*` tags, and avoid long-lived RubyGems API keys on developer machines.
 
 ## Done
+
+1. Resolve GitHub Actions Node.js 20 deprecation warning.
+   - Added `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true` to the CI workflow so JavaScript actions run on Node.js 24 before GitHub's forced default switch.
+   - Verified with full `./scripts/check.sh` and a post-merge GitHub Actions run.
 
 1. Decide and declare the supported Ruby version floor.
    - Set `spec.required_ruby_version` to `>= 3.2` in the gemspec.
