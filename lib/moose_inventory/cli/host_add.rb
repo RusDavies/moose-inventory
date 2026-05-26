@@ -4,6 +4,7 @@ require 'indentation'
 
 require_relative './formatter.rb'
 require_relative '../db/exceptions.rb'
+require_relative '../inventory_context.rb'
 require_relative '../operations/add_hosts.rb'
 
 module Moose
@@ -32,7 +33,7 @@ module Moose
           abort_if_automatic_group(groups)
 
           Moose::Inventory::Operations::AddHosts
-            .new(db: db, formatter: fmt)
+            .new(context: Moose::Inventory::InventoryContext.new(db: db), formatter: fmt)
             .call(names: names, groups: groups)
           puts 'Succeeded'
         end

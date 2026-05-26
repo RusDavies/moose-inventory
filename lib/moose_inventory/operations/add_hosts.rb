@@ -9,13 +9,13 @@ module Moose
       class AddHosts
         AUTOMATIC_GROUP = 'ungrouped'.freeze
 
-        def initialize(db:, formatter:)
-          @db = db
+        def initialize(context:, formatter:)
+          @context = context
           @fmt = formatter
         end
 
         def call(names:, groups:)
-          db.transaction do
+          context.transaction do
             fmt.reset_indent
 
             names.each do |name|
@@ -26,7 +26,7 @@ module Moose
 
         private
 
-        attr_reader :db, :fmt
+        attr_reader :context, :fmt
 
         def add_host(name, groups)
           puts "Add host '#{name}':"
@@ -42,11 +42,11 @@ module Moose
 
         def create_or_find_host(name)
           fmt.puts 2, "- Creating host '#{name}'..."
-          host = db.models[:host].find(name: name)
+          host = context.find_host(name)
           groups_dataset = nil
 
           if host.nil?
-            host = db.models[:host].create(name: name)
+            host = context.create_host(name)
           else
             fmt.warn "The host '#{name}' already exists, skipping creation.\n"
             groups_dataset = host.groups_dataset
@@ -72,11 +72,11 @@ module Moose
         end
 
         def find_or_create_group(name)
-          group = db.models[:group].find(name: name)
+          group = context.find_group(name)
           return group unless group.nil?
 
           fmt.warn "The group '#{name}' doesn't exist, but will be created.\n"
-          db.models[:group].create(name: name)
+          context.create_group(name)
         end
 
         def add_automatic_group_if_needed(host, host_name)
@@ -89,7 +89,7 @@ module Moose
         end
 
         def automatic_group
-          db.models[:group].find_or_create(name: AUTOMATIC_GROUP)
+          context.automatic_group
         end
 
         def association_exists?(dataset, name)
