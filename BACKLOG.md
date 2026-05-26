@@ -225,18 +225,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 3 done / 2 open.
+Code quality status counts: 4 done / 1 open.
 
 ## Open
-
-1. Separate structured operation results from CLI rendering.
-   - Have domain operations return events/results, then let the CLI formatter render progress/warnings.
-   - This should make behavior tests less dependent on exact progress text where domain behavior is the real concern.
 
 1. Reintroduce a small modern lint/complexity gate.
    - Prefer a targeted RuboCop config for new/refactored code first, rather than forcing the whole inherited codebase through a style grinder in one pass.
 
 ## Done
+
+1. Separate first structured operation result from CLI rendering.
+   - Changed `Moose::Inventory::Operations::AddHosts` to return structured `Result`/`Event` objects instead of writing directly to stdout/stderr.
+   - Moved `host add` progress/warning rendering into the Thor adapter while preserving existing user-visible CLI output.
+   - Added direct operation specs proving inventory mutation and event emission without renderer output.
+   - Verified with focused specs and full `./scripts/check.sh`.
 
 1. Introduce an inventory context facade around DB access.
    - Added `Moose::Inventory::InventoryContext` as a thin wrapper over the existing DB singleton for transaction/model operations.

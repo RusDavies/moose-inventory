@@ -32,10 +32,42 @@ module Moose
           # Sanity
           abort_if_automatic_group(groups)
 
-          Moose::Inventory::Operations::AddHosts
-            .new(context: Moose::Inventory::InventoryContext.new(db: db), formatter: fmt)
-            .call(names: names, groups: groups)
+          result = Moose::Inventory::Operations::AddHosts
+                   .new(context: Moose::Inventory::InventoryContext.new(db: db))
+                   .call(names: names, groups: groups)
+          render_add_hosts_events(result.events)
           puts 'Succeeded'
+        end
+
+        private
+
+        def render_add_hosts_events(events)
+          fmt.reset_indent
+          events.each { |event| render_add_hosts_event(event) }
+        end
+
+        def render_add_hosts_event(event) # rubocop:disable Metrics/CyclomaticComplexity
+          payload = event.payload
+          case event.type
+          when :host_started
+            puts "Add host '#{payload[:name]}':"
+          when :creating_host
+            fmt.puts 2, "- Creating host '#{payload[:name]}'..."
+          when :host_exists
+            fmt.warn "The host '#{payload[:name]}' already exists, skipping creation.\n"
+          when :ok
+            fmt.puts payload[:indent], '- OK'
+          when :adding_association
+            fmt.puts 2, "- Adding association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
+          when :group_missing_created
+            fmt.warn "The group '#{payload[:name]}' doesn't exist, but will be created.\n"
+          when :association_exists
+            fmt.warn "Association {host:#{payload[:host]} <-> group:#{payload[:group]}} already exists, skipping creation.\n"
+          when :adding_automatic_group
+            fmt.puts 2, "- Adding automatic association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
+          when :host_complete
+            fmt.puts 2, '- All OK'
+          end
         end
       end
     end
