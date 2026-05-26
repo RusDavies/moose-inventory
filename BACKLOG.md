@@ -234,14 +234,27 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 10 done / 0 open.
+Code quality status counts: 11 done / 2 open.
 
 ## Open
 
-_No open code quality items._
+1. Extract read-only host/group query commands behind a thin query seam.
+   - `host get`, `group get`, `host list`, `group list`, `host listvars`, and `group listvars` still reach directly into the DB singleton from CLI classes.
+   - They are lower risk than the write-path commands but still keep rendering, lookup, and data-shaping tangled together.
+   - Introduce a small query layer or context-backed read facade so CLI commands become thin renderers.
 
+1. Tame remaining global DB/config singleton complexity.
+   - `Moose::Inventory::DB` and `Config` still carry a lot of module-level state, broad responsibilities, and RuboCop suppressions.
+   - `db.rb` still contains the lingering user-advice TODO/HACK comments and large methods like `purge`, `create_tables`, and `init_sqlite3`.
+   - The next cleanup slice should reduce module-function/global-state coupling and make DB/config behavior more explicit and testable.
 
 ## Done
+
+1. Extract host/group variable mutation commands into operations.
+   - Added `Moose::Inventory::Operations::AddVariables` and `RemoveVariables` to own shared host/group variable validation, lookup, create/update/delete behavior, and structured event emission.
+   - Converted `host addvar`, `host rmvar`, `group addvar`, and `group rmvar` into thinner Thor adapters over `InventoryContext` that render operation events while preserving existing CLI output and transaction rollback behavior.
+   - Added direct operation specs and expanded the targeted RuboCop gate to cover the new operation/adapter/spec seam.
+   - Verified with focused CLI/operation specs and full `./scripts/check.sh`.
 
 1. Extract `group rm` to reuse the new group-cleanup / relation-operation seam.
    - Added `Moose::Inventory::Operations::RemoveGroups` and reused `GroupCleanup` so top-level group deletion, recursive orphan cleanup, and host `ungrouped` reattachment now run through structured operation events instead of bespoke Thor logic.

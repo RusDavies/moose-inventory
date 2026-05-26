@@ -42,7 +42,23 @@ module Moose
         find_or_create_group(AUTOMATIC_GROUP)
       end
 
+      def find_variable(entity_type, id)
+        db.models[variable_model_key(entity_type)].find(id: id)
+      end
+
+      def create_variable(entity_type, name:, value:)
+        db.models[variable_model_key(entity_type)].create(name: name, value: value)
+      end
+
+      def moose_exception_class
+        db.exceptions[:moose]
+      end
+
       private
+
+      def variable_model_key(entity_type)
+        :"#{entity_type}var"
+      end
 
       attr_reader :db
     end

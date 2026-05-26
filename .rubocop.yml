@@ -23,6 +23,8 @@ Metrics/BlockLength:
     - spec/lib/moose_inventory/operations/remove_associations_spec.rb
     - spec/lib/moose_inventory/operations/group_child_relations_spec.rb
     - spec/lib/moose_inventory/operations/remove_groups_spec.rb
+    - spec/lib/moose_inventory/operations/add_variables_spec.rb
+    - spec/lib/moose_inventory/operations/remove_variables_spec.rb
 
 Style/Documentation:
   Enabled: false

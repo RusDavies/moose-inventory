@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
+require_relative '../inventory_context'
+require_relative '../operations/remove_variables'
 
 module Moose
   module Inventory
@@ -11,53 +14,49 @@ module Moose
         desc 'rmvar NAME VARNAME',
              'Remove a variable VARNAME from the group NAME'
         def rmvar(*args)
-          if args.length < 2
-            abort('ERROR: Wrong number of arguments, ' \
-                  "#{args.length} for 2 or more.")
-          end
+          abort_if_missing_args(args, 2, '2 or more')
 
-          # Convenience
-          db  = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
-
-          # Arguments
           name = args[0].downcase
           vars = args.slice(1, args.length - 1).uniq
+          operation = Moose::Inventory::Operations::RemoveVariables.new(
+            context: Moose::Inventory::InventoryContext.new(db: db),
+            entity_type: :group,
+            emitter: group_rmvar_emitter(name, vars)
+          )
 
-          # Transaction
-          db.transaction do # Transaction start
-            puts "Remove variable(s) '#{vars.join(',')}' from group '#{name}':"
+          db.transaction do
+            operation.call(name: name, vars: vars)
+          end
 
-            fmt.puts 2, "- retrieve group '#{name}'..."
-            group = db.models[:group].find(name: name)
-            if group.nil?
-              fail db.exceptions[:moose],
-                   "The group '#{name}' does not exist."
-            end
-            fmt.puts 4, '- OK'
-
-            groupvars_ds = group.groupvars_dataset
-            vars.each do |v|
-              fmt.puts 2, "- remove variable '#{v}'..."
-              vararray = v.split('=')
-              if v.start_with?('=') || v.scan('=').count > 1
-                fail db.exceptions[:moose],
-                     "Incorrect format in {#{v}}. " \
-                     'Expected \'key\' or \'key=value\'.'
-              end
-
-              # Check against existing associations
-              groupvar = groupvars_ds[name: vararray[0]]
-              unless groupvar.nil?
-                # remove the association
-                group.remove_groupvar(groupvar)
-                groupvar.destroy
-              end
-              fmt.puts 4, '- OK'
-            end
-            fmt.puts 2, '- all OK'
-          end # Transaction end
           puts 'Succeeded.'
+        end
+
+        private
+
+        def group_rmvar_emitter(name, vars)
+          lambda do |event|
+            render_rmvar_event(
+              event,
+              entity_label: 'group',
+              entity_name: name,
+              variables_label: vars.join(',')
+            )
+          end
+        end
+
+        def render_rmvar_event(event, entity_label:, entity_name:, variables_label:)
+          case event.type
+          when :entity_started
+            puts "Remove variable(s) '#{variables_label}' from #{entity_label} '#{entity_name}':"
+          when :retrieving_entity
+            fmt.puts 2, "- retrieve #{entity_label} '#{event.payload[:name]}'..."
+          when :removing_variable
+            fmt.puts 2, "- remove variable '#{event.payload[:variable]}'..."
+          when :entity_complete
+            fmt.puts 2, '- all OK'
+          when :ok
+            fmt.puts event.payload[:indent], '- OK'
+          end
         end
       end
     end
