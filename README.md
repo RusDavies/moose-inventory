@@ -312,10 +312,14 @@ We can also list hosts, to get the host-centric view.
       - group2
       - group3
 
-Removing variables, groups, and hosts is just as easy.  In the following examples, the output is again omitted for compactness; the reader is encouraged to work along to experience the tool.  Note, that although we show how to remove the variables, it is not strictly necessary to do so in this example, since deleting hosts and groups would delete all associated variables anyway. 
+Removing variables, groups, and hosts is just as easy.  In the following examples, the output is again omitted for compactness; the reader is encouraged to work along to experience the tool.  Note, that although we show how to remove the variables, it is not strictly necessary to do so in this example, since deleting hosts and groups would delete all associated variables anyway.
+
+By default, deleting a group preserves its child groups as root groups. Use `group rm --recursive` when child groups that become orphaned should also be deleted. Similarly, `group rmchild --delete-orphans` removes a parent-child association and deletes the child subtree only when it becomes orphaned by that removal. Hosts whose last group is deleted are automatically moved to `ungrouped`.
 
     $ moose-inventory group rmvar group1 location
     $ moose-inventory group rm group1 group2 group3
+    $ moose-inventory group rm --recursive old_parent_group
+    $ moose-inventory group rmchild --delete-orphans parent_group child_group
     $ moose-inventory host rmvar
     $ moose-inventory host rmvar host1 owner id
     $ moose-inventory host rm host1 host2 host3
