@@ -56,3 +56,5 @@ jobs:
 
       - name: Publish gem to RubyGems
         uses: rubygems/release-gem@v1
+        with:
+          await-release: false

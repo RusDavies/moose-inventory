@@ -1,15 +1,18 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 13 done / 1 open.
+Release readiness status counts: 14 done / 0 open.
 
 ## Open
 
-1. Stop `release.yml` from reporting failure when RubyGems full-index propagation lags after a successful publish.
-   - Release tag `v2.0` verified RubyGems trusted publishing end-to-end: RubyGems registered `moose-inventory` `2.0`, remote install worked, and the workflow used OIDC/trusted publishing.
-   - The remaining defect is in the post-publish wait path: `rubygems-await` timed out on the RubyGems full index even though the gem was already published and visible through the API/install path.
-   - Adjust the release workflow/action settings so successful publishes do not show up as failed releases.
+_No open release-readiness items._
 
 ## Done
+
+1. Stop `release.yml` from reporting failure when RubyGems full-index propagation lags after a successful publish.
+   - Release tag `v2.0` verified RubyGems trusted publishing end-to-end: RubyGems registered `moose-inventory` `2.0`, remote install worked, and the workflow used OIDC/trusted publishing.
+   - `rubygems/release-gem@v1` defaulted `await-release: true`, and its `rubygems-await` post-publish wait timed out on the RubyGems full index even though the gem was already published and installable.
+   - Set `await-release: false` in `.github/workflows/release.yml` so future successful publishes do not surface as failed releases because of RubyGems full-index propagation lag.
+   - Direct RubyGems verification remains documented in `docs/release/publishing.md`.
 
 1. Align release workflow with required CI security tooling.
    - Security audit rerun found that `.github/workflows/release.yml` ran `./scripts/check.sh` without installing or requiring the dedicated security tools, meaning tag-based releases could skip `gitleaks`/`osv-scanner` enforcement if those tools were absent.
