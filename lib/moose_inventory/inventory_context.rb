@@ -50,6 +50,14 @@ module Moose
         db.models[variable_model_key(entity_type)].create(name: name, value: value)
       end
 
+      def all_hosts
+        db.models[:host].all
+      end
+
+      def all_groups
+        db.models[:group].all
+      end
+
       def moose_exception_class
         db.exceptions[:moose]
       end

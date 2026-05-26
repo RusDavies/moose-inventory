@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 
-require_relative './formatter.rb'
-require_relative '../db/exceptions.rb'
+require_relative '../inventory_context'
+require_relative '../operations/query_inventory'
 
 module Moose
   module Inventory
@@ -15,40 +17,20 @@ module Moose
         #==========================
         desc 'get HOST_1 [HOST_2 ...]',
              'Get hosts HOST_n from the inventory'
-        def get(*argv) # rubocop:disable Metrics/AbcSize
-          if argv.empty?
-            abort('ERROR: Wrong number of arguments, '\
-              "#{argv.length} for 1 or more")
-          end
+        def get(*argv)
+          abort("ERROR: Wrong number of arguments, #{argv.length} for 1 or more") if argv.empty?
 
-          # Convenience
-          db = Moose::Inventory::DB
-          fmt = Moose::Inventory::Cli::Formatter
-
-          # Arguments
-          names = argv.uniq.map(&:downcase)
-
-          # Process
-          results = {}
-          names.each do |name|
-            host = db.models[:host].find(name: name)
-
-            next if host.nil?
-            groups = host.groups_dataset.map(:name)
-
-            hostvars = {}
-            host.hostvars_dataset.each do |hv|
-              hostvars[hv[:name].to_sym] = hv[:value]
-            end
-
-            results[host[:name].to_sym] = {}
-            results[host[:name].to_sym][:groups] = groups unless groups.empty?
-            unless hostvars.empty?
-              results[host[:name].to_sym][:hostvars] = hostvars
-            end
-          end
-
+          names = normalize_names(argv)
+          results = query_inventory.get_hosts(names: names)
           fmt.dump(results)
+        end
+
+        private
+
+        def query_inventory
+          Moose::Inventory::Operations::QueryInventory.new(
+            context: Moose::Inventory::InventoryContext.new(db: db)
+          )
         end
       end
     end
