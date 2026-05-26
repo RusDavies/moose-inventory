@@ -225,12 +225,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 2 done / 3 open.
+Code quality status counts: 3 done / 2 open.
 
 ## Open
-
-1. Introduce an inventory context or repository facade around DB access.
-   - Start as a wrapper over the existing DB singleton, then use it to reduce direct `Moose::Inventory::DB` coupling in command code.
 
 1. Separate structured operation results from CLI rendering.
    - Have domain operations return events/results, then let the CLI formatter render progress/warnings.
@@ -240,6 +237,11 @@ Code quality status counts: 2 done / 3 open.
    - Prefer a targeted RuboCop config for new/refactored code first, rather than forcing the whole inherited codebase through a style grinder in one pass.
 
 ## Done
+
+1. Introduce an inventory context facade around DB access.
+   - Added `Moose::Inventory::InventoryContext` as a thin wrapper over the existing DB singleton for transaction/model operations.
+   - Wired the `AddHosts` operation through the context, reducing direct DB coupling in the first extracted operation while leaving legacy CLI commands stable.
+   - Verified with focused `host add` specs and full `./scripts/check.sh`.
 
 1. Extract first domain operation behind a Thor command.
    - Added `Moose::Inventory::Operations::AddHosts` as the first operation/service object behind the CLI.
