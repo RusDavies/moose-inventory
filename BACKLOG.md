@@ -1,13 +1,13 @@
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 12 done / 1 open.
+Release readiness status counts: 13 done / 1 open.
 
 ## Open
 
-1. Verify RubyGems trusted publishing with the next real release tag.
-   - RubyGems trusted publisher is configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
-   - Verify the full trusted-publishing path when publishing the next real version tag.
-   - Do not retag already-published `v1.0.9`.
+1. Stop `release.yml` from reporting failure when RubyGems full-index propagation lags after a successful publish.
+   - Release tag `v2.0` verified RubyGems trusted publishing end-to-end: RubyGems registered `moose-inventory` `2.0`, remote install worked, and the workflow used OIDC/trusted publishing.
+   - The remaining defect is in the post-publish wait path: `rubygems-await` timed out on the RubyGems full index even though the gem was already published and visible through the API/install path.
+   - Adjust the release workflow/action settings so successful publishes do not show up as failed releases.
 
 ## Done
 
@@ -15,6 +15,12 @@ Release readiness status counts: 12 done / 1 open.
    - Security audit rerun found that `.github/workflows/release.yml` ran `./scripts/check.sh` without installing or requiring the dedicated security tools, meaning tag-based releases could skip `gitleaks`/`osv-scanner` enforcement if those tools were absent.
    - Added Go setup with cache disabled, installed pinned security tools through `scripts/ci/install_security_tools.sh`, required `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1` during the release check gate, and added the same native-dependency timeout used by CI.
    - Documented the rerun in `docs/security-audit-2026-05-26-rerun.md`; final trusted-publishing proof remains gated on the next real release tag.
+
+1. Verify RubyGems trusted publishing with the next real release tag.
+   - Published `moose-inventory` `2.0` from tag `v2.0` through GitHub Actions trusted publishing/OIDC.
+   - Release workflow initially failed because the repo lacked a `rake release` task; fixed by adding `require 'bundler/gem_tasks'` to `Rakefile`, then re-pointed `v2.0` to the corrected commit because the first tag attempt had not published a gem.
+   - Verified the published gem directly with `gem info moose-inventory --remote --all`, `gem install moose-inventory -v 2.0 --install-dir tmp/release-smoke --no-document`, and `moose-inventory --config spec/config/config.yml version` returning `Version 2.0`.
+   - Remaining workflow false-negative is tracked as a separate open release-readiness item.
 
 1. Add manual GitHub Actions CI trigger and harden CI runner setup.
    - Added `workflow_dispatch` to `.github/workflows/ci.yml` so CI can be manually triggered when push events fail to enqueue during a GitHub Actions incident.
