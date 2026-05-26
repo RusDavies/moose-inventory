@@ -5,6 +5,7 @@ allowed_executables=(
   "bin/moose-inventory"
   "scripts/check.sh"
   "scripts/ci/check_permissions.sh"
+  "scripts/ci/check_rubocop.sh"
   "scripts/ci/check_secrets.sh"
   "scripts/ci/check_security.sh"
   "scripts/ci/install_security_tools.sh"

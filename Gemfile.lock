@@ -26,7 +26,7 @@ GEM
     lint_roller (1.1.0)
     mysql2 (0.5.7)
       bigdecimal
-    parallel (2.1.0)
+    parallel (1.28.0)
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
@@ -85,6 +85,7 @@ DEPENDENCIES
   bundler (>= 2.2.33, < 3)
   bundler-audit (>= 0.9, < 1)
   moose-inventory!
+  parallel (>= 1.10, < 2.0)
   rake (>= 13.0, < 14)
   rspec (~> 3)
   rubocop (>= 1.72, < 2)
