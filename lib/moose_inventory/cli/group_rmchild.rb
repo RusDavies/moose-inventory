@@ -70,55 +70,8 @@ module Moose
         end
 
         def render_rmchild_events(events)
-          events.each { |event| render_rmchild_event(event) }
-        end
-
-        def render_rmchild_event(event)
-          payload = event.payload
-
-          return render_rmchild_warning(payload) if event.type == :child_association_missing
-          return render_rmchild_missing(payload) if event.type == :missing_skipping
-          return render_rmchild_progress(event.type, payload) if rmchild_progress_event?(event.type)
-
-          render_rmchild_status(event.type, payload)
-        end
-
-        def rmchild_progress_event?(type)
-          %i[
-            removing_child_association
-            recursively_delete_orphaned_group
-            removing_recursive_child_association
-          ].include?(type)
-        end
-
-        def render_rmchild_progress(type, payload)
-          case type
-          when :removing_child_association
-            fmt.puts 2, "- remove association {group:#{payload[:parent]} <-> group:#{payload[:child]}}..."
-          when :recursively_delete_orphaned_group
-            fmt.puts 2, "- Recursively delete orphaned group '#{payload[:name]}'..."
-          when :removing_recursive_child_association
-            fmt.puts 4, "- Remove association {group:#{payload[:parent]} <-> group:#{payload[:child]}}..."
-          end
-        end
-
-        def render_rmchild_status(type, payload)
-          case type
-          when :adding_automatic_group_to_host
-            fmt.puts payload[:indent], "- Adding automatic association {group:ungrouped <-> host:#{payload[:host]}}..."
-          when :destroying_group
-            fmt.puts payload[:indent], "- Destroy group '#{payload[:name]}'..."
-          when :ok
-            fmt.puts payload[:indent], '- OK'
-          end
-        end
-
-        def render_rmchild_warning(payload)
-          fmt.warn "Association {group:#{payload[:parent]} <-> group:#{payload[:child]}} does not exist, skipping.\n"
-        end
-
-        def render_rmchild_missing(payload)
-          fmt.puts payload[:indent], "- doesn't exist, skipping."
+          emitter = rmchild_emitter
+          events.each { |event| emitter.call(event) }
         end
       end
     end
