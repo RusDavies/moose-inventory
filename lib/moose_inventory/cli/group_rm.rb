@@ -40,8 +40,7 @@ module Moose
         private
 
         def remove_groups(names)
-          context = inventory_context
-          operation = Moose::Inventory::Operations::RemoveGroups.new(context: context)
+          operation = build_operation(Moose::Inventory::Operations::RemoveGroups)
 
           db.transaction do
             result = operation.call(names: names, recursive: options[:recursive])

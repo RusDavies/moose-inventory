@@ -18,11 +18,9 @@ module Moose
 
           name = args[0].downcase
           vars = args.slice(1, args.length - 1).uniq
-          operation = Moose::Inventory::Operations::RemoveVariables.new(
-            context: inventory_context,
-            entity_type: :group,
-            emitter: group_rmvar_emitter(name, vars)
-          )
+          operation = build_operation(Moose::Inventory::Operations::RemoveVariables,
+                                      entity_type: :group,
+                                      emitter: group_rmvar_emitter(name, vars))
 
           db.transaction do
             operation.call(name: name, vars: vars)

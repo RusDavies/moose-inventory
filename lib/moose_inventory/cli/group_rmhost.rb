@@ -34,13 +34,12 @@ module Moose
         private
 
         def remove_hosts_from_group(name, hosts)
-          context = inventory_context
-          operation = Moose::Inventory::Operations::RemoveAssociations.new(context: context)
+          operation = build_operation(Moose::Inventory::Operations::RemoveAssociations)
 
           begin
             db.transaction do
               puts "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':"
-              group = fetch_existing_group_for_rmhost(context, name)
+              group = fetch_existing_group_for_rmhost(name)
               result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts)
               render_group_rmhost_events(result.events)
               fmt.puts 2, '- all OK'
@@ -51,9 +50,9 @@ module Moose
           end
         end
 
-        def fetch_existing_group_for_rmhost(context, name)
+        def fetch_existing_group_for_rmhost(name)
           fmt.puts 2, "- retrieve group '#{name}'..."
-          group = context.find_group(name)
+          group = inventory_context.find_group(name)
           abort("ERROR: The group '#{name}' does not exist.") if group.nil?
 
           fmt.puts 4, '- OK'

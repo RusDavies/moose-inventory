@@ -6,6 +6,7 @@ bundle exec rubocop \
   lib/moose_inventory/db/db.rb \
   lib/moose_inventory/runtime_options.rb \
   lib/moose_inventory/inventory_context.rb \
+  lib/moose_inventory/cli/factory.rb \
   lib/moose_inventory/operations/add_hosts.rb \
   lib/moose_inventory/operations/add_groups.rb \
   lib/moose_inventory/operations/add_associations.rb \
@@ -54,6 +55,7 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/query_inventory_spec.rb \
   spec/lib/moose_inventory/inventory_context_spec.rb \
   spec/lib/moose_inventory/cli/cli_spec.rb \
+  spec/lib/moose_inventory/cli/factory_spec.rb \
   spec/lib/moose_inventory/cli/formatter_spec.rb \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
   spec/lib/moose_inventory/config/config_spec.rb \

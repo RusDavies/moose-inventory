@@ -25,8 +25,7 @@ module Moose
             "ERROR: Cannot manually manipulate the automatic group 'ungrouped'\n"
           )
 
-          result = Moose::Inventory::Operations::AddGroups
-                   .new(context: inventory_context)
+          result = build_operation(Moose::Inventory::Operations::AddGroups)
                    .call(names: names, hosts: hosts)
           render_add_groups_events(result.events)
 

@@ -22,9 +22,9 @@ module Moose
           end
 
           names = normalize_names(argv)
-          results = query_inventory.list_host_vars(names: names, ansible: ansible_mode?)
+          results = inventory_query.list_host_vars(names: names, ansible: ansible_mode?)
 
-          if ansible_mode? && query_context.find_host(names.first).nil?
+          if ansible_mode? && inventory_context.find_host(names.first).nil?
             fmt.warn "The host #{names.first} does not exist.\n"
           end
 
@@ -37,14 +37,6 @@ module Moose
           return if args.length == expected
 
           abort("ERROR: Wrong number of arguments for Ansible mode, #{args.length} for #{expected}.")
-        end
-
-        def query_inventory
-          Moose::Inventory::Operations::QueryInventory.new(context: query_context)
-        end
-
-        def query_context
-          inventory_context
         end
       end
     end
