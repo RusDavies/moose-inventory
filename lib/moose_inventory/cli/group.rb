@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './formatter.rb'
-require_relative './helpers.rb'
+require_relative 'formatter'
+require_relative 'helpers'
 
 module Moose
   module Inventory

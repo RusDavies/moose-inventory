@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative '../version.rb'
-require_relative '../config/config.rb'
-require_relative './group.rb'
-require_relative './host.rb'
+require_relative '../version'
+require_relative '../config/config'
+require_relative 'group'
+require_relative 'host'
 
 module Moose
   module Inventory
     module Cli
       ##
-      # TODO: Documentation
+      # Top-level Thor application for moose-inventory.
       class Application < Thor
         desc 'version', 'Get the code version'
         def version
