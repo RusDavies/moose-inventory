@@ -259,13 +259,28 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 50 done / 0 open.
+Code quality status counts: 51 done / 3 open.
 
 ## Open
 
-_No open code-quality items._
+1. Narrow production `rescue Exception` handling in `lib/moose_inventory/db/db.rb`.
+   - Replace the broad catch-all with more explicit non-fatal error handling where safe, preserving rollback/reporting behavior.
+   - Add focused DB transaction specs before changing rescue semantics.
+
+1. Remove stale CLI spec TODO noise around Thor responder comments.
+   - Delete the repeated obsolete comments that say the normal `respond_to?` check does not work on Thor objects now that the spec pattern is established.
+   - Keep behavior unchanged and re-run the targeted/full gates.
+
+1. Extract a tiny shared operations event helper/base for repeated event plumbing.
+   - Reduce duplication around `Event`, `Result`, `emit`, association checks, and warning-count plumbing in the operations classes.
+   - Land it as one bounded family refactor with focused operation specs and the full gate.
 
 ## Done
+
+1. Add direct `Cli::Helpers` coverage for helper-only branches.
+   - Covered `run_group_relation_transaction` rescue handling, automatic-group helper methods, `association_exists?`, and small wrapper helpers, raising `lib/moose_inventory/cli/helpers.rb` to 100% coverage.
+   - Kept the slice test-only and added a dedicated `helpers_spec` to the targeted RuboCop gate.
+   - Re-ran the focused helper spec slice and the full gate.
 
 1. Harden config flag parsing for missing option values.
    - Made `--config`, `--env`, and `--format` fail explicitly when a value is missing or when the next token is another flag.
