@@ -71,6 +71,10 @@ module Moose
         groupvar: :Groupvar
       }.freeze
 
+      BUSY_RETRY_LIMIT = 10
+      BUSY_RETRY_BASE_DELAY_SECONDS = 0.05
+      BUSY_RETRY_MAX_DELAY_SECONDS = 1.0
+
       #----------------------
       def self.init
         init_exceptions
@@ -141,10 +145,15 @@ module Moose
         error.message.include?('BusyException')
       end
 
-      def self.retry_busy_transaction(error, tries)
-        if tries <= 10
+      def self.busy_retry_delay(tries)
+        delay = BUSY_RETRY_BASE_DELAY_SECONDS * (2**(tries - 1))
+        [delay, BUSY_RETRY_MAX_DELAY_SECONDS].min
+      end
+
+      def self.retry_busy_transaction(error, tries, sleeper: method(:sleep))
+        if tries <= BUSY_RETRY_LIMIT
           warn error.message if Moose::Inventory::Config.trace_enabled?
-          sleep rand
+          sleeper.call(busy_retry_delay(tries))
           return
         end
 

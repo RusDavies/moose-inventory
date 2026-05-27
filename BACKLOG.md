@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 33 done / 0 open.
+Code quality status counts: 34 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Replace randomized SQLite busy retry sleeps with deterministic capped backoff.
+   - Added named retry constants and a testable `busy_retry_delay` helper for database lock retries.
+   - Replaced `sleep rand` with deterministic capped exponential backoff while preserving the existing retry limit and trace warning behavior.
+   - Added DB specs for retry delays, sleeper injection, and retry-limit exhaustion.
 
 1. Clean tiny production entrypoints and Moose DB exception behavior.
    - Updated `MooseDBException` to initialize through `RuntimeError#initialize` instead of overriding `message`, preserving default-message behavior while avoiding non-idiomatic exception state.
