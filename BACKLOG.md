@@ -259,11 +259,25 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 58 done / 0 open.
+Code quality status counts: 58 done / 4 open.
 
 ## Open
 
-_No open code-quality items._
+1. Audit the `host rm` Moose-exception rescue branch.
+   - Fresh coverage review shows the only remaining uncovered production line is the `host rm` rescue/abort path in `lib/moose_inventory/cli/host_rm.rb`.
+   - Determine whether it is reachable now that DB transaction handling aborts Moose exceptions centrally; either remove the dead rescue or add focused coverage if it is intentionally defensive.
+
+1. Resolve the missing-parent behavior question for `group addchild`.
+   - `spec/lib/moose_inventory/cli/group_addchild_spec.rb` still asks whether missing parent groups should be created instead of aborting, unlike some host/group association flows that create missing counterpart entities.
+   - Decide the intended CLI contract, document it in the spec/backlog, then either preserve-and-clarify the abort behavior or implement explicit parent creation.
+
+1. Clarify the empty-hosts shape for `group get` output.
+   - `spec/lib/moose_inventory/cli/group_get_spec.rb` still has a TODO asking whether an empty `hosts: []` key should be present for groups with no hosts.
+   - Treat this as an output-contract decision: either lock in omitted-empty-hosts behavior with a clearer spec note or normalize output to include empty lists consistently.
+
+1. Extract a small shared operation event emitter/result helper.
+   - Several operation classes still define their own `Event`, `Result`, and `emit(events, type, payload = {})` plumbing.
+   - A bounded helper, similar in spirit to the variable-operation support extraction, would reduce duplication without touching CLI output rendering.
 
 ## Done
 
