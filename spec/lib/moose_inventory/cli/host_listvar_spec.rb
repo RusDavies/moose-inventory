@@ -105,6 +105,20 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
+    it '--ansible HOST ... should warn when the host does not exist' do
+      host_name = 'missing_host'
+
+      actual = runner do
+        @cli.start(%W[--config #{@mockarg_parts[:config]} --ansible host listvars #{host_name}])
+      end
+
+      desired = {}
+      desired[:STDOUT] = "{\"_meta\":{\"hostvars\":{}}}\n"
+      desired[:STDERR] = "WARNING: The host #{host_name} does not exist.\n"
+      expected(actual, desired)
+    end
+
+    #------------------------
     it '--ansible HOST ... should be an alias for Ansible\'s --host HOST' do
       host_name = 'test_host'
       host_vars = %w[foo=bar cow=chicken]
