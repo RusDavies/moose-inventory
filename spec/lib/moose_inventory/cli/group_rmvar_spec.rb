@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -14,14 +17,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
   describe 'rmvar' do
     it 'should be responsive' do
-      result = @group.instance_methods(false).include?(:rmvar)
+      result = @group.method_defined?(:rmvar, false)
       expect(result).to eq(true)
     end
 
     #-----------------
     it '<missing args> ... should abort with an error' do
       actual = runner  do
-        @app.start(%w(group rmvar))
+        @app.start(%w[group rmvar])
       end
 
       # Check output
@@ -35,16 +38,16 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'does-not-exist'
       var_name = 'foo=bar'
       actual = runner do
-        @app.start(%W(group rmvar #{group_name} #{var_name}))
+        @app.start(%W[group rmvar #{group_name} #{var_name}])
       end
 
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Remove variable(s) '#{var_name}' from group '#{group_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"
+        "Remove variable(s) '#{var_name}' from group '#{group_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n"
       desired[:STDERR] =
-        "An error occurred during a transaction, any changes have been rolled back.\n"\
+        "An error occurred during a transaction, any changes have been rolled back.\n" \
         "ERROR: The group '#{group_name}' does not exist.\n"
       expected(actual, desired)
     end
@@ -56,29 +59,27 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       group_name = 'test1'
       @db.models[:group].create(name: group_name)
-
-      var = { name: 'foo', value: 'bar' }
-      cases = %w(
+      cases = %w[
         =bar
         foo=bar=
         =foo=bar
         foo=bar=extra
-      )
+      ]
 
       cases.each do |args|
         actual = runner do
-          @app.start(%W(group rmvar #{group_name} #{args}))
+          @app.start(%W[group rmvar #{group_name} #{args}])
         end
         # @console.out(actual,'p')
 
         desired = { aborted: true }
         desired[:STDOUT] =
-          "Remove variable(s) '#{args}' from group '#{group_name}':\n"\
-          "  - retrieve group '#{group_name}'...\n"\
-          "    - OK\n"\
-          "  - remove variable '#{args}'...\n"
+          "Remove variable(s) '#{args}' from group '#{group_name}':\n  " \
+          "- retrieve group '#{group_name}'...\n    " \
+          "- OK\n  " \
+          "- remove variable '#{args}'...\n"
         desired[:STDERR] =
-          "An error occurred during a transaction, any changes have been rolled back.\n"\
+          "An error occurred during a transaction, any changes have been rolled back.\n" \
           "ERROR: Incorrect format in {#{args}}. Expected 'key' or 'key=value'.\n"
 
         expected(actual, desired)
@@ -89,11 +90,11 @@ RSpec.describe Moose::Inventory::Cli::Group do
     it 'GROUP <valid args> ... should remove the group variable' do
       group_name = 'group_test'
       var = { name: 'foo', value: 'bar' }
-      cases = %W(
+      cases = %W[
         #{var[:name]}
         #{var[:name]}=
         #{var[:name]}=#{var[:value]}
-      )
+      ]
       cases.each do |example|
         # reset the db
         @db.reset
@@ -101,24 +102,24 @@ RSpec.describe Moose::Inventory::Cli::Group do
         # Add an initial group and groupvar
         @db.models[:group].create(name: group_name)
         runner do
-          @app.start(%W(group addvar #{group_name} #{var[:name]}=#{var[:value]}))
+          @app.start(%W[group addvar #{group_name} #{var[:name]}=#{var[:value]}])
         end
 
         # Try to remove the groupvar using the case example valid args
         actual = runner do
-          @app.start(%W(group rmvar #{group_name} #{example}))
+          @app.start(%W[group rmvar #{group_name} #{example}])
         end
         # @console.out(actual,'p')
 
         # Check the output
         desired = { aborted: false }
         desired[:STDOUT] =
-          "Remove variable(s) '#{example}' from group '#{group_name}':\n"\
-          "  - retrieve group '#{group_name}'...\n"\
-          "    - OK\n"\
-          "  - remove variable '#{example}'...\n"\
-          "    - OK\n"\
-          "  - all OK\n"\
+          "Remove variable(s) '#{example}' from group '#{group_name}':\n  " \
+          "- retrieve group '#{group_name}'...\n    " \
+          "- OK\n  " \
+          "- remove variable '#{example}'...\n    " \
+          "- OK\n  " \
+          "- all OK\n" \
           "Succeeded.\n"
 
         # @console.out(desired,'p')
@@ -139,36 +140,35 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'test_group'
       varsarray  = [
         { name: 'var1', value: 'val1' },
-        { name: 'var2', value: 'val2' },
+        { name: 'var2', value: 'val2' }
       ]
 
-      vars = []
-      varsarray.each do |var|
-        vars << "#{var[:name]}=#{var[:value]}"
+      vars = varsarray.map do |var|
+        "#{var[:name]}=#{var[:value]}"
       end
 
       @db.models[:group].create(name: group_name)
-      actual = runner do
-        @app.start(%W(group addvar #{group_name}) + vars)
+      runner do
+        @app.start(%W[group addvar #{group_name}] + vars)
       end
 
       actual = runner do
-        @app.start(%W(group rmvar #{group_name}) + vars)
+        @app.start(%W[group rmvar #{group_name}] + vars)
       end
       # @console.out(actual,'y')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Remove variable(s) '#{vars.join(',')}' from group '#{group_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"\
-        "    - OK\n"
+        "Remove variable(s) '#{vars.join(',')}' from group '#{group_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n"
       vars.each do |var|
         desired[:STDOUT] = desired[:STDOUT] +
-                           "  - remove variable '#{var}'...\n"\
-                           "    - OK\n"
+                           "  - remove variable '#{var}'...\n    " \
+                           "- OK\n"
       end
       desired[:STDOUT] = desired[:STDOUT] +
-                         "  - all OK\n"\
+                         "  - all OK\n" \
                          "Succeeded.\n"
       expected(actual, desired)
 
@@ -179,3 +179,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
