@@ -259,15 +259,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 53 done / 1 open.
+Code quality status counts: 54 done / 0 open.
 
 ## Open
 
-1. Extract a tiny shared operations event helper/base for repeated event plumbing.
-   - Reduce duplication around `Event`, `Result`, `emit`, association checks, and warning-count plumbing in the operations classes.
-   - Land it as one bounded family refactor with focused operation specs and the full gate.
+## Open
+
+_No open code-quality items._
 
 ## Done
+
+1. Extract a tiny shared operations event helper/base for repeated event plumbing.
+   - Added `EntityVariableOperationSupport` as a bounded shared helper for the variable-operation family, consolidating shared entity lookup, missing-entity errors, and event emission plumbing.
+   - Refactored `AddVariables` and `RemoveVariables` to use the shared support without changing their emitted event contract.
+   - Added focused operation coverage for shared missing-entity and unsupported-entity-type behavior, then re-ran the targeted/full gates.
 
 1. Remove stale CLI spec TODO noise around Thor responder comments.
    - Deleted the repeated obsolete comments about `respond_to?` on Thor objects now that the spec pattern is established.

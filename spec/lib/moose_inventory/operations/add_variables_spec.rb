@@ -57,6 +57,22 @@ RSpec.describe Moose::Inventory::Operations::AddVariables do
     expect(@db.models[:groupvar].count).to eq(1)
   end
 
+  it 'uses the shared variable operation support for missing entity errors' do
+    operation = build_operation(:host)
+
+    expect do
+      operation.call(name: 'ghost', vars: ['var1=val1'])
+    end.to raise_error(Moose::Inventory::DB.exceptions[:moose], "The host 'ghost' does not exist.")
+  end
+
+  it 'rejects unsupported entity types via the shared variable operation support' do
+    operation = build_operation(:thing)
+
+    expect do
+      operation.call(name: 'whatever', vars: ['var1=val1'])
+    end.to raise_error(ArgumentError, /Unsupported entity type/)
+  end
+
   it 'emits partial progress before raising on malformed host variable input' do
     @db.models[:host].create(name: 'test1')
     emitted = []
