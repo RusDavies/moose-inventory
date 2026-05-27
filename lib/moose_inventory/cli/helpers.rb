@@ -106,7 +106,9 @@ module Moose
         end
 
         def print_warning_summary(result, success_message: 'Succeeded.', warning_message: 'Succeeded, with warnings.')
-          if result.warning_count.zero?
+          warning_count = result.respond_to?(:warning_count) ? result.warning_count : 0
+
+          if warning_count.zero?
             puts success_message
           else
             puts warning_message

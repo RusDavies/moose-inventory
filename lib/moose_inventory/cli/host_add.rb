@@ -35,7 +35,7 @@ module Moose
           result = build_operation(Moose::Inventory::Operations::AddHosts)
                    .call(names: names, groups: groups)
           render_add_hosts_events(result.events)
-          puts 'Succeeded'
+          print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
         end
 
         private
