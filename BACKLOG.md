@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 35 done / 0 open.
+Code quality status counts: 36 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean build/support RuboCop hygiene.
+   - Added frozen string literal comments to `Gemfile`, `Rakefile`, and `scripts/files.rb`.
+   - Simplified `scripts/files.rb` symbol/hash output and removed redundant string coercion.
+   - Added the build/support files to the targeted RuboCop gate.
 
 1. Clean CLI loader and gemspec hygiene.
    - Normalized small CLI loader files for frozen string literals and idiomatic `require_relative` paths.
