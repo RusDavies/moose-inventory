@@ -107,12 +107,11 @@ module Moose
 
         def print_warning_summary(result, success_message: 'Succeeded.', warning_message: 'Succeeded, with warnings.')
           warning_count = result.respond_to?(:warning_count) ? result.warning_count : 0
+          print_success_summary(warning_count.zero? ? success_message : warning_message)
+        end
 
-          if warning_count.zero?
-            puts success_message
-          else
-            puts warning_message
-          end
+        def print_success_summary(message = 'Succeeded.')
+          puts message
         end
 
         def automatic_group

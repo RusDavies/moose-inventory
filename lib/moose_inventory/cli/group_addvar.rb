@@ -26,7 +26,7 @@ module Moose
             operation.call(name: name, vars: vars)
           end
 
-          puts 'Succeeded.'
+          print_success_summary
         end
 
         private
