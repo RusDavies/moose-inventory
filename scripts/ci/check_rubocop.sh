@@ -17,6 +17,9 @@ bundle exec rubocop \
   lib/moose_inventory/operations/remove_variables.rb \
   lib/moose_inventory/operations/remove_hosts.rb \
   lib/moose_inventory/operations/query_inventory.rb \
+  lib/moose_inventory/operations/query_inventory/base_query.rb \
+  lib/moose_inventory/operations/query_inventory/host_queries.rb \
+  lib/moose_inventory/operations/query_inventory/group_queries.rb \
   lib/moose_inventory/cli/formatter.rb \
   lib/moose_inventory/cli/helpers.rb \
   lib/moose_inventory/cli/host_add.rb \

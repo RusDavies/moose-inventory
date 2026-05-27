@@ -9,10 +9,6 @@ Metrics/AbcSize:
 Metrics/MethodLength:
   Max: 25
 
-Metrics/ClassLength:
-  Exclude:
-    - lib/moose_inventory/operations/query_inventory.rb
-
 Metrics/ModuleLength:
   Exclude:
     - lib/moose_inventory/config/config.rb

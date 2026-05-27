@@ -234,13 +234,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 16 done / 0 open.
+Code quality status counts: 17 done / 1 open.
 
 ## Open
 
-_No open code-quality items._
+1. Reduce remaining DB singleton leakage behind `InventoryContext` and CLI bootstrap.
+   - Splitting `QueryInventory` clarified that the query/mutation operations are cleaner, but context creation still ultimately hangs off module-global DB state.
+   - Next step: make context construction and DB wiring a bit more explicit so operations depend less on hidden runtime-global setup and tests need less implicit module state.
 
 ## Done
+
+1. Split `QueryInventory` before it grew into a new monolith.
+   - Broke `lib/moose_inventory/operations/query_inventory.rb` into a thin delegator plus focused host/group query helpers under `lib/moose_inventory/operations/query_inventory/`.
+   - Kept the public operation API unchanged for `host get/list/listvars` and `group get/list/listvars`, preserving existing YAML/JSON/Ansible output behavior.
+   - Removed the temporary targeted RuboCop `Metrics/ClassLength` exclusion for `QueryInventory` and extended the lint gate to cover the new helper files.
+   - Verified with focused query specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Fix formatter output bug and make output format explicit at command call sites.
    - Fixed `Moose::Inventory::Cli::Formatter.info` so it prints the provided message instead of the literal placeholder string `INFO: {msg}`.
