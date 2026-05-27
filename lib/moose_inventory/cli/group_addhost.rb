@@ -23,12 +23,7 @@ module Moose
           abort_if_automatic_group([name])
 
           result = add_hosts_to_group(name, hosts)
-
-          if result.warning_count.zero?
-            puts 'Succeeded.'
-          else
-            puts 'Succeeded, with warnings.'
-          end
+          print_warning_summary(result)
         end
 
         private

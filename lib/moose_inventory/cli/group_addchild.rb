@@ -23,12 +23,7 @@ module Moose
           abort_if_automatic_group([pname] + cnames)
 
           result = add_children_to_group(pname, cnames)
-
-          if result.warning_count.zero?
-            puts 'Succeeded.'
-          else
-            puts 'Succeeded, with warnings.'
-          end
+          print_warning_summary(result)
         end
 
         private

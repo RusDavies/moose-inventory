@@ -105,6 +105,14 @@ module Moose
           error.to_s
         end
 
+        def print_warning_summary(result)
+          if result.warning_count.zero?
+            puts 'Succeeded.'
+          else
+            puts 'Succeeded, with warnings.'
+          end
+        end
+
         def automatic_group
           inventory_context.automatic_group
         end

@@ -234,15 +234,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 24 done / 1 open.
+Code quality status counts: 25 done / 1 open.
 
 ## Open
 
-1. Reduce repeated final success-summary boilerplate across the group relation adapters.
-   - `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` still repeat the same `warning_count.zero?` branching to print `Succeeded.` vs `Succeeded, with warnings.`.
-   - Next step: extract one narrow shared helper for that final status summary without changing the exact wording or punctuation.
+1. Reduce repeated final success-summary boilerplate across the remaining mutating CLI adapters.
+   - `group add`, `group rm`, and `host rm` still repeat the same or nearly identical `Succeeded.` / `Succeeded, with warnings.` summary logic that is now shared for the group relation adapters.
+   - Next step: extend the shared summary helper into those remaining mutating adapters without changing the exact wording or punctuation.
 
 ## Done
+
+1. Reduce repeated final success-summary boilerplate across the group relation adapters.
+   - Added `print_warning_summary` to `Moose::Inventory::Cli::Helpers` to centralize the shared `Succeeded.` vs `Succeeded, with warnings.` tail output.
+   - Refactored `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` to use the shared helper while preserving exact wording and punctuation.
+   - Verified with focused group-relation CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated transaction/result wrapper boilerplate across the group relation adapters.
    - Added `run_group_relation_transaction` to `Moose::Inventory::Cli::Helpers` to centralize the shared transaction/rescue/result wrapper, including the common `- all OK` line and Moose-exception abort path.
