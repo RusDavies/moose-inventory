@@ -259,19 +259,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 52 done / 2 open.
+Code quality status counts: 53 done / 1 open.
 
 ## Open
-
-1. Remove stale CLI spec TODO noise around Thor responder comments.
-   - Delete the repeated obsolete comments that say the normal `respond_to?` check does not work on Thor objects now that the spec pattern is established.
-   - Keep behavior unchanged and re-run the targeted/full gates.
 
 1. Extract a tiny shared operations event helper/base for repeated event plumbing.
    - Reduce duplication around `Event`, `Result`, `emit`, association checks, and warning-count plumbing in the operations classes.
    - Land it as one bounded family refactor with focused operation specs and the full gate.
 
 ## Done
+
+1. Remove stale CLI spec TODO noise around Thor responder comments.
+   - Deleted the repeated obsolete comments about `respond_to?` on Thor objects now that the spec pattern is established.
+   - Kept the remaining behavior-question TODO comments intact.
+   - Re-ran the targeted/full gates.
 
 1. Narrow production `rescue Exception` handling in `lib/moose_inventory/db/db.rb`.
    - Replaced the broad catch-all with `StandardError` handling so fatal control-flow exceptions are not swallowed.

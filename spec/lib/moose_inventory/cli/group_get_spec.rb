@@ -3,7 +3,6 @@
 # rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
-# TODO: the usual respond_to? method doesn't seem to work on Thor objects.
 # Why not? For now, we'll check against instance_methods.
 
 RSpec.describe Moose::Inventory::Cli::Group do
