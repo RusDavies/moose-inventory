@@ -62,5 +62,6 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/factory_spec.rb \
   spec/lib/moose_inventory/cli/formatter_spec.rb \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
+  spec/support/cli_harness.rb \
   spec/lib/moose_inventory/config/config_spec.rb \
   spec/lib/moose_inventory/db/db_spec.rb

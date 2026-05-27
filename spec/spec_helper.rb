@@ -31,8 +31,10 @@ require 'yaml'
 require 'fileutils'
 require 'find'
 require 'moose_inventory'
+require_relative 'support/cli_harness'
 
 RSpec.configure do |config|
+  config.include CliHarness
   # config.filter_run focus: true # <- enable to allow test focus
   config.color = true
   config.tty = true
