@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 34 done / 0 open.
+Code quality status counts: 35 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean CLI loader and gemspec hygiene.
+   - Normalized small CLI loader files for frozen string literals and idiomatic `require_relative` paths.
+   - Updated gemspec metadata to require RubyGems MFA, removed deprecated `test_files`, and corrected dependency/API/style issues while preserving the project’s Gemfile-through-gemspec setup.
+   - Added the cleaned CLI loader files and gemspec to the targeted RuboCop gate.
 
 1. Replace randomized SQLite busy retry sleeps with deterministic capped backoff.
    - Added named retry constants and a testable `busy_retry_delay` helper for database lock retries.

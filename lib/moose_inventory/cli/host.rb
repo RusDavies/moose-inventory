@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'thor'
 require 'json'
 
-require_relative './formatter.rb'
-require_relative './helpers.rb'
-require_relative '../db/exceptions.rb'
+require_relative 'formatter'
+require_relative 'helpers'
+require_relative '../db/exceptions'
 
 module Moose
   module Inventory

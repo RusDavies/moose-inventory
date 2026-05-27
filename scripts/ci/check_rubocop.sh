@@ -10,6 +10,7 @@ bundle exec rubocop \
   lib/moose_inventory/db/models.rb \
   lib/moose_inventory/runtime_options.rb \
   lib/moose_inventory/inventory_context.rb \
+  lib/moose_inventory/cli/application.rb \
   lib/moose_inventory/cli/factory.rb \
   lib/moose_inventory/cli/association_rendering.rb \
   lib/moose_inventory/cli/association_rendering_support.rb \
@@ -30,7 +31,9 @@ bundle exec rubocop \
   lib/moose_inventory/operations/query_inventory/host_queries.rb \
   lib/moose_inventory/operations/query_inventory/group_queries.rb \
   lib/moose_inventory/cli/formatter.rb \
+  lib/moose_inventory/cli/group.rb \
   lib/moose_inventory/cli/helpers.rb \
+  lib/moose_inventory/cli/host.rb \
   lib/moose_inventory/cli/host_add.rb \
   lib/moose_inventory/cli/group_add.rb \
   lib/moose_inventory/cli/host_addgroup.rb \
@@ -70,4 +73,5 @@ bundle exec rubocop \
   spec/lib/moose_inventory/config/config_spec.rb \
   spec/lib/moose_inventory/db/db_spec.rb \
   spec/lib/moose_inventory/db/exceptions_spec.rb \
-  lib/moose_inventory/version.rb
+  lib/moose_inventory/version.rb \
+  moose-inventory.gemspec
