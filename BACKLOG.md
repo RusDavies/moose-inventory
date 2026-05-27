@@ -234,15 +234,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 22 done / 1 open.
+Code quality status counts: 23 done / 1 open.
 
 ## Open
 
-1. Reduce repeated parent-group lookup/bootstrap boilerplate across the group relation adapters.
-   - `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` still repeat nearly identical "print retrieve banner → look up parent group → abort if missing → print OK" flows.
-   - Next step: extract one narrow shared helper for that fetch/bootstrap path without changing the exact command-specific output text or error ordering.
+1. Reduce repeated transaction/result wrapper boilerplate across the group relation adapters.
+   - `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` still repeat very similar `db.transaction`/`rescue` wrappers, success-line emission, and result-return plumbing around their operation calls.
+   - Next step: extract one narrow shared helper for that wrapper path without changing the exact command-specific headings, error ordering, or final success wording.
 
 ## Done
+
+1. Reduce repeated parent-group lookup/bootstrap boilerplate across the group relation adapters.
+   - Added `fetch_existing_group_or_abort` to `Moose::Inventory::Cli::Helpers` to centralize the shared retrieve/look-up/missing-group/OK bootstrap flow.
+   - Refactored `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` to use the shared helper while preserving the exact existing output strings and error ordering.
+   - Verified with focused group-relation CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated event-rendering boilerplate across child-group relation CLI adapters.
    - Added `Moose::Inventory::Cli::ChildRelationRendering` to centralize the shared event-emitter and render-path logic for `group addchild` and `group rmchild`.

@@ -44,7 +44,7 @@ module Moose
           begin
             db.transaction do
               puts "Dissociate parent group '#{parent_name}' from child group(s) '#{child_names.join(',')}':"
-              parent_group = fetch_existing_group_for_rmchild(parent_name)
+              parent_group = fetch_existing_group_or_abort(parent_name)
               result = operation.remove_children(
                 parent_group: parent_group,
                 parent_name: parent_name,
@@ -58,15 +58,6 @@ module Moose
           rescue db.exceptions[:moose] => e
             abort("ERROR: #{e}")
           end
-        end
-
-        def fetch_existing_group_for_rmchild(name)
-          fmt.puts 2, "- retrieve group '#{name}'..."
-          group = inventory_context.find_group(name)
-          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
-
-          fmt.puts 4, '- OK'
-          group
         end
 
         def render_rmchild_events(events)
