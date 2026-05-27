@@ -28,12 +28,7 @@ module Moose
           result = build_operation(Moose::Inventory::Operations::AddGroups)
                    .call(names: names, hosts: hosts)
           render_add_groups_events(result.events)
-
-          if result.warning_count.zero?
-            puts 'Succeeded'
-          else
-            puts 'Succeeded, with warnings.'
-          end
+          print_warning_summary(result, success_message: 'Succeeded')
         end
 
         private
