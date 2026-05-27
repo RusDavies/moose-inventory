@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -20,14 +23,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'addhost' do
     #------------------------
     it 'Group.addhost() should be responsive' do
-      result = @group.instance_methods(false).include?(:addhost)
+      result = @group.method_defined?(:addhost, false)
       expect(result).to eq(true)
     end
 
     #------------------------
     it 'addhost <missing args> ... should abort with an error' do
       actual = runner do
-        @app.start(%w(group addhost)) # <- no group given
+        @app.start(%w[group addhost]) # <- no group given
       end
 
       # @console.out(actual, 'y')
@@ -44,17 +47,17 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'not-a-group'
 
       actual = runner do
-        @app.start(%W(group addhost #{group_name} #{host_name}))
+        @app.start(%W[group addhost #{group_name} #{host_name}])
       end
 
       # @console.out(actual, 'y')
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Associate group '#{group_name}' with host(s) '#{host_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"
+        "Associate group '#{group_name}' with host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n"
       desired[:STDERR] =
-        "ERROR: The group '#{group_name}' does not exist.\n"\
+        "ERROR: The group '#{group_name}' does not exist.\n" \
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
     end
@@ -67,26 +70,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
       host_name = 'test1'
       group_name = 'testgroup1'
 
-      runner { @app.start(%W(host add #{host_name})) }
+      runner { @app.start(%W[host add #{host_name}]) }
       @db.models[:group].create(name: group_name)
 
-      actual = runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      actual = runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
-      # rubocop:disable Metrics/LineLength
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Associate group '#{group_name}' with host(s) '#{host_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"\
-        "    - OK\n"\
-        "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
-        "    - OK\n"\
-        "  - remove automatic association {group:ungrouped <-> host:#{host_name}}...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Associate group '#{group_name}' with host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- OK\n  " \
+        "- remove automatic association {group:ungrouped <-> host:#{host_name}}...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
-      # rubocop:enable Metrics/LineLength
-
       # We should have the correct group associations
       host = @db.models[:host].find(name: host_name)
       groups = host.groups_dataset
@@ -100,9 +100,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
       host_name = 'test1'
       group_name = 'ungrouped'
 
-      runner { @app.start(%W(host add #{host_name})) }
+      runner { @app.start(%W[host add #{host_name}]) }
 
-      actual = runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      actual = runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
       desired = { aborted: true }
       desired[:STDERR] =
@@ -115,23 +115,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
       host_name = 'test1'
       group_name = 'testgroup1'
 
-      runner { @app.start(%W(group add #{group_name})) }
+      runner { @app.start(%W[group add #{group_name}]) }
 
       # DON'T CREATE THE HOST! That's the point of the test. ;o)
 
-      actual = runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      actual = runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Associate group '#{group_name}' with host(s) '#{host_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"\
-        "    - OK\n"\
-        "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
-        "    - host does not exist, creating now...\n"\
-        "      - OK\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Associate group '#{group_name}' with host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- host does not exist, creating now...\n      " \
+        "- OK\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded, with warnings.\n"
       desired[:STDERR] =
         "WARNING: Host '#{host_name}' does not exist and will be created.\n"
@@ -145,32 +145,32 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
-    it 'GROUP HOST... should skip associations that already '\
-       ' exist, but raise a warning.' do
+    it 'GROUP HOST... should skip associations that already  ' \
+       'exist, but raise a warning.' do
       host_name = 'test1'
       group_name = 'testgroup1'
 
-      runner { @app.start(%W(group add #{group_name})) }
-      runner { @app.start(%W(host add #{host_name})) }
+      runner { @app.start(%W[group add #{group_name}]) }
+      runner { @app.start(%W[host add #{host_name}]) }
 
       # Run once to make the initial association
-      runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
       # Run again, to prove expected result
-      actual = runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      actual = runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
       # @console.out(actual,'y')
 
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Associate group '#{group_name}' with host(s) '#{host_name}':\n"\
-        "  - retrieve group \'#{group_name}\'...\n"\
-        "    - OK\n"\
-        "  - add association {group:#{group_name} <-> host:#{host_name}}...\n"\
-        "    - already exists, skipping.\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Associate group '#{group_name}' with host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- already exists, skipping.\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded, with warnings.\n"
       desired[:STDERR] =
         "WARNING: Association {group:#{group_name} <-> host:#{host_name}} already exists, skipping.\n"
@@ -184,38 +184,38 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
-    it 'GROUP HOST1 HOST2 ... should associate the group with '\
-      ' multiple hosts at once' do
+    it 'GROUP HOST1 HOST2 ... should associate the group with  ' \
+       'multiple hosts at once' do
       group_name = 'test1'
-      host_names = %w(host1 host2 host3)
+      host_names = %w[host1 host2 host3]
 
-      runner { @app.start(%W(group add #{group_name})) }
+      runner { @app.start(%W[group add #{group_name}]) }
       host_names.each do |host|
-        runner { @app.start(%W(host add #{host})) }
+        runner { @app.start(%W[host add #{host}]) }
       end
 
-      actual = runner { @app.start(%W(group addhost #{group_name}) + host_names) }
+      actual = runner { @app.start(%W[group addhost #{group_name}] + host_names) }
 
       # @console.out(actual, 'y')
 
       # Check output
       desired = { aborted: false, STDERR: '' }
       desired[:STDOUT] =
-        "Associate group '#{group_name}' with host(s) '#{host_names.join(',')}':\n"\
-        "  - retrieve group '#{group_name}'...\n"\
-        "    - OK\n"
+        "Associate group '#{group_name}' with host(s) '#{host_names.join(',')}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n"
       host_names.each do |host|
         desired[:STDOUT] = desired[:STDOUT] +
-                           "  - add association {group:#{group_name} <-> host:#{host}}...\n"\
-                           "    - OK\n"\
-                           "  - remove automatic association {group:ungrouped <-> host:#{host}}...\n"\
-                           "    - OK\n"\
+                           "  - add association {group:#{group_name} <-> host:#{host}}...\n    " \
+                           "- OK\n  " \
+                           "- remove automatic association {group:ungrouped <-> host:#{host}}...\n    " \
+                           "- OK\n" \
 
         # desired[:STDERR] = desired[:STDERR] +
         #  "WARNING: Host '#{host}' does not exist and will be created.\n"
       end
       desired[:STDOUT] = desired[:STDOUT] +
-                         "  - all OK\n"\
+                         "  - all OK\n" \
                          "Succeeded.\n"
       expected(actual, desired)
 
@@ -227,3 +227,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
