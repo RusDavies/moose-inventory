@@ -2,6 +2,7 @@
 
 require_relative '../inventory_context'
 require_relative 'factory'
+require_relative 'variable_rendering'
 
 module Moose
   module Inventory
@@ -9,6 +10,8 @@ module Moose
       ##
       # Shared helpers for Thor command classes.
       module Helpers
+        include Moose::Inventory::Cli::VariableRendering
+
         AUTOMATIC_GROUP = 'ungrouped'
 
         private

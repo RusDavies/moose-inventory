@@ -234,15 +234,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 19 done / 1 open.
+Code quality status counts: 20 done / 1 open.
 
 ## Open
 
-1. Reduce repeated event-rendering boilerplate across association and variable CLI adapters.
-   - After introducing the small CLI factory seam, the next obvious duplication is not object construction but the very similar event-rendering helper methods spread across host/group association and variable commands.
-   - Next step: extract one narrow rendering helper seam without disturbing the exact spec-sensitive output strings.
+1. Reduce repeated event-rendering boilerplate across association CLI adapters.
+   - Variable command rendering is now shared, but the host/group association and dissociation adapters still carry several very similar `render_*_event` helper stacks.
+   - Next step: extract one narrow association-rendering seam without disturbing the exact spec-sensitive output strings or warning wording.
 
 ## Done
+
+1. Reduce repeated event-rendering boilerplate across the variable CLI adapters.
+   - Added `Moose::Inventory::Cli::VariableRendering` to centralize the shared event-emitter and render-path logic for `host/group addvar` and `host/group rmvar`.
+   - Refactored the four variable adapters to delegate through the shared helper while preserving the exact existing CLI output strings for add/remove headings, retrieval lines, variable mutation lines, update notices, and success markers.
+   - Extended the targeted RuboCop gate to cover the new rendering helper and verified with focused variable CLI/operation specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Introduce a small CLI operation/query factory to reduce adapter boilerplate.
    - Added `Moose::Inventory::Cli::Factory` as a tiny shared seam for building context-backed operations and the memoized inventory query wrapper.
