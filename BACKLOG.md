@@ -234,15 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 27 done / 1 open.
+Code quality status counts: 28 done / 0 open.
 
 ## Open
 
-1. Reduce repeated fixed-success tail boilerplate across the variable and remaining host association CLI adapters.
-   - `host addvar`, `host rmvar`, `group addvar`, `group rmvar`, and the host association adapters still contain repeated one-line success tails (`Succeeded` or `Succeeded.`) that now overlap with the shared summary helper shape.
-   - Next step: decide whether to generalize a tiny no-warning success helper for those fixed-tail commands without disturbing the spec-sensitive punctuation split between `Succeeded` and `Succeeded.`.
+None.
 
 ## Done
+
+1. Reduce repeated fixed-success tail boilerplate across the variable CLI adapters.
+   - Added `print_success_summary` as the no-warning fixed-success helper and routed `print_warning_summary` through it for the success path.
+   - Refactored `host addvar`, `host rmvar`, `group addvar`, and `group rmvar` to use the helper while preserving the exact legacy `Succeeded.` output.
+   - The host association adapters had already been handled by the previous warning-summary slice, so no additional association changes were needed here.
 
 1. Reduce repeated final success-summary boilerplate across the remaining host mutating CLI adapters.
    - Extended `print_warning_summary` into `host add`, `host addgroup`, and `host rmgroup`, preserving the legacy behavior that these commands always end with plain `Succeeded` even when warnings are emitted.
