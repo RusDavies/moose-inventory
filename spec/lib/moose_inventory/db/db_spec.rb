@@ -469,6 +469,13 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
   end
 
+  describe '.busy_database_error?()' do
+    it 'identifies Sequel busy database errors by message' do
+      expect(@db.busy_database_error?(Sequel::DatabaseError.new('BusyException: locked'))).to eq(true)
+      expect(@db.busy_database_error?(Sequel::DatabaseError.new('other database failure'))).to eq(false)
+    end
+  end
+
   describe '.retry_busy_transaction()' do
     it 'sleeps for the deterministic retry delay before another busy retry' do
       delays = []
@@ -488,6 +495,31 @@ RSpec.describe 'Moose::Inventory::DB' do
       end
 
       expect(actual_stderr).to include('The database appears to be locked by another process')
+    end
+  end
+
+  describe '.purge()' do
+    it 'uses drop_table for non-sqlite adapters' do
+      saved_db = @db.instance_variable_get(:@db)
+
+      begin
+        fake_db = instance_double('DB')
+        @db.instance_variable_set(:@db, fake_db)
+        allow(@db).to receive(:sqlite_adapter?).and_return(false)
+        expect(fake_db).to receive(:drop_table).with(
+          :hosts,
+          :hostvars,
+          :groups,
+          :groupvars,
+          :group_hosts,
+          if_exists: true,
+          cascade: true
+        )
+
+        @db.purge
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+      end
     end
   end
 
@@ -521,6 +553,57 @@ RSpec.describe 'Moose::Inventory::DB' do
     it 'should be responsive' do
       result = @db.respond_to?(:transaction)
       expect(result).to eq(true)
+    end
+
+    it 'retries busy database transactions before succeeding' do
+      saved_db = @db.instance_variable_get(:@db)
+      fake_db = Class.new do
+        attr_reader :attempts
+
+        def initialize(error)
+          @error = error
+          @attempts = 0
+        end
+
+        def transaction(savepoint:)
+          raise ArgumentError, 'expected savepoint' unless savepoint
+
+          @attempts += 1
+          raise @error if @attempts == 1
+
+          yield
+        end
+      end.new(Sequel::DatabaseError.new('BusyException: database is locked'))
+
+      begin
+        @db.instance_variable_set(:@db, fake_db)
+        allow(@db).to receive(:retry_busy_transaction)
+
+        result = @db.transaction { :ok }
+
+        expect(result).to eq(:ok)
+        expect(fake_db.attempts).to eq(2)
+        expect(@db).to have_received(:retry_busy_transaction).once
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+      end
+    end
+
+    it 're-raises non-busy database errors without retrying' do
+      saved_db = @db.instance_variable_get(:@db)
+      error = Sequel::DatabaseError.new('constraint failed')
+      fake_db = instance_double('DB')
+
+      begin
+        @db.instance_variable_set(:@db, fake_db)
+        allow(fake_db).to receive(:transaction).and_raise(error)
+        allow(@db).to receive(:retry_busy_transaction)
+
+        expect { @db.transaction { :ignored } }.to raise_error(error)
+        expect(@db).not_to have_received(:retry_busy_transaction)
+      ensure
+        @db.instance_variable_set(:@db, saved_db)
+      end
     end
 
     it 'should perform transactions' do
