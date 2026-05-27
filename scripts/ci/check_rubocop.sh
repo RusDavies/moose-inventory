@@ -93,6 +93,8 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/host_rmvar_spec.rb \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
   spec/lib/moose_inventory/cli/host_spec.rb \
+  spec/shared/shared_config_setup.rb \
+  spec/spec_helper.rb \
   spec/support/cli_harness.rb \
   spec/lib/moose_inventory/config/config_spec.rb \
   spec/lib/moose_inventory/db/db_spec.rb \

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 if RUBY_VERSION >= '1.9'
   require 'simplecov'
   SimpleCov.formatters = [
@@ -33,34 +35,32 @@ require 'find'
 require 'moose_inventory'
 require_relative 'support/cli_harness'
 
-RSpec.configure do |config|
-  config.include CliHarness
-  # config.filter_run focus: true # <- enable to allow test focus
-  config.color = true
-  config.tty = true
-  config.formatter = :progress #:documentation # :progress, :html, :textmate
-  def capture(stream)
+module SpecOutputHelpers
+  def capture(stream, &)
     case stream
     when :STDOUT
-      begin
-        orig = $stdout
-        $stdout = StringIO.new
-        yield
-        result = $stdout.string
-      ensure
-        $stdout = orig
-      end
+      capture_stdout(&)
     when :STDERR
-      begin
-        orig = $stderr
-        $stderr = StringIO.new
-        yield
-        result = $stderr.string
-      ensure
-        $stderr = orig
-      end
+      capture_stderr(&)
     end
-    result
+  end
+
+  def capture_stdout
+    orig = $stdout
+    $stdout = StringIO.new
+    yield
+    $stdout.string
+  ensure
+    $stdout = orig
+  end
+
+  def capture_stderr
+    orig = $stderr
+    $stderr = StringIO.new
+    yield
+    $stderr.string
+  ensure
+    $stderr = orig
   end
 
   def runner
@@ -68,17 +68,13 @@ RSpec.configure do |config|
 
     out[:STDERR] = capture(:STDERR) do
       out[:STDOUT] = capture(:STDOUT) do
-        begin
-          yield
-
-        rescue SystemExit
-          out[:aborted] = true
-
-        # rubocop:disable Lint/RescueException
-        rescue Exception => e
-          # rubocop:enable Lint/RescueException
-          out[:unexpected] = e
-        end
+        yield
+      rescue SystemExit
+        out[:aborted] = true
+      # rubocop:disable Lint/RescueException
+      rescue Exception => e
+        # rubocop:enable Lint/RescueException
+        out[:unexpected] = e
       end
     end
     out # return the output
@@ -95,17 +91,29 @@ RSpec.configure do |config|
     expect(actual[:STDERR]).to eq(desired[:STDERR])
   end
 
-  def clobber_db_files
+  def spec_root
+    File.dirname(__FILE__)
+  end
+end
+
+module SpecDatabaseHelpers
+  def self.clobber_db_files
     FileUtils.mkdir_p('tmp')
     paths = []
     Find.find('tmp') { |path| paths << path if path =~ /.*\.db$/ }
     paths.each { |file| File.delete(file) }
   end
+end
 
-  def spec_root
-    File.dirname(__FILE__)
+RSpec.configure do |config|
+  config.include CliHarness
+  config.include SpecOutputHelpers
+  # config.filter_run focus: true # <- enable to allow test focus
+  config.color = true
+  config.tty = true
+  config.formatter = :progress # :documentation # :progress, :html, :textmate
+
+  config.before(:suite) do
+    SpecDatabaseHelpers.clobber_db_files
   end
-
-  # Always start with a fresh db file.
-  clobber_db_files
 end

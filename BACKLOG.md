@@ -4,8 +4,6 @@ Release readiness status counts: 14 done / 0 open.
 
 ## Open
 
-_No open code-quality items._
-
 _No open release-readiness items._
 
 ## Done
@@ -261,11 +259,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 47 done / 0 open.
+Code quality status counts: 48 done / 1 open.
 
 ## Open
 
+1. Add formatter branch coverage for STDERR and invalid stream paths.
+   - Cover `Formatter#print`, `Formatter#puts`, `Formatter#info`, `Formatter#warn`, and `Formatter#error` branches that currently miss STDERR and invalid-stream behavior.
+   - Keep output formatting and abort text exact while raising production coverage on `lib/moose_inventory/cli/formatter.rb`.
+   - Re-run the full gate after the spec-only slice.
+
 ## Done
+
+1. Close the remaining full-RuboCop gap in spec support helpers.
+   - Cleaned `spec/spec_helper.rb` and `spec/shared/shared_config_setup.rb` so full `bundle exec rubocop` is green, including extracting helper modules and moving DB cleanup to a `before(:suite)` hook.
+   - Added those two support files to `scripts/ci/check_rubocop.sh`, bringing the targeted gate into line with the current full RuboCop surface.
+   - Preserved existing spec harness behavior while reducing setup noise in the shared helpers.
 
 1. Clean group host-association CLI spec RuboCop hygiene.
    - Normalized `group addhost` and `group rmhost` specs for frozen string literals, literal style, Thor member checks, stale line-length directives, escaped strings, and continuation formatting.
