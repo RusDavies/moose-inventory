@@ -259,13 +259,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 55 done / 3 open.
+Code quality status counts: 56 done / 2 open.
 
 ## Open
-
-1. Add direct Ansible missing-entity coverage for `host listvars` and `group listvars`.
-   - Cover the warning branches for nonexistent host/group lookups in Ansible mode.
-   - Keep the slice test-only and re-run the full gate.
 
 1. Add focused helper-branch coverage in `lib/moose_inventory/db/db.rb`.
    - Cover remaining adapter/purge/busy-retry helper branches that still leave `db.rb` as one of the weaker production files.
@@ -276,6 +272,10 @@ Code quality status counts: 55 done / 3 open.
    - Keep counts and history intact.
 
 ## Done
+
+1. Add direct Ansible missing-entity coverage for `host listvars` and `group listvars`.
+   - Covered the warning branches for nonexistent host/group lookups in Ansible mode.
+   - Kept the slice test-only and re-ran the full gate.
 
 1. Cover `group addchild` duplicate-association warning/rendering path.
    - Added direct CLI coverage for the duplicate child-association branch in `ChildRelationRendering`.

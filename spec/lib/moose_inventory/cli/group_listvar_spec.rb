@@ -95,6 +95,20 @@ RSpec.describe Moose::Inventory::Cli::Group do
       desired[:STDOUT] = "#{mock.to_json}\n"
       expected(actual, desired)
     end
+
+    #------------------------
+    it 'warns when an Ansible-mode group does not exist' do
+      group_name = 'missing_group'
+
+      actual = runner do
+        @cli.start(%W[--config #{@mockarg_parts[:config]} --ansible group listvars #{group_name}])
+      end
+
+      desired = {}
+      desired[:STDOUT] = "{}\n"
+      desired[:STDERR] = "WARNING: The Group #{group_name} does not exist."
+      expected(actual, desired)
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength
