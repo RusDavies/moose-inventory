@@ -60,31 +60,8 @@ module Moose
         end
 
         def render_group_rmhost_events(events)
-          events.each { |event| render_group_rmhost_event(event) }
-        end
-
-        def render_group_rmhost_event(event)
-          payload = event.payload
-
-          return render_group_rmhost_warning(payload) if event.type == :group_host_association_missing
-          return render_group_rmhost_missing(payload) if event.type == :missing_skipping
-
-          case event.type
-          when :removing_group_host_association
-            fmt.puts 2, "- remove association {group:#{payload[:group]} <-> host:#{payload[:host]}}..."
-          when :adding_automatic_group
-            fmt.puts 2, "- add automatic association {group:ungrouped <-> host:#{payload[:host]}}..."
-          when :ok
-            fmt.puts payload[:indent], '- OK'
-          end
-        end
-
-        def render_group_rmhost_warning(payload)
-          fmt.warn "Association {group:#{payload[:group]} <-> host:#{payload[:host]}} doesn't exist, skipping.\n"
-        end
-
-        def render_group_rmhost_missing(payload)
-          fmt.puts payload[:indent], "- doesn't exist, skipping."
+          emitter = host_group_association_removal_emitter(perspective: :group)
+          events.each { |event| emitter.call(event) }
         end
       end
     end

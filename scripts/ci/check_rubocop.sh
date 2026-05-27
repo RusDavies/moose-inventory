@@ -7,6 +7,8 @@ bundle exec rubocop \
   lib/moose_inventory/runtime_options.rb \
   lib/moose_inventory/inventory_context.rb \
   lib/moose_inventory/cli/factory.rb \
+  lib/moose_inventory/cli/association_rendering.rb \
+  lib/moose_inventory/cli/association_rendering_support.rb \
   lib/moose_inventory/cli/variable_rendering.rb \
   lib/moose_inventory/operations/add_hosts.rb \
   lib/moose_inventory/operations/add_groups.rb \
