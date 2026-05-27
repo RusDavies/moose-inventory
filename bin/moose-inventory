@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 begin
   require 'moose_inventory'
-rescue
+rescue LoadError
   require 'rubygems'
   require 'moose_inventory'
 end

@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 32 done / 0 open.
+Code quality status counts: 33 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean tiny production entrypoints and Moose DB exception behavior.
+   - Updated `MooseDBException` to initialize through `RuntimeError#initialize` instead of overriding `message`, preserving default-message behavior while avoiding non-idiomatic exception state.
+   - Cleaned the CLI executable, top-level require file, DB model file, and version file so they pass the targeted RuboCop gate.
+   - Added direct exception specs and expanded the targeted RuboCop gate to cover the cleaned entrypoint/exception files.
 
 1. Expand shared CLI spec harness adoption across host/group add/remove command specs.
    - Extended the shared CLI harness to support extra CLI args for specs that intentionally alter bootstrap flags.
