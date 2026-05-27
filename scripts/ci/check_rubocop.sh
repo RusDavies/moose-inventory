@@ -35,6 +35,7 @@ bundle exec rubocop \
   lib/moose_inventory/cli/formatter.rb \
   lib/moose_inventory/cli/group.rb \
   lib/moose_inventory/cli/helpers.rb \
+  spec/lib/moose_inventory/cli/helpers_spec.rb \
   lib/moose_inventory/cli/host.rb \
   lib/moose_inventory/cli/host_add.rb \
   lib/moose_inventory/cli/group_add.rb \
