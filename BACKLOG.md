@@ -259,19 +259,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 56 done / 2 open.
+Code quality status counts: 57 done / 1 open.
 
 ## Open
-
-1. Add focused helper-branch coverage in `lib/moose_inventory/db/db.rb`.
-   - Cover remaining adapter/purge/busy-retry helper branches that still leave `db.rb` as one of the weaker production files.
-   - Keep behavior unchanged unless a test exposes a real defect.
 
 1. Clean the duplicated `## Open` heading drift in `BACKLOG.md`.
    - Remove the accidental duplicate section heading in the code-quality backlog block.
    - Keep counts and history intact.
 
 ## Done
+
+1. Add focused helper-branch coverage in `lib/moose_inventory/db/db.rb`.
+   - Covered busy vs non-busy transaction retry branches, the busy-error helper, and the non-sqlite purge/drop-table path.
+   - Kept behavior unchanged and re-ran the focused DB slice plus the full gate.
 
 1. Add direct Ansible missing-entity coverage for `host listvars` and `group listvars`.
    - Covered the warning branches for nonexistent host/group lookups in Ansible mode.
