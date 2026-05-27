@@ -5,33 +5,15 @@ require 'spec_helper'
 
 RSpec.describe Moose::Inventory::Cli::Group do
   before(:all) do
-    # Set up the configuration object
-    @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
-    }
-
-    @mockargs = []
-    @mockarg_parts.each do |key, val|
-      @mockargs << "--#{key}"
-      @mockargs << val
-    end
-
-    @console = Moose::Inventory::Cli::Formatter
-    @config = Moose::Inventory::Config
-    @config.init(@mockargs)
-
-    @db = Moose::Inventory::DB
-    @db.init if @db.db.nil?
-
-    @group = Moose::Inventory::Cli::Group
-    @host = Moose::Inventory::Cli::Host
-    @app = Moose::Inventory::Cli::Application
+    setup_cli_harness(
+      command_class: Moose::Inventory::Cli::Group,
+      command_ivar: :@group,
+      extra_commands: { :@host => Moose::Inventory::Cli::Host }
+    )
   end
 
   before(:each) do
-    @db.reset
+    reset_cli_harness
   end
 
   #====================
