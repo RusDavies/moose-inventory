@@ -234,15 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 31 done / 1 open.
+Code quality status counts: 32 done / 0 open.
 
 ## Open
 
-1. Expand shared CLI spec harness adoption across the remaining command specs.
-   - The first harness slices migrated representative host/group get/list/listvars specs, host/group addvar/rmvar specs, and host/group association specs, but the larger add/remove command specs still repeat setup boilerplate.
-   - Next step: migrate the add/remove specs in small focused batches to avoid breaking spec-sensitive output expectations.
+_No open code-quality items._
 
 ## Done
+
+1. Expand shared CLI spec harness adoption across host/group add/remove command specs.
+   - Extended the shared CLI harness to support extra CLI args for specs that intentionally alter bootstrap flags.
+   - Migrated `host add`, `host rm`, `group add`, and `group rm` specs to use the shared harness while preserving the `group add` trace fixture.
+   - Verified focused add/remove CLI specs and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Expand shared CLI spec harness adoption across host/group association command specs.
    - Extended the shared CLI harness to support optional secondary command-class fixtures for specs that need both host and group command objects.
