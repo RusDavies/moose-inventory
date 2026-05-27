@@ -29,13 +29,11 @@ module Moose
           db.transaction do
             puts "Associate host '#{name}' with groups '#{groups.join(',')}':"
             host = fetch_existing_host_for_addgroup(name)
-            render_host_addgroup_events(
-              operation.host_to_groups(host: host, host_name: name, group_names: groups).events
-            )
+            result = operation.host_to_groups(host: host, host_name: name, group_names: groups)
+            render_host_addgroup_events(result.events)
             fmt.puts 2, '- All OK'
+            print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
           end
-
-          puts 'Succeeded'
         end
 
         private

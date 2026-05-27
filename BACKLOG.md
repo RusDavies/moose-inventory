@@ -234,15 +234,24 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 25 done / 1 open.
+Code quality status counts: 27 done / 1 open.
 
 ## Open
 
-1. Reduce repeated final success-summary boilerplate across the remaining mutating CLI adapters.
-   - `group add`, `group rm`, and `host rm` still repeat the same or nearly identical `Succeeded.` / `Succeeded, with warnings.` summary logic that is now shared for the group relation adapters.
-   - Next step: extend the shared summary helper into those remaining mutating adapters without changing the exact wording or punctuation.
+1. Reduce repeated fixed-success tail boilerplate across the variable and remaining host association CLI adapters.
+   - `host addvar`, `host rmvar`, `group addvar`, `group rmvar`, and the host association adapters still contain repeated one-line success tails (`Succeeded` or `Succeeded.`) that now overlap with the shared summary helper shape.
+   - Next step: decide whether to generalize a tiny no-warning success helper for those fixed-tail commands without disturbing the spec-sensitive punctuation split between `Succeeded` and `Succeeded.`.
 
 ## Done
+
+1. Reduce repeated final success-summary boilerplate across the remaining host mutating CLI adapters.
+   - Extended `print_warning_summary` into `host add`, `host addgroup`, and `host rmgroup`, preserving the legacy behavior that these commands always end with plain `Succeeded` even when warnings are emitted.
+   - Adjusted the helper to tolerate result objects without a `warning_count` field so `Moose::Inventory::Operations::AddHosts::Result` stayed API-compatible.
+   - Verified with focused host CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
+
+1. Reduce repeated final success-summary boilerplate across the remaining mutating CLI adapters.
+   - Extended `print_warning_summary` into `group add`, `group rm`, and `host rm`, preserving the exact wording quirks including `group add` using `Succeeded` without a period on the no-warning path.
+   - Verified with focused `group add`/`group rm`/`host rm` specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated final success-summary boilerplate across the group relation adapters.
    - Added `print_warning_summary` to `Moose::Inventory::Cli::Helpers` to centralize the shared `Succeeded.` vs `Succeeded, with warnings.` tail output.

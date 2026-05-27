@@ -30,12 +30,11 @@ module Moose
           db.transaction do
             puts "Dissociate host '#{name}' from groups '#{groups.join(',')}':"
             host = fetch_existing_host_for_rmgroup(name)
-            render_host_rmgroup_events(
-              operation.host_from_groups(host: host, host_name: name, group_names: groups).events
-            )
+            result = operation.host_from_groups(host: host, host_name: name, group_names: groups)
+            render_host_rmgroup_events(result.events)
             fmt.puts 2, '- All OK'
+            print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
           end
-          puts 'Succeeded'
         end
 
         private
