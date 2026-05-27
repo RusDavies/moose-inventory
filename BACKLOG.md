@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 37 done / 0 open.
+Code quality status counts: 38 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean get/list CLI spec RuboCop hygiene.
+   - Normalized host/group get, list, and listvars specs for frozen string literals, literal style, member checks, and minor legacy lint issues.
+   - Kept focused get/list behavior unchanged while adding scoped block-length disables around the legacy command-spec structures.
+   - Added the cleaned get/list specs to the targeted RuboCop gate.
 
 1. Clean spec entrypoint RuboCop hygiene.
    - Replaced the stale fully commented `application_spec` scaffold with direct specs for the application version command and registered Thor subcommands.

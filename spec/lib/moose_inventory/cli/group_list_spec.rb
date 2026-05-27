@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 RSpec.describe Moose::Inventory::Cli::Group do
@@ -13,14 +16,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'list' do
     #---------------------
     it 'should be responsive' do
-      result = @group.instance_methods(false).include?(:list)
+      result = @group.method_defined?(:list, false)
       expect(result).to eq(true)
     end
 
     #---------------------
     it 'should return an empty set when no results' do
       # no items in the db
-      actual = runner { @app.start(%w(group list)) }
+      actual = runner { @app.start(%w[group list]) }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = {}.to_yaml
@@ -31,19 +34,18 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #---------------------
     it 'should get a list of group from the db' do
       var = 'foo=bar'
-      host_name = 'test_host'
 
       mock = {}
-      groups = %w(group1 group2 group3)
+      groups = %w[group1 group2 group3]
       groups.each do |name|
-        runner { @app.start(%W(group add #{name})) }
-        runner { @app.start(%W(group addvar #{name} #{var})) }
+        runner { @app.start(%W[group add #{name}]) }
+        runner { @app.start(%W[group addvar #{name} #{var}]) }
         mock[name.to_sym] = {}
         mock[name.to_sym][:groupvars] = { foo: 'bar' }
       end
 
       # items should now be in the db
-      actual = runner { @app.start(%w(group list)) }
+      actual = runner { @app.start(%w[group list]) }
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml
@@ -53,12 +55,10 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #---------------------
     it 'should be an alias of --list (i.e. Ansible parameter)' do
-      host_name = 'test_host'
-
       mock = {}
-      groups = %w(group1 group2 group3)
+      groups = %w[group1 group2 group3]
       groups.each do |name|
-        runner { @app.start(%W(group add #{name})) }
+        runner { @app.start(%W[group add #{name}]) }
         mock[name.to_sym] = { hosts: [] }
       end
 
@@ -70,10 +70,10 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # @console.out(actual, 'y')
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
-      desired[:STDOUT] = mock.to_json + "\n"
+      desired[:STDOUT] = "#{mock.to_json}\n"
 
       expected(actual, desired)
     end
-    end
   end
-
+end
+# rubocop:enable Metrics/BlockLength
