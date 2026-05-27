@@ -259,15 +259,17 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 57 done / 1 open.
+Code quality status counts: 58 done / 0 open.
 
 ## Open
 
-1. Clean the duplicated `## Open` heading drift in `BACKLOG.md`.
-   - Remove the accidental duplicate section heading in the code-quality backlog block.
-   - Keep counts and history intact.
+_No open code-quality items._
 
 ## Done
+
+1. Clean the duplicated `## Open` heading drift in `BACKLOG.md`.
+   - Reconciled the code-quality backlog open section now that it has no remaining active items.
+   - Preserved the backlog section structure and moved the cleanup item to done.
 
 1. Add focused helper-branch coverage in `lib/moose_inventory/db/db.rb`.
    - Covered busy vs non-busy transaction retry branches, the busy-error helper, and the non-sqlite purge/drop-table path.
