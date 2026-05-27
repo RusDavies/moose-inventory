@@ -64,39 +64,8 @@ module Moose
         end
 
         def render_addchild_events(events)
-          events.each { |event| render_addchild_event(event) }
-        end
-
-        def render_addchild_event(event)
-          payload = event.payload
-
-          return render_addchild_warning(event.type, payload) if addchild_warning?(event.type)
-          return render_addchild_existing(payload) if event.type == :already_exists_skipping
-
-          case event.type
-          when :adding_child_association
-            fmt.puts 2, "- add association {group:#{payload[:parent]} <-> group:#{payload[:child]}}..."
-          when :child_group_creating_now
-            fmt.puts 4, '- child group does not exist, creating now...'
-          when :ok
-            fmt.puts payload[:indent], '- OK'
-          end
-        end
-
-        def addchild_warning?(type)
-          %i[child_association_exists child_group_missing].include?(type)
-        end
-
-        def render_addchild_warning(type, payload)
-          if type == :child_association_exists
-            fmt.warn "Association {group:#{payload[:parent]} <-> group:#{payload[:child]}}} already exists, skipping.\n"
-          else
-            fmt.warn "Group '#{payload[:name]}' does not exist and will be created.\n"
-          end
-        end
-
-        def render_addchild_existing(payload)
-          fmt.puts payload[:indent], '- already exists, skipping.'
+          emitter = addchild_emitter
+          events.each { |event| emitter.call(event) }
         end
       end
     end
