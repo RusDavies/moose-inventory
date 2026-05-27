@@ -40,23 +40,19 @@ module Moose
 
         def remove_children_from_group(parent_name, child_names)
           operation = build_operation(Moose::Inventory::Operations::GroupChildRelations)
-
-          begin
-            db.transaction do
-              puts "Dissociate parent group '#{parent_name}' from child group(s) '#{child_names.join(',')}':"
-              parent_group = fetch_existing_group_or_abort(parent_name)
-              result = operation.remove_children(
-                parent_group: parent_group,
-                parent_name: parent_name,
-                child_names: child_names,
-                delete_orphans: options[:delete_orphans]
-              )
-              render_rmchild_events(result.events)
-              fmt.puts 2, '- all OK'
-              return result
-            end
-          rescue db.exceptions[:moose] => e
-            abort("ERROR: #{e}")
+          run_group_relation_transaction(
+            heading: "Dissociate parent group '#{parent_name}' from child group(s) '#{child_names.join(',')}':",
+            on_error: method(:exception_to_s)
+          ) do
+            parent_group = fetch_existing_group_or_abort(parent_name)
+            result = operation.remove_children(
+              parent_group: parent_group,
+              parent_name: parent_name,
+              child_names: child_names,
+              delete_orphans: options[:delete_orphans]
+            )
+            render_rmchild_events(result.events)
+            result
           end
         end
 

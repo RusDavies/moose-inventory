@@ -234,15 +234,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 23 done / 1 open.
+Code quality status counts: 24 done / 1 open.
 
 ## Open
 
-1. Reduce repeated transaction/result wrapper boilerplate across the group relation adapters.
-   - `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` still repeat very similar `db.transaction`/`rescue` wrappers, success-line emission, and result-return plumbing around their operation calls.
-   - Next step: extract one narrow shared helper for that wrapper path without changing the exact command-specific headings, error ordering, or final success wording.
+1. Reduce repeated final success-summary boilerplate across the group relation adapters.
+   - `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` still repeat the same `warning_count.zero?` branching to print `Succeeded.` vs `Succeeded, with warnings.`.
+   - Next step: extract one narrow shared helper for that final status summary without changing the exact wording or punctuation.
 
 ## Done
+
+1. Reduce repeated transaction/result wrapper boilerplate across the group relation adapters.
+   - Added `run_group_relation_transaction` to `Moose::Inventory::Cli::Helpers` to centralize the shared transaction/rescue/result wrapper, including the common `- all OK` line and Moose-exception abort path.
+   - Refactored `group addhost`, `group rmhost`, `group addchild`, and `group rmchild` to use the shared helper while preserving exact command headings, error ordering, and the child-relation `ERROR: #{e}` behavior via an explicit formatter hook.
+   - Verified with focused group-relation CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated parent-group lookup/bootstrap boilerplate across the group relation adapters.
    - Added `fetch_existing_group_or_abort` to `Moose::Inventory::Cli::Helpers` to centralize the shared retrieve/look-up/missing-group/OK bootstrap flow.
