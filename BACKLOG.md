@@ -8,6 +8,11 @@ _No open release-readiness items._
 
 ## Done
 
+1. Clean `host_rmgroup_spec.rb` RuboCop hygiene.
+   - Normalized the host remove-group CLI spec for frozen string literals, literal style, Thor member checks, stale line-length directives, escaped strings, redundant assignments, and continuation formatting.
+   - Preserved spec-sensitive command output exactly while adding scoped block-length disables around the legacy command-spec structure.
+   - Added the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
 1. Clean `host_addgroup_spec.rb` RuboCop hygiene.
    - Normalized the host add-group CLI spec for frozen string literals, literal style, Thor member checks, stale line-length directives, escaped strings, and continuation formatting.
    - Preserved spec-sensitive command output exactly while adding scoped block-length disables around the legacy command-spec structure.
@@ -239,14 +244,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 43 done / 4 open.
+Code quality status counts: 44 done / 3 open.
 
 ## Open
-
-1. Clean `host_rmgroup_spec.rb` RuboCop hygiene.
-   - Normalize the host remove-group CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and any stale inline cop directives.
-   - Preserve spec-sensitive command output exactly.
-   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
 
 1. Clean `group_rm_spec.rb` RuboCop hygiene.
    - Normalize the group remove CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and scoped block-length handling.
