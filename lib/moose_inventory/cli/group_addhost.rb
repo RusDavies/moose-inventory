@@ -60,45 +60,8 @@ module Moose
         end
 
         def render_group_addhost_events(events)
-          events.each { |event| render_group_addhost_event(event) }
-        end
-
-        def render_group_addhost_event(event)
-          payload = event.payload
-
-          return render_group_addhost_warning(event.type, payload) if group_addhost_warning?(event.type)
-          return render_group_addhost_status(payload) if event.type == :already_exists_skipping
-
-          render_group_addhost_output(event.type, payload)
-        end
-
-        def group_addhost_warning?(type)
-          %i[group_host_association_exists host_missing_created].include?(type)
-        end
-
-        def render_group_addhost_warning(type, payload)
-          if type == :group_host_association_exists
-            fmt.warn "Association {group:#{payload[:group]} <-> host:#{payload[:host]}} already exists, skipping.\n"
-          else
-            fmt.warn "Host '#{payload[:name]}' does not exist and will be created.\n"
-          end
-        end
-
-        def render_group_addhost_status(payload)
-          fmt.puts payload[:indent], '- already exists, skipping.'
-        end
-
-        def render_group_addhost_output(type, payload)
-          case type
-          when :adding_group_host_association
-            fmt.puts 2, "- add association {group:#{payload[:group]} <-> host:#{payload[:host]}}..."
-          when :host_creating_now
-            fmt.puts 4, '- host does not exist, creating now...'
-          when :removing_automatic_group
-            fmt.puts 2, "- remove automatic association {group:ungrouped <-> host:#{payload[:host]}}..."
-          when :ok
-            fmt.puts payload[:indent], '- OK'
-          end
+          emitter = host_group_association_addition_emitter(perspective: :group)
+          events.each { |event| emitter.call(event) }
         end
       end
     end

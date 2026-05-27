@@ -234,15 +234,20 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 20 done / 1 open.
+Code quality status counts: 21 done / 1 open.
 
 ## Open
 
-1. Reduce repeated event-rendering boilerplate across association CLI adapters.
-   - Variable command rendering is now shared, but the host/group association and dissociation adapters still carry several very similar `render_*_event` helper stacks.
-   - Next step: extract one narrow association-rendering seam without disturbing the exact spec-sensitive output strings or warning wording.
+1. Reduce repeated event-rendering boilerplate across child-group relation CLI adapters.
+   - Host/group association and dissociation rendering is now shared, but `group addchild` and `group rmchild` still carry their own near-duplicate event-rendering stacks.
+   - Next step: extract one narrow child-relation rendering seam without disturbing the exact spec-sensitive output strings, warning wording, or recursive orphan-cleanup output.
 
 ## Done
+
+1. Reduce repeated event-rendering boilerplate across host/group association CLI adapters.
+   - Added `Moose::Inventory::Cli::AssociationRendering` plus `AssociationRenderingSupport` to centralize the shared event-emitter and string-building logic for `host addgroup`, `host rmgroup`, `group addhost`, and `group rmhost`.
+   - Refactored the four association adapters to delegate through the shared helper while preserving the exact existing CLI output strings, capitalization, warning newlines, automatic `ungrouped` association wording, and success markers.
+   - Extended the targeted RuboCop gate to cover the new rendering helpers and verified with focused association CLI specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated event-rendering boilerplate across the variable CLI adapters.
    - Added `Moose::Inventory::Cli::VariableRendering` to centralize the shared event-emitter and render-path logic for `host/group addvar` and `host/group rmvar`.
