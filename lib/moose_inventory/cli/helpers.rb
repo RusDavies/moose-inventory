@@ -105,11 +105,11 @@ module Moose
           error.to_s
         end
 
-        def print_warning_summary(result)
+        def print_warning_summary(result, success_message: 'Succeeded.', warning_message: 'Succeeded, with warnings.')
           if result.warning_count.zero?
-            puts 'Succeeded.'
+            puts success_message
           else
-            puts 'Succeeded, with warnings.'
+            puts warning_message
           end
         end
 

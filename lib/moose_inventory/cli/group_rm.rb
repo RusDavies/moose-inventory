@@ -29,12 +29,7 @@ module Moose
           )
 
           result = remove_groups(names)
-
-          if result.warning_count.zero?
-            puts 'Succeeded.'
-          else
-            puts 'Succeeded, with warnings.'
-          end
+          print_warning_summary(result)
         end
 
         private

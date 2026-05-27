@@ -20,8 +20,7 @@ module Moose
 
           result = remove_hosts_operation.call(names: normalize_names(argv))
           render_remove_hosts_events(result.events)
-
-          puts(result.warning_count.zero? ? 'Succeeded.' : 'Succeeded, with warnings.')
+          print_warning_summary(result)
         rescue db.exceptions[:moose] => e
           abort("ERROR: #{e}")
         end
