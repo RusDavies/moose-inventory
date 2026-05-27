@@ -40,7 +40,7 @@ module Moose
         private
 
         def remove_groups(names)
-          context = Moose::Inventory::InventoryContext.new(db: db)
+          context = inventory_context
           operation = Moose::Inventory::Operations::RemoveGroups.new(context: context)
 
           db.transaction do

@@ -52,6 +52,8 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/remove_variables_spec.rb \
   spec/lib/moose_inventory/operations/remove_hosts_spec.rb \
   spec/lib/moose_inventory/operations/query_inventory_spec.rb \
+  spec/lib/moose_inventory/inventory_context_spec.rb \
+  spec/lib/moose_inventory/cli/cli_spec.rb \
   spec/lib/moose_inventory/cli/formatter_spec.rb \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
   spec/lib/moose_inventory/config/config_spec.rb \

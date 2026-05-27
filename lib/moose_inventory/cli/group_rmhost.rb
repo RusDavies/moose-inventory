@@ -34,7 +34,7 @@ module Moose
         private
 
         def remove_hosts_from_group(name, hosts)
-          context = Moose::Inventory::InventoryContext.new(db: db)
+          context = inventory_context
           operation = Moose::Inventory::Operations::RemoveAssociations.new(context: context)
 
           begin

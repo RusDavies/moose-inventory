@@ -33,7 +33,7 @@ module Moose
           abort_if_automatic_group(groups)
 
           result = Moose::Inventory::Operations::AddHosts
-                   .new(context: Moose::Inventory::InventoryContext.new(db: db))
+                   .new(context: inventory_context)
                    .call(names: names, groups: groups)
           render_add_hosts_events(result.events)
           puts 'Succeeded'

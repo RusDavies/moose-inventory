@@ -234,15 +234,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 17 done / 1 open.
+Code quality status counts: 18 done / 1 open.
 
 ## Open
 
-1. Reduce remaining DB singleton leakage behind `InventoryContext` and CLI bootstrap.
-   - Splitting `QueryInventory` clarified that the query/mutation operations are cleaner, but context creation still ultimately hangs off module-global DB state.
-   - Next step: make context construction and DB wiring a bit more explicit so operations depend less on hidden runtime-global setup and tests need less implicit module state.
+1. Introduce a small CLI operation/query factory to reduce adapter boilerplate.
+   - After centralizing `InventoryContext` creation, many Thor adapters still manually instantiate operations/query wrappers in near-identical helper methods.
+   - Next step: add a tiny factory seam so command classes stop repeating object-construction glue and new refactors need fewer bespoke adapter helpers.
 
 ## Done
+
+1. Reduce remaining DB singleton leakage behind `InventoryContext` and CLI bootstrap.
+   - Removed the hidden default DB dependency from `Moose::Inventory::InventoryContext`; callers must now supply the DB explicitly.
+   - Centralized CLI context construction in `Moose::Inventory::Cli::Helpers#inventory_context`, so refactored commands stop repeatedly open-coding `InventoryContext.new(db: db)` and automatic-group helpers also route through the same context seam.
+   - Updated `Moose::Inventory::Cli.start` to accept injected `config`, `db`, and `application` dependencies, making bootstrap wiring explicit and directly specable instead of hard-binding startup to module globals.
+   - Added regression coverage in `spec/lib/moose_inventory/cli/cli_spec.rb` and `spec/lib/moose_inventory/inventory_context_spec.rb`, extended the targeted RuboCop gate to include those specs, and verified with focused specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Split `QueryInventory` before it grew into a new monolith.
    - Broke `lib/moose_inventory/operations/query_inventory.rb` into a thin delegator plus focused host/group query helpers under `lib/moose_inventory/operations/query_inventory/`.

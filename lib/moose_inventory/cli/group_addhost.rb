@@ -34,7 +34,7 @@ module Moose
         private
 
         def add_hosts_to_group(name, hosts)
-          context = Moose::Inventory::InventoryContext.new(db: db)
+          context = inventory_context
           operation = Moose::Inventory::Operations::AddAssociations.new(context: context)
 
           begin
