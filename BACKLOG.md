@@ -234,13 +234,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 28 done / 0 open.
+Code quality status counts: 29 done / 1 open.
 
 ## Open
 
-None.
+1. Expand shared CLI spec harness adoption across the remaining command specs.
+   - The first harness slice migrated representative host/group get/list/listvars specs, but the larger mutating command specs still repeat setup boilerplate.
+   - Next step: migrate the add/remove/addvar/rmvar/association specs in small focused batches to avoid breaking spec-sensitive output expectations.
 
 ## Done
+
+1. Extract shared CLI spec harness for repeated command specs.
+   - Added `spec/support/cli_harness.rb` for shared CLI fixture argument construction, config/DB/application setup, optional top-level CLI wiring, and per-example reset behavior.
+   - Included the helper from `spec/spec_helper.rb` and migrated representative host/group `get`, `list`, and `listvars` specs to use it.
+   - Added the new support helper to the targeted RuboCop gate.
+   - Verified focused migrated specs, targeted RuboCop for the helper, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce repeated fixed-success tail boilerplate across the variable CLI adapters.
    - Added `print_success_summary` as the no-warning fixed-success helper and routed `print_warning_summary` through it for the success path.
