@@ -234,11 +234,34 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 42 done / 0 open.
+Code quality status counts: 42 done / 5 open.
 
 ## Open
 
-_No open code-quality items._
+1. Clean `host_addgroup_spec.rb` RuboCop hygiene.
+   - Normalize the host add-group CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and any stale inline cop directives.
+   - Preserve spec-sensitive command output exactly.
+   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
+1. Clean `host_rmgroup_spec.rb` RuboCop hygiene.
+   - Normalize the host remove-group CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and any stale inline cop directives.
+   - Preserve spec-sensitive command output exactly.
+   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
+1. Clean `group_rm_spec.rb` RuboCop hygiene.
+   - Normalize the group remove CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and scoped block-length handling.
+   - Preserve spec-sensitive command output exactly, including warning/success punctuation.
+   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
+1. Clean `host_add_spec.rb` RuboCop hygiene.
+   - Normalize the large host add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, scoped block-length handling, and any redundant assignments/directives.
+   - Preserve spec-sensitive command output exactly, especially warning/success summary formatting.
+   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
+1. Clean `group_add_spec.rb` RuboCop hygiene.
+   - Normalize the large group add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, scoped block-length handling, and any redundant assignments/directives.
+   - Preserve spec-sensitive command output exactly, including the known `Succeeded` punctuation split and trace fixture behavior.
+   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
 
 ## Done
 
