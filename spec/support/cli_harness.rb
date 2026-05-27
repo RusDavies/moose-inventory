@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 module CliHarness
-  def setup_cli_harness(command_class:, command_ivar: nil, include_cli: false, extra_commands: {})
+  def setup_cli_harness(command_class:, command_ivar: nil, include_cli: false, extra_commands: {}, extra_args: [])
     @mockarg_parts = {
       config: File.join(spec_root, 'config/config.yml'),
       format: 'yaml',
       env: 'test'
     }
-    @mockargs = build_cli_args(@mockarg_parts)
+    @mockargs = build_cli_args(@mockarg_parts) + extra_args
 
     @config = Moose::Inventory::Config
     @config.init(@mockargs)
