@@ -41,7 +41,7 @@ module Moose
 
         def render_addchild_warning(type, payload)
           if type == :child_association_exists
-            fmt.warn "Association {group:#{payload[:parent]} <-> group:#{payload[:child]}}} already exists, skipping.\n"
+            fmt.warn "Association {group:#{payload[:parent]} <-> group:#{payload[:child]}} already exists, skipping.\n"
           else
             fmt.warn "Group '#{payload[:name]}' does not exist and will be created.\n"
           end

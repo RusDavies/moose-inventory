@@ -259,15 +259,28 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 54 done / 0 open.
+Code quality status counts: 55 done / 3 open.
 
 ## Open
 
-## Open
+1. Add direct Ansible missing-entity coverage for `host listvars` and `group listvars`.
+   - Cover the warning branches for nonexistent host/group lookups in Ansible mode.
+   - Keep the slice test-only and re-run the full gate.
 
-_No open code-quality items._
+1. Add focused helper-branch coverage in `lib/moose_inventory/db/db.rb`.
+   - Cover remaining adapter/purge/busy-retry helper branches that still leave `db.rb` as one of the weaker production files.
+   - Keep behavior unchanged unless a test exposes a real defect.
+
+1. Clean the duplicated `## Open` heading drift in `BACKLOG.md`.
+   - Remove the accidental duplicate section heading in the code-quality backlog block.
+   - Keep counts and history intact.
 
 ## Done
+
+1. Cover `group addchild` duplicate-association warning/rendering path.
+   - Added direct CLI coverage for the duplicate child-association branch in `ChildRelationRendering`.
+   - The new spec exposed and fixed a real rendering typo: an extra `}` in the duplicate-association warning.
+   - Re-ran the focused spec slice and the full gate.
 
 1. Extract a tiny shared operations event helper/base for repeated event plumbing.
    - Added `EntityVariableOperationSupport` as a bounded shared helper for the variable-operation family, consolidating shared entity lookup, missing-entity errors, and event emission plumbing.

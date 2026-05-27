@@ -145,6 +145,38 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
+
+    it 'GROUP CHILDGROUP... should warn and skip when the association already exists' do
+      pname = 'parent_group'
+      cname = 'child_group'
+
+      runner { @app.start(%W[group add #{pname} #{cname}]) }
+      runner { @app.start(%W[group addchild #{pname} #{cname}]) }
+
+      actual = runner { @app.start(%W[group addchild #{pname} #{cname}]) }
+
+      desired = { aborted: false }
+      desired[:STDOUT] = <<~OUTPUT
+        Associate parent group '#{pname}' with child group(s) '#{cname}':
+          - retrieve group '#{pname}'...
+            - OK
+          - add association {group:#{pname} <-> group:#{cname}}...
+            - already exists, skipping.
+            - OK
+          - all OK
+        Succeeded, with warnings.
+      OUTPUT
+      desired[:STDERR] = <<~ERROR
+        WARNING: Association {group:#{pname} <-> group:#{cname}} already exists, skipping.
+      ERROR
+      expected(actual, desired)
+
+      pgroup = @db.models[:group].find(name: pname)
+      cgroups = pgroup.children_dataset
+      expect(cgroups.count).to eq(1)
+      expect(cgroups[name: cname]).not_to be_nil
+    end
+
     it 'GROUP CHILDGROUP... should associate GROUP with a CHILDGROUP ' \
        'creating it if necessary' do
       pname = 'parent_group'
