@@ -234,15 +234,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 29 done / 1 open.
+Code quality status counts: 30 done / 1 open.
 
 ## Open
 
 1. Expand shared CLI spec harness adoption across the remaining command specs.
-   - The first harness slice migrated representative host/group get/list/listvars specs, but the larger mutating command specs still repeat setup boilerplate.
-   - Next step: migrate the add/remove/addvar/rmvar/association specs in small focused batches to avoid breaking spec-sensitive output expectations.
+   - The first harness slices migrated representative host/group get/list/listvars specs and host/group addvar/rmvar specs, but the larger add/remove/association command specs still repeat setup boilerplate.
+   - Next step: migrate the add/remove/association specs in small focused batches to avoid breaking spec-sensitive output expectations.
 
 ## Done
+
+1. Expand shared CLI spec harness adoption across variable mutating command specs.
+   - Migrated `host addvar`, `host rmvar`, `group addvar`, and `group rmvar` specs to use the shared CLI harness for config/DB/application setup and per-example DB reset.
+   - Verified focused variable CLI specs and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Extract shared CLI spec harness for repeated command specs.
    - Added `spec/support/cli_harness.rb` for shared CLI fixture argument construction, config/DB/application setup, optional top-level CLI wiring, and per-example reset behavior.
