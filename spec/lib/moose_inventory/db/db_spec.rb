@@ -459,6 +459,38 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
   end
 
+  describe '.busy_retry_delay()' do
+    it 'uses deterministic capped exponential backoff delays' do
+      expect(@db.busy_retry_delay(1)).to eq(0.05)
+      expect(@db.busy_retry_delay(2)).to eq(0.1)
+      expect(@db.busy_retry_delay(5)).to eq(0.8)
+      expect(@db.busy_retry_delay(6)).to eq(1.0)
+      expect(@db.busy_retry_delay(10)).to eq(1.0)
+    end
+  end
+
+  describe '.retry_busy_transaction()' do
+    it 'sleeps for the deterministic retry delay before another busy retry' do
+      delays = []
+      error = Sequel::DatabaseError.new('BusyException: database is locked')
+
+      @db.retry_busy_transaction(error, 3, sleeper: ->(delay) { delays << delay })
+
+      expect(delays).to eq([0.2])
+    end
+
+    it 'raises the original error when the retry limit is exceeded' do
+      error = Sequel::DatabaseError.new('BusyException: database is locked')
+
+      actual_stderr = capture(:STDERR) do
+        expect { @db.retry_busy_transaction(error, 11, sleeper: ->(_delay) {}) }
+          .to raise_error(error)
+      end
+
+      expect(actual_stderr).to include('The database appears to be locked by another process')
+    end
+  end
+
   describe '.reset()' do
     it 'should be responsive' do
       result = @db.respond_to?(:reset)
