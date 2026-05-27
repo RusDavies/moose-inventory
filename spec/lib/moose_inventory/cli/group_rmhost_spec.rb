@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -20,7 +23,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'rmgroup' do
     #----------------
     it 'should be responsive' do
-      result = @group.instance_methods(false).include?(:rmhost)
+      result = @group.method_defined?(:rmhost, false)
       expect(result).to eq(true)
     end
 
@@ -29,7 +32,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #------------------------
     it '<missing args> ... should abort with an error' do
       actual = runner  do
-        @app.start(%w(group rmhost)) # <- no group or hosts given
+        @app.start(%w[group rmhost]) # <- no group or hosts given
       end
 
       # Check output
@@ -43,16 +46,16 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'not-a-group'
       host_name = 'example'
       actual = runner do
-        @app.start(%W(group rmhost #{group_name} #{host_name}))
+        @app.start(%W[group rmhost #{group_name} #{host_name}])
       end
 
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"
+        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n"
       desired[:STDERR] =
-        "ERROR: The group '#{group_name}' does not exist.\n"\
+        "ERROR: The group '#{group_name}' does not exist.\n" \
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
     end
@@ -62,9 +65,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
       host_name = 'test1'
       group_name = 'group1'
 
-      runner { @app.start(%W(host add #{host_name})) }
-      runner { @app.start(%W(group add #{group_name})) }
-      runner { @app.start(%W(group addhost #{group_name} #{host_name})) }
+      runner { @app.start(%W[host add #{host_name}]) }
+      runner { @app.start(%W[group add #{group_name}]) }
+      runner { @app.start(%W[group addhost #{group_name} #{host_name}]) }
 
       #
       # Dissociate the host
@@ -72,26 +75,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # 2. expect that no association with ungrouped is made.
 
       actual = runner do
-        @app.start(%W(group rmhost #{group_name} #{host_name}))
+        @app.start(%W[group rmhost #{group_name} #{host_name}])
       end
 
       # @console.dump(actual, 'y')
 
-      # rubocop:disable Metrics/LineLength
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n"\
-        "  - retrieve group '#{group_name}'...\n"\
-        "    - OK\n"\
-        "  - remove association {group:#{group_name} <-> host:#{host_name}}...\n"\
-        "    - OK\n"\
-        "  - add automatic association {group:ungrouped <-> host:#{host_name}}...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- remove association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- OK\n  " \
+        "- add automatic association {group:ungrouped <-> host:#{host_name}}...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
-      # rubocop:enable Metrics/LineLength
-
       # We should have the correct group associations
       group = @db.models[:group].find(name: group_name)
       hosts = group.hosts_dataset
@@ -105,28 +105,27 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       host_name = 'test_host'
       group_name = 'test_group'
-      runner { @app.start(%W(host add #{host_name})) }
-      runner { @app.start(%W(group add #{group_name})) }
-      runner { @app.start(%W(group addhost #{host_name})) }
+      runner { @app.start(%W[host add #{host_name}]) }
+      runner { @app.start(%W[group add #{group_name}]) }
+      runner { @app.start(%W[group addhost #{host_name}]) }
 
       actual = runner do
-        @app.start(%W(group rmhost #{group_name} #{host_name}))
+        @app.start(%W[group rmhost #{group_name} #{host_name}])
       end
 
-      # rubocop:disable Metrics/LineLength
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n"\
-        "  - retrieve group \'#{group_name}\'...\n"\
-        "    - OK\n"\
-        "  - remove association {group:#{group_name} <-> host:#{host_name}}...\n"\
-        "    - doesn't exist, skipping.\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Dissociate group '#{group_name}' from host(s) '#{host_name}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- remove association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- doesn't exist, skipping.\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded, with warnings.\n"
       desired[:STDERR] =
-        "WARNING: Association {group:#{group_name} <-> host:#{host_name}} "\
-          "doesn't exist, skipping.\n"
+        "WARNING: Association {group:#{group_name} <-> host:#{host_name}} " \
+        "doesn't exist, skipping.\n"
 
       expected(actual, desired)
     end
@@ -136,9 +135,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
       host_name = 'test_host'
       group_name = 'ungrouped'
 
-      runner { @app.start(%W(host add #{name})) } # <- auto creates the association with ungrouped
+      runner { @app.start(%W[host add #{name}]) } # <- auto creates the association with ungrouped
 
-      actual = runner { @app.start(%W(group rmhost #{group_name} #{host_name})) }
+      actual = runner { @app.start(%W[group rmhost #{group_name} #{host_name}]) }
 
       desired = { aborted: true }
       desired[:STDERR] =
@@ -147,41 +146,39 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
-    it 'GROUP HOST1 HOST2 ... should dissociate the group from'\
-      ' multiple hosts at once' do
+    it 'GROUP HOST1 HOST2 ... should dissociate the group from ' \
+       'multiple hosts at once' do
       # 1. Should dissociate hosts from the group
       # 2. Should add each host to the 'ungrouped' automatic group
       #    if it has no other groups.
 
       group_name = 'test_group'
-      host_names = %w(test_host1 test_host2 test_host3)
+      host_names = %w[test_host1 test_host2 test_host3]
 
-      runner { @app.start(%W(group add #{group_name})) }
-      runner { @app.start(%W(group addhost #{group_name}) + host_names) }
+      runner { @app.start(%W[group add #{group_name}]) }
+      runner { @app.start(%W[group addhost #{group_name}] + host_names) }
 
       actual = runner do
-        @app.start(%W(group rmhost #{group_name}) + host_names)
+        @app.start(%W[group rmhost #{group_name}] + host_names)
       end
 
       # @console.out(actual, 'y')
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Dissociate group '#{group_name}' from host(s) '#{host_names.join(',')}':\n"\
-        "  - retrieve group \'#{group_name}\'...\n"\
-        "    - OK\n"
+        "Dissociate group '#{group_name}' from host(s) '#{host_names.join(',')}':\n  " \
+        "- retrieve group '#{group_name}'...\n    " \
+        "- OK\n"
       host_names.each do |host|
         desired[:STDOUT] = desired[:STDOUT] +
-                           "  - remove association {group:#{group_name} <-> host:#{host}}...\n"\
-                           "    - OK\n"\
-                           "  - add automatic association {group:ungrouped <-> host:#{host}}...\n"\
-                           "    - OK\n"\
+                           "  - remove association {group:#{group_name} <-> host:#{host}}...\n    " \
+                           "- OK\n  " \
+                           "- add automatic association {group:ungrouped <-> host:#{host}}...\n    " \
+                           "- OK\n" \
       end
       desired[:STDOUT] = desired[:STDOUT] +
-                         "  - all OK\n"\
+                         "  - all OK\n" \
                          "Succeeded.\n"
       expected(actual, desired)
-      # rubocop:enable Metrics/LineLength
-
       # We should have the correct group associations
       group = @db.models[:group].find(name: group_name)
       hosts = group.hosts_dataset
@@ -192,3 +189,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
