@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 
 RSpec.shared_context 'shared config init', a: :b do
   before(:all) do
     @mockarg_parts = {
-      config:  File.join(spec_dir, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_dir, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
