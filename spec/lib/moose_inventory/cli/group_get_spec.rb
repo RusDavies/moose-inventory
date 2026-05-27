@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -16,13 +19,13 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'get' do
     #---------------------
     it 'should be responsive' do
-      result = @group.instance_methods(false).include?(:get)
+      result = @group.method_defined?(:get, false)
       expect(result).to eq(true)
     end
 
     #---------------------
     it '<missing args> ... should abort with an error' do
-      actual = runner { @app.start(%w(group get)) }
+      actual = runner { @app.start(%w[group get]) }
 
       # @console.out(actual,'y')
 
@@ -35,7 +38,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #---------------------
     it "GROUP ... should return an empty set when GROUP doesn't exist" do
       group_name = 'does-not-exist'
-      actual = runner { @app.start(%W(group get #{group_name})) }
+      actual = runner { @app.start(%W[group get #{group_name}]) }
 
       # @console.out(actual, 'y')
 
@@ -48,9 +51,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #---------------------
     it 'GROUP ... should get a group from the db' do
       name = 'test_group'
-      runner { @app.start(%W(group add #{name})) }
+      runner { @app.start(%W[group add #{name}]) }
 
-      actual = runner { @app.start(%W(group get #{name})) }
+      actual = runner { @app.start(%W[group get #{name}]) }
 
       mock = {}
       mock[name.to_sym] = {}
@@ -66,10 +69,10 @@ RSpec.describe Moose::Inventory::Cli::Group do
     it 'GROUP ... should display groupvars, if any are set' do
       name = 'test_group'
       var = 'foo=bar'
-      tmp = runner { @app.start(%W(group add #{name})) }
-      tmp = runner { @app.start(%W(group addvar #{name} #{var})) }
+      runner { @app.start(%W[group add #{name}]) }
+      runner { @app.start(%W[group addvar #{name} #{var}]) }
 
-      actual = runner { @app.start(%W(group get #{name})) }
+      actual = runner { @app.start(%W[group get #{name}]) }
       # @console.out(actual, 'y')
 
       mock = {}
@@ -83,3 +86,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

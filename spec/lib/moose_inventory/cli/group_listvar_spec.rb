@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 RSpec.describe Moose::Inventory::Cli::Group do
@@ -13,13 +16,13 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'listvar' do
     #-----------------
     it 'should be responsive' do
-      result = @group.instance_methods(false).include?(:listvars)
+      result = @group.method_defined?(:listvars, false)
       expect(result).to eq(true)
     end
 
     #-----------------
     it '<missing args> ... should abort with an error' do
-      actual = runner  { @app.start(%w(group listvars)) }
+      actual = runner  { @app.start(%w[group listvars]) }
 
       # Check output
       desired = { aborted: true }
@@ -30,7 +33,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #-----------------
     it '--ansible <missing args> ... should abort with an error' do
       args = @mockargs.clone
-      args.concat(%w(--ansible group listvars)).flatten
+      args.push('--ansible', 'group', 'listvars').flatten
 
       actual = runner { @cli.start(args) }
 
@@ -43,13 +46,13 @@ RSpec.describe Moose::Inventory::Cli::Group do
     #------------------------
     it 'GROUP ... should return a list of group variables grouped by group' do
       group_name = 'test_group'
-      group_vars = %w(foo=bar cow=chicken)
+      group_vars = %w[foo=bar cow=chicken]
 
-      tmp = runner {  @app.start(%W(group add #{group_name})) }
-      tmp = runner {  @app.start(%W(group addvar #{group_name} #{group_vars[0]} #{group_vars[1]})) }
+      runner {  @app.start(%W[group add #{group_name}]) }
+      runner {  @app.start(%W[group addvar #{group_name} #{group_vars[0]} #{group_vars[1]}]) }
 
       actual = runner do
-        @app.start(%W(group listvars #{group_name}))
+        @app.start(%W[group listvars #{group_name}])
       end
 
       # @console.out(actual, 'y')
@@ -68,15 +71,15 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
-    it '--ansible GROUP ... should return a list of group variables, in a  style akin to Ansible\'s \'--host HOSTNAME\'' do
+    it 'returns group variables in an Ansible-style hostvars payload' do
       group_name = 'test_group'
-      group_vars = %w(foo=bar cow=chicken)
+      group_vars = %w[foo=bar cow=chicken]
 
-      tmp = runner {  @app.start(%W(group add #{group_name})) }
-      tmp = runner {  @app.start(%W(group addvar #{group_name} #{group_vars[0]} #{group_vars[1]})) }
+      runner {  @app.start(%W[group add #{group_name}]) }
+      runner {  @app.start(%W[group addvar #{group_name} #{group_vars[0]} #{group_vars[1]}]) }
 
       actual = runner do
-        @cli.start(%W(--config #{@mockarg_parts[:config]} --ansible group listvars #{group_name}))
+        @cli.start(%W[--config #{@mockarg_parts[:config]} --ansible group listvars #{group_name}])
       end
 
       # @console.out(actual, 'y')
@@ -89,8 +92,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
       end
 
       desired = {}
-      desired[:STDOUT] = mock.to_json + "\n"
+      desired[:STDOUT] = "#{mock.to_json}\n"
       expected(actual, desired)
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
