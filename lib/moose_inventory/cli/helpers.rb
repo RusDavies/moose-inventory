@@ -89,6 +89,22 @@ module Moose
           group
         end
 
+        def run_group_relation_transaction(heading:, on_error: nil)
+          db.transaction do
+            puts heading
+            result = yield
+            fmt.puts 2, '- all OK'
+            result
+          end
+        rescue db.exceptions[:moose] => e
+          message = on_error ? on_error.call(e) : e.message
+          abort("ERROR: #{message}")
+        end
+
+        def exception_to_s(error)
+          error.to_s
+        end
+
         def automatic_group
           inventory_context.automatic_group
         end

@@ -35,18 +35,11 @@ module Moose
 
         def remove_hosts_from_group(name, hosts)
           operation = build_operation(Moose::Inventory::Operations::RemoveAssociations)
-
-          begin
-            db.transaction do
-              puts "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':"
-              group = fetch_existing_group_or_abort(name)
-              result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts)
-              render_group_rmhost_events(result.events)
-              fmt.puts 2, '- all OK'
-              return result
-            end
-          rescue db.exceptions[:moose] => e
-            abort("ERROR: #{e.message}")
+          run_group_relation_transaction(heading: "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':") do
+            group = fetch_existing_group_or_abort(name)
+            result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts)
+            render_group_rmhost_events(result.events)
+            result
           end
         end
 

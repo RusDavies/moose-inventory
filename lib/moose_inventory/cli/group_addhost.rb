@@ -35,18 +35,11 @@ module Moose
 
         def add_hosts_to_group(name, hosts)
           operation = build_operation(Moose::Inventory::Operations::AddAssociations)
-
-          begin
-            db.transaction do
-              puts "Associate group '#{name}' with host(s) '#{hosts.join(',')}':"
-              group = fetch_existing_group_or_abort(name)
-              result = operation.group_to_hosts(group: group, group_name: name, host_names: hosts)
-              render_group_addhost_events(result.events)
-              fmt.puts 2, '- all OK'
-              return result
-            end
-          rescue db.exceptions[:moose] => e
-            abort("ERROR: #{e.message}")
+          run_group_relation_transaction(heading: "Associate group '#{name}' with host(s) '#{hosts.join(',')}':") do
+            group = fetch_existing_group_or_abort(name)
+            result = operation.group_to_hosts(group: group, group_name: name, host_names: hosts)
+            render_group_addhost_events(result.events)
+            result
           end
         end
 
