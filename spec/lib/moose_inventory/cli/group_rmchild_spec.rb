@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -7,9 +10,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -39,14 +42,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'rmchild' do
     #------------------------
     it 'Group.rmchild() should be responsive' do
-      result = @group.instance_methods(false).include?(:rmchild)
+      result = @group.method_defined?(:rmchild, false)
       expect(result).to eq(true)
     end
 
     #------------------------
     it '<missing args> ... should abort with an error' do
       actual = runner  do
-        @app.start(%w(group addchild))
+        @app.start(%w[group addchild])
       end
 
       # @console.out(actual, 'y')
@@ -63,7 +66,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       child_name = 'fake'
 
       actual = runner do
-        @app.start(%W(group addchild #{parent_name} #{child_name}))
+        @app.start(%W[group addchild #{parent_name} #{child_name}])
       end
 
       # @console.out(actual, 'y')
@@ -79,7 +82,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       child_name = 'ungrouped'
 
       actual = runner do
-        @app.start(%W(group rmchild #{parent_name} #{child_name}))
+        @app.start(%W[group rmchild #{parent_name} #{child_name}])
       end
 
       # @console.out(actual, 'y')
@@ -96,17 +99,17 @@ RSpec.describe Moose::Inventory::Cli::Group do
       cname = 'child group'
 
       actual = runner do
-        @app.start(%W(group rmchild #{pname} #{cname}))
+        @app.start(%W[group rmchild #{pname} #{cname}])
       end
 
       # @console.out(actual, 'y')
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"
+        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n"
       desired[:STDERR] =
-        "ERROR: The group '#{pname}' does not exist.\n"\
+        "ERROR: The group '#{pname}' does not exist.\n" \
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
     end
@@ -116,10 +119,10 @@ RSpec.describe Moose::Inventory::Cli::Group do
       pname = 'parent_group'
       cname = 'child group'
 
-      runner { @app.start(%W(group add #{pname} #{cname})) }
+      runner { @app.start(%W[group add #{pname} #{cname}]) }
 
       actual = runner do
-        @app.start(%W(group rmchild #{pname} #{cname}))
+        @app.start(%W[group rmchild #{pname} #{cname}])
       end
 
       # @console.out(actual, 'y')
@@ -127,13 +130,13 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"\
-        "    - OK\n"\
-        "  - remove association {group:#{pname} <-> group:#{cname}}...\n"\
-        "    - doesn't exist, skipping.\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n    " \
+        "- OK\n  " \
+        "- remove association {group:#{pname} <-> group:#{cname}}...\n    " \
+        "- doesn't exist, skipping.\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded, with warnings.\n"
 
       desired[:STDERR] =
@@ -147,11 +150,11 @@ RSpec.describe Moose::Inventory::Cli::Group do
       pname = 'parent_group'
       cname = 'child group'
 
-      runner { @app.start(%W(group add #{pname} #{cname})) }
-      runner { @app.start(%W(group addchild #{pname} #{cname})) }
+      runner { @app.start(%W[group add #{pname} #{cname}]) }
+      runner { @app.start(%W[group addchild #{pname} #{cname}]) }
 
       actual = runner do
-        @app.start(%W(group rmchild #{pname} #{cname}))
+        @app.start(%W[group rmchild #{pname} #{cname}])
       end
 
       # @console.out(actual, 'y')
@@ -159,12 +162,12 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # Check output
       desired = {}
       desired[:STDOUT] =
-        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"\
-        "    - OK\n"\
-        "  - remove association {group:#{pname} <-> group:#{cname}}...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Dissociate parent group '#{pname}' from child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n    " \
+        "- OK\n  " \
+        "- remove association {group:#{pname} <-> group:#{cname}}...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
 
       expected(actual, desired)
@@ -172,14 +175,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #------------------------
     it 'GROUP CHILDGROUP --delete-orphans ... should delete orphaned child groups recursively' do
-      runner { @app.start(%w(group add parent)) }
-      runner { @app.start(%w(group add child --hosts child-host)) }
-      runner { @app.start(%w(group add grandchild)) }
-      runner { @app.start(%w(group addchild parent child)) }
-      runner { @app.start(%w(group addchild child grandchild)) }
+      runner { @app.start(%w[group add parent]) }
+      runner { @app.start(%w[group add child --hosts child-host]) }
+      runner { @app.start(%w[group add grandchild]) }
+      runner { @app.start(%w[group addchild parent child]) }
+      runner { @app.start(%w[group addchild child grandchild]) }
 
       actual = runner do
-        @app.start(%w(group rmchild --delete-orphans parent child))
+        @app.start(%w[group rmchild --delete-orphans parent child])
       end
 
       expect(actual[:unexpected]).to eq(false)
@@ -188,7 +191,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       expect(actual[:STDOUT]).to include("- Recursively delete orphaned group 'grandchild'...\n")
 
       expect(@db.models[:group].find(name: 'parent')).not_to be_nil
-      %w(child grandchild).each do |name|
+      %w[child grandchild].each do |name|
         expect(@db.models[:group].find(name: name)).to be_nil
       end
 
@@ -198,12 +201,12 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #------------------------
     it 'GROUP CHILDGROUP --delete-orphans ... should preserve child groups with another parent' do
-      runner { @app.start(%w(group add parent other-parent)) }
-      runner { @app.start(%w(group addchild parent child)) }
-      runner { @app.start(%w(group addchild other-parent child)) }
+      runner { @app.start(%w[group add parent other-parent]) }
+      runner { @app.start(%w[group addchild parent child]) }
+      runner { @app.start(%w[group addchild other-parent child]) }
 
       actual = runner do
-        @app.start(%w(group rmchild --delete-orphans parent child))
+        @app.start(%w[group rmchild --delete-orphans parent child])
       end
 
       expect(actual[:unexpected]).to eq(false)
@@ -216,3 +219,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
