@@ -71,9 +71,11 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/cli_spec.rb \
   spec/lib/moose_inventory/cli/factory_spec.rb \
   spec/lib/moose_inventory/cli/formatter_spec.rb \
+  spec/lib/moose_inventory/cli/group_addchild_spec.rb \
   spec/lib/moose_inventory/cli/group_get_spec.rb \
   spec/lib/moose_inventory/cli/group_list_spec.rb \
   spec/lib/moose_inventory/cli/group_listvar_spec.rb \
+  spec/lib/moose_inventory/cli/group_rmchild_spec.rb \
   spec/lib/moose_inventory/cli/group_spec.rb \
   spec/lib/moose_inventory/cli/host_get_spec.rb \
   spec/lib/moose_inventory/cli/host_list_spec.rb \

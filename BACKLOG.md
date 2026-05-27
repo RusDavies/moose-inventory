@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 38 done / 0 open.
+Code quality status counts: 39 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean group child CLI spec RuboCop hygiene.
+   - Normalized `group addchild` and `group rmchild` specs for frozen string literals, literal style, Thor member checks, hash alignment, and continuation formatting.
+   - Kept command behavior unchanged while adding scoped block-length disables around the legacy command-spec structures.
+   - Added the cleaned group child specs to the targeted RuboCop gate.
 
 1. Clean get/list CLI spec RuboCop hygiene.
    - Normalized host/group get, list, and listvars specs for frozen string literals, literal style, member checks, and minor legacy lint issues.

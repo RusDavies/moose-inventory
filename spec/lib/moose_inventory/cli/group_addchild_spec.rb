@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -7,9 +10,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -39,14 +42,14 @@ RSpec.describe Moose::Inventory::Cli::Group do
   describe 'addchild' do
     #------------------------
     it 'Group.addchild() should be responsive' do
-      result = @group.instance_methods(false).include?(:addchild)
+      result = @group.method_defined?(:addchild, false)
       expect(result).to eq(true)
     end
 
     #------------------------
     it '<missing args> ... should abort with an error' do
       actual = runner  do
-        @app.start(%w(group addchild))
+        @app.start(%w[group addchild])
       end
 
       # @console.out(actual, 'y')
@@ -63,7 +66,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       child_name = 'fake'
 
       actual = runner do
-        @app.start(%W(group addchild #{parent_name} #{child_name}))
+        @app.start(%W[group addchild #{parent_name} #{child_name}])
       end
 
       # @console.out(actual, 'y')
@@ -79,7 +82,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       child_name = 'ungrouped'
 
       actual = runner do
-        @app.start(%W(group addchild #{parent_name} #{child_name}))
+        @app.start(%W[group addchild #{parent_name} #{child_name}])
       end
 
       # @console.out(actual, 'y')
@@ -98,17 +101,17 @@ RSpec.describe Moose::Inventory::Cli::Group do
       cname = 'child group'
 
       actual = runner do
-        @app.start(%W(group addchild #{pname} #{cname}))
+        @app.start(%W[group addchild #{pname} #{cname}])
       end
 
       # @console.out(actual, 'y')
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"
+        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n"
       desired[:STDERR] =
-        "ERROR: The group '#{pname}' does not exist.\n"\
+        "ERROR: The group '#{pname}' does not exist.\n" \
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
     end
@@ -118,20 +121,20 @@ RSpec.describe Moose::Inventory::Cli::Group do
       pname = 'parent_group'
       cname = 'child_group'
 
-      runner { @app.start(%W(group add #{pname} #{cname})) }
+      runner { @app.start(%W[group add #{pname} #{cname}]) }
 
-      actual = runner { @app.start(%W(group addchild #{pname} #{cname})) }
+      actual = runner { @app.start(%W[group addchild #{pname} #{cname}]) }
 
       # @console.out(actual, 'y')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"\
-        "    - OK\n"\
-        "  - add association {group:#{pname} <-> group:#{cname}}...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{pname} <-> group:#{cname}}...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
 
@@ -143,28 +146,27 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
-    it 'GROUP CHILDGROUP... should associate GROUP with a CHILDGROUP '\
-      'creating it if necessary' do
-      #
+    it 'GROUP CHILDGROUP... should associate GROUP with a CHILDGROUP ' \
+       'creating it if necessary' do
       pname = 'parent_group'
       cname = 'child_group'
 
-      runner { @app.start(%W(group add #{pname})) } # <- don't pre-create the child
+      runner { @app.start(%W[group add #{pname}]) } # <- don't pre-create the child
 
-      actual = runner { @app.start(%W(group addchild #{pname} #{cname})) }
+      actual = runner { @app.start(%W[group addchild #{pname} #{cname}]) }
 
       # @console.out(actual, 'y')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n"\
-        "  - retrieve group '#{pname}'...\n"\
-        "    - OK\n"\
-        "  - add association {group:#{pname} <-> group:#{cname}}...\n"\
-        "    - child group does not exist, creating now...\n"\
-        "      - OK\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Associate parent group '#{pname}' with child group(s) '#{cname}':\n  " \
+        "- retrieve group '#{pname}'...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{pname} <-> group:#{cname}}...\n    " \
+        "- child group does not exist, creating now...\n      " \
+        "- OK\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded, with warnings.\n"
       desired[:STDERR] = "WARNING: Group '#{cname}' does not exist and will be created.\n"
       expected(actual, desired)
@@ -177,3 +179,4 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
