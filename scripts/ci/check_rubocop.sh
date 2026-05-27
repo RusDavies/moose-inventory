@@ -81,6 +81,7 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/group_rmhost_spec.rb \
   spec/lib/moose_inventory/cli/group_rmvar_spec.rb \
   spec/lib/moose_inventory/cli/group_spec.rb \
+  spec/lib/moose_inventory/cli/host_addgroup_spec.rb \
   spec/lib/moose_inventory/cli/host_addvar_spec.rb \
   spec/lib/moose_inventory/cli/host_get_spec.rb \
   spec/lib/moose_inventory/cli/host_list_spec.rb \

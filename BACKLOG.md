@@ -8,6 +8,11 @@ _No open release-readiness items._
 
 ## Done
 
+1. Clean `host_addgroup_spec.rb` RuboCop hygiene.
+   - Normalized the host add-group CLI spec for frozen string literals, literal style, Thor member checks, stale line-length directives, escaped strings, and continuation formatting.
+   - Preserved spec-sensitive command output exactly while adding scoped block-length disables around the legacy command-spec structure.
+   - Added the cleaned spec to `scripts/ci/check_rubocop.sh`.
+
 1. Stop `release.yml` from reporting failure when RubyGems full-index propagation lags after a successful publish.
    - Release tag `v2.0` verified RubyGems trusted publishing end-to-end: RubyGems registered `moose-inventory` `2.0`, remote install worked, and the workflow used OIDC/trusted publishing.
    - `rubygems/release-gem@v1` defaulted `await-release: true`, and its `rubygems-await` post-publish wait timed out on the RubyGems full index even though the gem was already published and installable.
@@ -234,14 +239,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 42 done / 5 open.
+Code quality status counts: 43 done / 4 open.
 
 ## Open
-
-1. Clean `host_addgroup_spec.rb` RuboCop hygiene.
-   - Normalize the host add-group CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and any stale inline cop directives.
-   - Preserve spec-sensitive command output exactly.
-   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
 
 1. Clean `host_rmgroup_spec.rb` RuboCop hygiene.
    - Normalize the host remove-group CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, and any stale inline cop directives.
