@@ -613,5 +613,42 @@ RSpec.describe 'Moose::Inventory::DB' do
       expect(actual[:STDERR]).to include("ERROR: Trace regression target\n")
       expect(actual[:STDERR]).not_to include('NoMethodError')
     end
+
+    it 'warns and re-raises ordinary StandardError failures' do
+      actual = runner do
+        @db.transaction do
+          raise 'generic failure'
+        end
+      end
+
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:unexpected].class).to eq(RuntimeError)
+      expect(actual[:unexpected].message).to eq('generic failure')
+      expect(actual[:STDERR]).to eq(
+        "An error occurred during a transaction, any changes have been rolled back.\n"
+      )
+    end
+
+    it 'warns and re-raises SystemExit failures triggered inside the transaction' do
+      actual = runner do
+        @db.transaction do
+          raise SystemExit.new(7), 'stop now'
+        end
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to eq(
+        "An error occurred during a transaction, any changes have been rolled back.\n"
+      )
+    end
+
+    it 'does not swallow non-rescued fatal exceptions such as interrupts' do
+      expect do
+        @db.transaction do
+          raise Interrupt, 'ctrl-c'
+        end
+      end.to raise_error(Interrupt, 'ctrl-c')
+    end
   end
 end
