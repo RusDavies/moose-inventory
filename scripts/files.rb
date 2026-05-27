@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'yaml'
 
@@ -8,8 +9,8 @@ test_files    = files.grep(%r{^(test|spec|features)/})
 require_paths = ['lib']
 
 out = {}
-out['Executables'.to_sym] = executables
-out['Test_Files'.to_sym] = test_files
-out['Require_Paths'.to_sym] = require_paths
+out[:Executables] = executables
+out[:Test_Files] = test_files
+out[:Require_Paths] = require_paths
 
-puts out.to_yaml.to_s
+puts out.to_yaml

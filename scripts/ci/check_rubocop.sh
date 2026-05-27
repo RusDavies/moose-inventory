@@ -2,6 +2,8 @@
 set -euo pipefail
 
 bundle exec rubocop \
+  Gemfile \
+  Rakefile \
   bin/moose-inventory \
   lib/moose_inventory.rb \
   lib/moose_inventory/config/config.rb \
@@ -74,4 +76,5 @@ bundle exec rubocop \
   spec/lib/moose_inventory/db/db_spec.rb \
   spec/lib/moose_inventory/db/exceptions_spec.rb \
   lib/moose_inventory/version.rb \
-  moose-inventory.gemspec
+  moose-inventory.gemspec \
+  scripts/files.rb
