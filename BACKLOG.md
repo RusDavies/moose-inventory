@@ -259,16 +259,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 48 done / 1 open.
+Code quality status counts: 49 done / 1 open.
 
 ## Open
 
-1. Add formatter branch coverage for STDERR and invalid stream paths.
-   - Cover `Formatter#print`, `Formatter#puts`, `Formatter#info`, `Formatter#warn`, and `Formatter#error` branches that currently miss STDERR and invalid-stream behavior.
-   - Keep output formatting and abort text exact while raising production coverage on `lib/moose_inventory/cli/formatter.rb`.
-   - Re-run the full gate after the spec-only slice.
+1. Harden config flag parsing for missing option values.
+   - Make `--config`, `--env`, and `--format` fail explicitly when a value is missing or when the next token is another flag.
+   - Preserve current valid-argument behavior while preventing silent command-token consumption.
+   - Add focused config specs and re-run the full gate.
 
 ## Done
+
+1. Add formatter branch coverage for STDERR and invalid stream paths.
+   - Covered `Formatter#print`, `Formatter#puts`, `Formatter#info`, `Formatter#warn`, and `Formatter#error` branches for STDERR and invalid-stream behavior.
+   - Kept output formatting and abort text exact while raising `lib/moose_inventory/cli/formatter.rb` coverage to 100%.
+   - Re-ran the focused formatter spec slice and the full gate.
 
 1. Close the remaining full-RuboCop gap in spec support helpers.
    - Cleaned `spec/spec_helper.rb` and `spec/shared/shared_config_setup.rb` so full `bundle exec rubocop` is green, including extracting helper modules and moving DB cleanup to a `before(:suite)` hook.
