@@ -1,15 +1,25 @@
-# require 'spec_helper'
-#
-# RSpec.describe Moose::Inventory::Cli::Group do
-#  before do
-#    # Set up the configuration object
-#    mockargs = "--format yaml --env testing --config ./test.config"
-#    Moose::Inventory::Config
-#  end
-#
-#  describe ".add" do
-#    it '"add test" should add a group called test' do
-#      expect(["group","add","test").to_eq(2)
-#    end
-#  end
-# end
+# frozen_string_literal: true
+
+require 'spec_helper'
+
+RSpec.describe Moose::Inventory::Cli::Application do
+  describe 'version' do
+    it 'prints the current Moose Inventory version' do
+      output = capture(:STDOUT) do
+        described_class.start(%w[version])
+      end
+
+      expect(output).to eq("Version #{Moose::Inventory::VERSION}\n")
+    end
+  end
+
+  describe 'subcommands' do
+    it 'registers the group subcommand' do
+      expect(described_class.subcommands).to include('group')
+    end
+
+    it 'registers the host subcommand' do
+      expect(described_class.subcommands).to include('host')
+    end
+  end
+end

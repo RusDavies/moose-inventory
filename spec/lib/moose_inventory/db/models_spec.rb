@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 RSpec.describe 'models' do
   #=============================
   # Initialization
@@ -8,9 +11,9 @@ RSpec.describe 'models' do
   before(:all) do
     # Set up the configuration object
     @mockarg_parts = {
-      config:  File.join(spec_root, 'config/config.yml'),
-      format:  'yaml',
-      env:     'test',
+      config: File.join(spec_root, 'config/config.yml'),
+      format: 'yaml',
+      env: 'test'
     }
 
     @mockargs = []
@@ -173,3 +176,4 @@ RSpec.describe 'models' do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
