@@ -29,9 +29,7 @@ module Moose
         private
 
         def remove_hosts_operation
-          Moose::Inventory::Operations::RemoveHosts.new(
-            context: inventory_context
-          )
+          build_operation(Moose::Inventory::Operations::RemoveHosts)
         end
 
         def render_remove_hosts_events(events)

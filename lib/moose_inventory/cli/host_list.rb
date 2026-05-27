@@ -9,20 +9,11 @@ require_relative '../operations/query_inventory'
 module Moose
   module Inventory
     module Cli
-      ##
       # Implementation of the "host list" method of the CLI
       class Host
         desc 'list', 'List the contents of the inventory by host'
         def list
-          fmt.dump(query_inventory.list_hosts, output_format)
-        end
-
-        private
-
-        def query_inventory
-          Moose::Inventory::Operations::QueryInventory.new(
-            context: inventory_context
-          )
+          fmt.dump(inventory_query.list_hosts, output_format)
         end
       end
     end

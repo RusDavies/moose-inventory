@@ -234,15 +234,21 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 18 done / 1 open.
+Code quality status counts: 19 done / 1 open.
 
 ## Open
 
-1. Introduce a small CLI operation/query factory to reduce adapter boilerplate.
-   - After centralizing `InventoryContext` creation, many Thor adapters still manually instantiate operations/query wrappers in near-identical helper methods.
-   - Next step: add a tiny factory seam so command classes stop repeating object-construction glue and new refactors need fewer bespoke adapter helpers.
+1. Reduce repeated event-rendering boilerplate across association and variable CLI adapters.
+   - After introducing the small CLI factory seam, the next obvious duplication is not object construction but the very similar event-rendering helper methods spread across host/group association and variable commands.
+   - Next step: extract one narrow rendering helper seam without disturbing the exact spec-sensitive output strings.
 
 ## Done
+
+1. Introduce a small CLI operation/query factory to reduce adapter boilerplate.
+   - Added `Moose::Inventory::Cli::Factory` as a tiny shared seam for building context-backed operations and the memoized inventory query wrapper.
+   - Updated `Moose::Inventory::Cli::Helpers` to expose `build_operation` and `inventory_query`, so refactored Thor adapters stop repeating near-identical operation/query construction glue.
+   - Simplified host/group get/list/listvars plus the refactored association/variable/removal adapters to use the shared factory seam while preserving existing CLI behavior.
+   - Added direct regression coverage in `spec/lib/moose_inventory/cli/factory_spec.rb`, extended the targeted RuboCop gate to lint the new factory and spec, and verified with focused specs, targeted RuboCop, and full `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh`.
 
 1. Reduce remaining DB singleton leakage behind `InventoryContext` and CLI bootstrap.
    - Removed the hidden default DB dependency from `Moose::Inventory::InventoryContext`; callers must now supply the DB explicitly.

@@ -34,13 +34,12 @@ module Moose
         private
 
         def add_children_to_group(parent_name, child_names)
-          context = inventory_context
-          operation = Moose::Inventory::Operations::GroupChildRelations.new(context: context)
+          operation = build_operation(Moose::Inventory::Operations::GroupChildRelations)
 
           begin
             db.transaction do
               puts "Associate parent group '#{parent_name}' with child group(s) '#{child_names.join(',')}':"
-              parent_group = fetch_existing_group_for_child_relation(context, parent_name)
+              parent_group = fetch_existing_group_for_child_relation(parent_name)
               result = operation.add_children(
                 parent_group: parent_group,
                 parent_name: parent_name,
@@ -55,9 +54,9 @@ module Moose
           end
         end
 
-        def fetch_existing_group_for_child_relation(context, name)
+        def fetch_existing_group_for_child_relation(name)
           fmt.puts 2, "- retrieve group '#{name}'..."
-          group = context.find_group(name)
+          group = inventory_context.find_group(name)
           abort("ERROR: The group '#{name}' does not exist.") if group.nil?
 
           fmt.puts 4, '- OK'

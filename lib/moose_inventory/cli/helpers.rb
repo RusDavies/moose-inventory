@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../inventory_context'
+require_relative 'factory'
+
 module Moose
   module Inventory
     module Cli
@@ -16,6 +19,18 @@ module Moose
 
         def inventory_context
           @inventory_context ||= Moose::Inventory::InventoryContext.new(db: db)
+        end
+
+        def cli_factory
+          @cli_factory ||= Moose::Inventory::Cli::Factory.new(context: inventory_context)
+        end
+
+        def build_operation(operation_class, **)
+          cli_factory.operation(operation_class, **)
+        end
+
+        def inventory_query
+          cli_factory.query_inventory
         end
 
         def fmt
