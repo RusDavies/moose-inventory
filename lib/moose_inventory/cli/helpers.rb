@@ -80,6 +80,15 @@ module Moose
           !dataset.nil? && !dataset[name: name].nil?
         end
 
+        def fetch_existing_group_or_abort(name)
+          fmt.puts 2, "- retrieve group '#{name}'..."
+          group = inventory_context.find_group(name)
+          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
+
+          fmt.puts 4, '- OK'
+          group
+        end
+
         def automatic_group
           inventory_context.automatic_group
         end

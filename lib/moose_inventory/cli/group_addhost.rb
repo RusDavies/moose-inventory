@@ -39,7 +39,7 @@ module Moose
           begin
             db.transaction do
               puts "Associate group '#{name}' with host(s) '#{hosts.join(',')}':"
-              group = fetch_existing_group_for_addhost(name)
+              group = fetch_existing_group_or_abort(name)
               result = operation.group_to_hosts(group: group, group_name: name, host_names: hosts)
               render_group_addhost_events(result.events)
               fmt.puts 2, '- all OK'
@@ -48,15 +48,6 @@ module Moose
           rescue db.exceptions[:moose] => e
             abort("ERROR: #{e.message}")
           end
-        end
-
-        def fetch_existing_group_for_addhost(name)
-          fmt.puts 2, "- retrieve group '#{name}'..."
-          group = inventory_context.find_group(name)
-          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
-
-          fmt.puts 4, '- OK'
-          group
         end
 
         def render_group_addhost_events(events)
