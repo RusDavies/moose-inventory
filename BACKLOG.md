@@ -234,13 +234,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 40 done / 0 open.
+Code quality status counts: 41 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean host variable CLI spec RuboCop hygiene.
+   - Normalized `host addvar` and `host rmvar` specs for frozen string literals, literal style, Thor member checks, map-style construction, and continuation formatting.
+   - Kept command behavior unchanged while adding scoped block-length disables around the legacy command-spec structures.
+   - Added the cleaned host variable specs to the targeted RuboCop gate.
 
 1. Clean group variable CLI spec RuboCop hygiene.
    - Normalized `group addvar` and `group rmvar` specs for frozen string literals, literal style, Thor member checks, map-style construction, and continuation formatting.

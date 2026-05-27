@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -14,14 +17,14 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
   describe 'rmvar' do
     it 'should be responsive' do
-      result = @host.instance_methods(false).include?(:rmvar)
+      result = @host.method_defined?(:rmvar, false)
       expect(result).to eq(true)
     end
 
     #-----------------
     it '<missing args> ... should abort with an error' do
       actual = runner  do
-        @app.start(%w(host rmvar)) # <- no group given
+        @app.start(%w[host rmvar]) # <- no group given
       end
 
       # Check output
@@ -35,16 +38,16 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'not-a-host'
       var_name = 'foo=bar'
       actual = runner do
-        @app.start(%W(host rmvar #{host_name} #{var_name}))
+        @app.start(%W[host rmvar #{host_name} #{var_name}])
       end
 
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Remove variable(s) '#{var_name}' from host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"
+        "Remove variable(s) '#{var_name}' from host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n"
       desired[:STDERR] =
-        "An error occurred during a transaction, any changes have been rolled back.\n"\
+        "An error occurred during a transaction, any changes have been rolled back.\n" \
         "ERROR: The host '#{host_name}' does not exist.\n"
       expected(actual, desired)
     end
@@ -56,29 +59,27 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       host_name = 'test1'
       @db.models[:host].create(name: host_name)
-
-      var = { name: 'foo', value: 'bar' }
-      cases = %w(
+      cases = %w[
         =bar
         foo=bar=
         =foo=bar
         foo=bar=extra
-      )
+      ]
 
       cases.each do |args|
         actual = runner do
-          @app.start(%W(host rmvar #{host_name} #{args}))
+          @app.start(%W[host rmvar #{host_name} #{args}])
         end
         # @console.out(actual,'p')
 
         desired = { aborted: true }
         desired[:STDOUT] =
-          "Remove variable(s) '#{args}' from host '#{host_name}':\n"\
-          "  - retrieve host '#{host_name}'...\n"\
-          "    - OK\n"\
-          "  - remove variable '#{args}'...\n"
+          "Remove variable(s) '#{args}' from host '#{host_name}':\n  " \
+          "- retrieve host '#{host_name}'...\n    " \
+          "- OK\n  " \
+          "- remove variable '#{args}'...\n"
         desired[:STDERR] =
-          "An error occurred during a transaction, any changes have been rolled back.\n"\
+          "An error occurred during a transaction, any changes have been rolled back.\n" \
           "ERROR: Incorrect format in {#{args}}. Expected 'key' or 'key=value'.\n"
 
         expected(actual, desired)
@@ -93,11 +94,11 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'test1'
 
       var = { name: 'foo', value: 'bar' }
-      cases = %W(
+      cases = %W[
         #{var[:name]}
         #{var[:name]}=
         #{var[:name]}=#{var[:value]}
-      )
+      ]
       cases.each do |example|
         # reset the db
         @db.reset
@@ -105,24 +106,24 @@ RSpec.describe Moose::Inventory::Cli::Host do
         # Add an initial host and hostvar
         @db.models[:host].create(name: host_name)
         runner do
-          @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]}))
+          @app.start(%W[host addvar #{host_name} #{var[:name]}=#{var[:value]}])
         end
 
         # Try to remove the hostvar using the case example valid args
         actual = runner do
-          @app.start(%W(host rmvar #{host_name} #{example}))
+          @app.start(%W[host rmvar #{host_name} #{example}])
         end
         # @console.out(actual,'p')
 
         # Check the output
         desired = { aborted: false }
         desired[:STDOUT] =
-          "Remove variable(s) '#{example}' from host '#{host_name}':\n"\
-          "  - retrieve host '#{host_name}'...\n"\
-          "    - OK\n"\
-          "  - remove variable '#{example}'...\n"\
-          "    - OK\n"\
-          "  - all OK\n"\
+          "Remove variable(s) '#{example}' from host '#{host_name}':\n  " \
+          "- retrieve host '#{host_name}'...\n    " \
+          "- OK\n  " \
+          "- remove variable '#{example}'...\n    " \
+          "- OK\n  " \
+          "- all OK\n" \
           "Succeeded.\n"
 
         # @console.out(desired,'p')
@@ -143,36 +144,35 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'test1'
       varsarray = [
         { name: 'var1', value: 'val1' },
-        { name: 'var2', value: 'val2' },
+        { name: 'var2', value: 'val2' }
       ]
 
-      vars = []
-      varsarray.each do |var|
-        vars << "#{var[:name]}=#{var[:value]}"
+      vars = varsarray.map do |var|
+        "#{var[:name]}=#{var[:value]}"
       end
 
       @db.models[:host].create(name: host_name)
-      actual = runner do
-        @app.start(%W(host addvar #{host_name}) + vars)
+      runner do
+        @app.start(%W[host addvar #{host_name}] + vars)
       end
 
       actual = runner do
-        @app.start(%W(host rmvar #{host_name}) + vars)
+        @app.start(%W[host rmvar #{host_name}] + vars)
       end
       # @console.out(actual,'p')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Remove variable(s) '#{vars.join(',')}' from host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"\
-        "    - OK\n"
+        "Remove variable(s) '#{vars.join(',')}' from host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n    " \
+        "- OK\n"
       vars.each do |var|
         desired[:STDOUT] = desired[:STDOUT] +
-                           "  - remove variable '#{var}'...\n"\
-                           "    - OK\n"
+                           "  - remove variable '#{var}'...\n    " \
+                           "- OK\n"
       end
       desired[:STDOUT] = desired[:STDOUT] +
-                         "  - all OK\n"\
+                         "  - all OK\n" \
                          "Succeeded.\n"
       expected(actual, desired)
 
@@ -183,3 +183,4 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

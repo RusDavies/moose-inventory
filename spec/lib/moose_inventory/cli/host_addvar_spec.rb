@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
 require 'spec_helper'
 
 # TODO: the usual respond_to? method doesn't seem to work on Thor objects.
@@ -16,14 +19,14 @@ RSpec.describe Moose::Inventory::Cli::Host do
   describe 'addvar' do
     #-----------------
     it 'should be responsive' do
-      result = @host.instance_methods(false).include?(:addvar)
+      result = @host.method_defined?(:addvar, false)
       expect(result).to eq(true)
     end
 
     #-----------------
     it 'host addvar <missing args> ... should abort with an error' do
       actual = runner do
-        @app.start(%w(host addvar)) # <- no group given
+        @app.start(%w[host addvar]) # <- no group given
       end
 
       # Check output
@@ -38,16 +41,16 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_var = 'foo=bar'
 
       actual = runner do
-        @app.start(%W(host addvar #{host_name} #{host_var}))
+        @app.start(%W[host addvar #{host_name} #{host_var}])
       end
 
       # Check output
       desired = { aborted: true }
       desired[:STDOUT] =
-        "Add variables '#{host_var}' to host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"
+        "Add variables '#{host_var}' to host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n"
       desired[:STDERR] =
-        "An error occurred during a transaction, any changes have been rolled back.\n"\
+        "An error occurred during a transaction, any changes have been rolled back.\n" \
         "ERROR: The host '#{host_name}' does not exist.\n"
       expected(actual, desired)
     end
@@ -59,32 +62,30 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       host_name = 'test1'
       @db.models[:host].create(name: host_name)
-
-      var = { name: 'var1', value: 'testval' }
-      cases = %w(
+      cases = %w[
         testvar
         testvar=
         =testval
         testvar=testval=
         =testvar=testval
         testvar=testval=extra
-      )
+      ]
 
       cases.each do |args|
         actual = runner do
-          @app.start(%W(host addvar #{host_name} #{args}))
+          @app.start(%W[host addvar #{host_name} #{args}])
         end
         # @console.out(actual,'p')
 
         desired = { aborted: true }
         desired[:STDOUT] =
-          "Add variables '#{args}' to host '#{host_name}':\n"\
-          "  - retrieve host '#{host_name}'...\n"\
-          "    - OK\n"\
-          "  - add variable '#{args}'...\n"
+          "Add variables '#{args}' to host '#{host_name}':\n  " \
+          "- retrieve host '#{host_name}'...\n    " \
+          "- OK\n  " \
+          "- add variable '#{args}'...\n"
 
         desired[:STDERR] =
-          "An error occurred during a transaction, any changes have been rolled back.\n"\
+          "An error occurred during a transaction, any changes have been rolled back.\n" \
           "ERROR: Incorrect format in '{#{args}}'. Expected 'key=value'.\n"
 
         expected(actual, desired)
@@ -102,18 +103,18 @@ RSpec.describe Moose::Inventory::Cli::Host do
       @db.models[:host].create(name: host_name)
 
       actual = runner do
-        @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]}))
+        @app.start(%W[host addvar #{host_name} #{var[:name]}=#{var[:value]}])
       end
       # @console.out(actual,'p')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"\
-        "    - OK\n"\
-        "  - add variable '#{var[:name]}=#{var[:value]}'...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n    " \
+        "- OK\n  " \
+        "- add variable '#{var[:name]}=#{var[:value]}'...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
 
@@ -136,18 +137,18 @@ RSpec.describe Moose::Inventory::Cli::Host do
       @db.models[:host].create(name: host_name)
 
       actual = runner do
-        @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]}))
+        @app.start(%W[host addvar #{host_name} #{var[:name]}=#{var[:value]}])
       end
       # @console.out(actual,'p')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"\
-        "    - OK\n"\
-        "  - add variable '#{var[:name]}=#{var[:value]}'...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n    " \
+        "- OK\n  " \
+        "- add variable '#{var[:name]}=#{var[:value]}'...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
 
@@ -167,33 +168,32 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'test1'
       varsarray = [
         { name: 'var1', value: 'val1' },
-        { name: 'var2', value: 'val2' },
+        { name: 'var2', value: 'val2' }
       ]
 
-      vars = []
-      varsarray.each do |var|
-        vars << "#{var[:name]}=#{var[:value]}"
+      vars = varsarray.map do |var|
+        "#{var[:name]}=#{var[:value]}"
       end
 
       @db.models[:host].create(name: host_name)
 
       actual = runner do
-        @app.start(%W(host addvar #{host_name}) + vars)
+        @app.start(%W[host addvar #{host_name}] + vars)
       end
       # @console.out(actual,'p')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Add variables '#{vars.join(',')}' to host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"\
-        "    - OK\n"
+        "Add variables '#{vars.join(',')}' to host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n    " \
+        "- OK\n"
       vars.each do |var|
         desired[:STDOUT] =  desired[:STDOUT] +
-                            "  - add variable '#{var}'...\n"\
-                            "    - OK\n"
+                            "  - add variable '#{var}'...\n    " \
+                            "- OK\n"
       end
       desired[:STDOUT] = desired[:STDOUT] +
-                         "  - all OK\n"\
+                         "  - all OK\n" \
                          "Succeeded.\n"
       expected(actual, desired)
 
@@ -212,23 +212,23 @@ RSpec.describe Moose::Inventory::Cli::Host do
       var = { name: 'var1', value: 'testval' }
 
       @db.models[:host].create(name: host_name)
-      runner { @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]})) }
+      runner { @app.start(%W[host addvar #{host_name} #{var[:name]}=#{var[:value]}]) }
 
       var[:value] = 'newtestval'
       actual = runner do
-        @app.start(%W(host addvar #{host_name} #{var[:name]}=#{var[:value]}))
+        @app.start(%W[host addvar #{host_name} #{var[:name]}=#{var[:value]}])
       end
       # @console.out(actual,'p')
 
       desired = { aborted: false }
       desired[:STDOUT] =
-        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n"\
-        "  - retrieve host '#{host_name}'...\n"\
-        "    - OK\n"\
-        "  - add variable '#{var[:name]}=#{var[:value]}'...\n"\
-        "    - already exists, applying as an update...\n"\
-        "    - OK\n"\
-        "  - all OK\n"\
+        "Add variables '#{var[:name]}=#{var[:value]}' to host '#{host_name}':\n  " \
+        "- retrieve host '#{host_name}'...\n    " \
+        "- OK\n  " \
+        "- add variable '#{var[:name]}=#{var[:value]}'...\n    " \
+        "- already exists, applying as an update...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
         "Succeeded.\n"
       expected(actual, desired)
 
@@ -244,3 +244,4 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
