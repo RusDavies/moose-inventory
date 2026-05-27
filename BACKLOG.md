@@ -234,13 +234,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 36 done / 0 open.
+Code quality status counts: 37 done / 0 open.
 
 ## Open
 
 _No open code-quality items._
 
 ## Done
+
+1. Clean spec entrypoint RuboCop hygiene.
+   - Replaced the stale fully commented `application_spec` scaffold with direct specs for the application version command and registered Thor subcommands.
+   - Added frozen string literal coverage to the host/group aggregate spec entrypoints.
+   - Brought `models_spec` into the targeted RuboCop gate with scoped block-length disables for the legacy integration-style model coverage.
+   - Added these spec entrypoints to the targeted RuboCop gate.
 
 1. Clean build/support RuboCop hygiene.
    - Added frozen string literal comments to `Gemfile`, `Rakefile`, and `scripts/files.rb`.

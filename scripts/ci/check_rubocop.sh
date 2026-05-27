@@ -67,14 +67,18 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/remove_hosts_spec.rb \
   spec/lib/moose_inventory/operations/query_inventory_spec.rb \
   spec/lib/moose_inventory/inventory_context_spec.rb \
+  spec/lib/moose_inventory/cli/application_spec.rb \
   spec/lib/moose_inventory/cli/cli_spec.rb \
   spec/lib/moose_inventory/cli/factory_spec.rb \
   spec/lib/moose_inventory/cli/formatter_spec.rb \
+  spec/lib/moose_inventory/cli/group_spec.rb \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
+  spec/lib/moose_inventory/cli/host_spec.rb \
   spec/support/cli_harness.rb \
   spec/lib/moose_inventory/config/config_spec.rb \
   spec/lib/moose_inventory/db/db_spec.rb \
   spec/lib/moose_inventory/db/exceptions_spec.rb \
+  spec/lib/moose_inventory/db/models_spec.rb \
   lib/moose_inventory/version.rb \
   moose-inventory.gemspec \
   scripts/files.rb
