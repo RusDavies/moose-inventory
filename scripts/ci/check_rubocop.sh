@@ -78,6 +78,7 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/group_list_spec.rb \
   spec/lib/moose_inventory/cli/group_listvar_spec.rb \
   spec/lib/moose_inventory/cli/group_rmchild_spec.rb \
+  spec/lib/moose_inventory/cli/group_rm_spec.rb \
   spec/lib/moose_inventory/cli/group_rmhost_spec.rb \
   spec/lib/moose_inventory/cli/group_rmvar_spec.rb \
   spec/lib/moose_inventory/cli/group_spec.rb \
