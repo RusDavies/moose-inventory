@@ -259,16 +259,18 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 49 done / 1 open.
+Code quality status counts: 50 done / 0 open.
 
 ## Open
 
-1. Harden config flag parsing for missing option values.
-   - Make `--config`, `--env`, and `--format` fail explicitly when a value is missing or when the next token is another flag.
-   - Preserve current valid-argument behavior while preventing silent command-token consumption.
-   - Add focused config specs and re-run the full gate.
+_No open code-quality items._
 
 ## Done
+
+1. Harden config flag parsing for missing option values.
+   - Made `--config`, `--env`, and `--format` fail explicitly when a value is missing or when the next token is another flag.
+   - Preserved valid-argument behavior while preventing silent command-token consumption.
+   - Added focused config specs and re-ran the full gate.
 
 1. Add formatter branch coverage for STDERR and invalid stream paths.
    - Covered `Formatter#print`, `Formatter#puts`, `Formatter#info`, `Formatter#warn`, and `Formatter#error` branches for STDERR and invalid-stream behavior.

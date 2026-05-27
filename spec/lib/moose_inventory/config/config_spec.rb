@@ -82,6 +82,22 @@ RSpec.describe 'Moose::Inventory::Config' do
     end
   end
 
+  describe 'flag parsing' do
+    it 'raises when --config is missing its value' do
+      expect { @config.init(['--config']) }.to raise_error(RuntimeError, 'Expected a value after --config')
+    end
+
+    it 'raises when --env is missing its value' do
+      expect { @config.init(['--env', '--config', @mockarg_parts[:config]]) }
+        .to raise_error(RuntimeError, 'Expected a value after --env')
+    end
+
+    it 'raises when --format is missing its value' do
+      expect { @config.init(['--config', @mockarg_parts[:config], '--format']) }
+        .to raise_error(RuntimeError, 'Expected a value after --format')
+    end
+  end
+
   # ._settings
   describe '._settings' do
     it 'should be responsive' do

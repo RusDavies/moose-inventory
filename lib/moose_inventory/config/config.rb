@@ -222,7 +222,10 @@ module Moose
         index = @_argv.index("--#{flag}")
         return if index.nil?
 
-        @_confopts[flag.to_sym] = @_argv[index + 1]
+        value = @_argv[index + 1]
+        raise("Expected a value after --#{flag}") if value.nil? || value.start_with?('--')
+
+        @_confopts[flag.to_sym] = value
         @_argv.slice!(index, 2)
       end
 
