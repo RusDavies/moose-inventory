@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'thor'
-require_relative './moose_inventory/config/config.rb'
-require_relative './moose_inventory/db/db.rb'
-require_relative './moose_inventory/cli/application.rb'
+require_relative 'moose_inventory/config/config'
+require_relative 'moose_inventory/db/db'
+require_relative 'moose_inventory/cli/application'
 
 module Moose
   module Inventory

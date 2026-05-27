@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moose
   module Inventory
     module DB

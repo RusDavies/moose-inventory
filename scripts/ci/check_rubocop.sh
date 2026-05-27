@@ -2,8 +2,12 @@
 set -euo pipefail
 
 bundle exec rubocop \
+  bin/moose-inventory \
+  lib/moose_inventory.rb \
   lib/moose_inventory/config/config.rb \
   lib/moose_inventory/db/db.rb \
+  lib/moose_inventory/db/exceptions.rb \
+  lib/moose_inventory/db/models.rb \
   lib/moose_inventory/runtime_options.rb \
   lib/moose_inventory/inventory_context.rb \
   lib/moose_inventory/cli/factory.rb \
@@ -64,4 +68,6 @@ bundle exec rubocop \
   spec/lib/moose_inventory/cli/host_rm_spec.rb \
   spec/support/cli_harness.rb \
   spec/lib/moose_inventory/config/config_spec.rb \
-  spec/lib/moose_inventory/db/db_spec.rb
+  spec/lib/moose_inventory/db/db_spec.rb \
+  spec/lib/moose_inventory/db/exceptions_spec.rb \
+  lib/moose_inventory/version.rb
