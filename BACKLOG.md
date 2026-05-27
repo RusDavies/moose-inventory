@@ -4,9 +4,16 @@ Release readiness status counts: 14 done / 0 open.
 
 ## Open
 
+_No open code-quality items._
+
 _No open release-readiness items._
 
 ## Done
+
+1. Clean `group_add_spec.rb` RuboCop hygiene.
+   - Normalized the large group add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, interpolation style, redundant assignments, and scoped block-length handling.
+   - Preserved spec-sensitive command output exactly, including the known `Succeeded` punctuation split and trace fixture behavior.
+   - Added the cleaned spec to `scripts/ci/check_rubocop.sh`.
 
 1. Clean `host_add_spec.rb` RuboCop hygiene.
    - Normalized the large host add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, interpolation style, spacing, and scoped block-length handling.
@@ -254,14 +261,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 46 done / 1 open.
+Code quality status counts: 47 done / 0 open.
 
 ## Open
-
-1. Clean `group_add_spec.rb` RuboCop hygiene.
-   - Normalize the large group add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, scoped block-length handling, and any redundant assignments/directives.
-   - Preserve spec-sensitive command output exactly, including the known `Succeeded` punctuation split and trace fixture behavior.
-   - Add the cleaned spec to `scripts/ci/check_rubocop.sh`.
 
 ## Done
 
