@@ -259,13 +259,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 51 done / 3 open.
+Code quality status counts: 52 done / 2 open.
 
 ## Open
-
-1. Narrow production `rescue Exception` handling in `lib/moose_inventory/db/db.rb`.
-   - Replace the broad catch-all with more explicit non-fatal error handling where safe, preserving rollback/reporting behavior.
-   - Add focused DB transaction specs before changing rescue semantics.
 
 1. Remove stale CLI spec TODO noise around Thor responder comments.
    - Delete the repeated obsolete comments that say the normal `respond_to?` check does not work on Thor objects now that the spec pattern is established.
@@ -276,6 +272,11 @@ Code quality status counts: 51 done / 3 open.
    - Land it as one bounded family refactor with focused operation specs and the full gate.
 
 ## Done
+
+1. Narrow production `rescue Exception` handling in `lib/moose_inventory/db/db.rb`.
+   - Replaced the broad catch-all with `StandardError` handling so fatal control-flow exceptions are not swallowed.
+   - Added focused DB transaction specs covering generic StandardError re-raise behavior and non-StandardError passthrough.
+   - Re-ran the focused DB slice and the full gate.
 
 1. Add direct `Cli::Helpers` coverage for helper-only branches.
    - Covered `run_group_relation_transaction` rescue handling, automatic-group helper methods, `association_exists?`, and small wrapper helpers, raising `lib/moose_inventory/cli/helpers.rb` to 100% coverage.

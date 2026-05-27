@@ -117,9 +117,9 @@ module Moose
 
           warn e.full_message(highlight: false, order: :top) if Moose::Inventory::Config.trace_enabled?
           abort("ERROR: #{e.message}")
-        rescue Exception => e
+        rescue SystemExit, StandardError
           warn 'An error occurred during a transaction, any changes have been rolled back.'
-          raise e
+          raise
         end
       end
 
