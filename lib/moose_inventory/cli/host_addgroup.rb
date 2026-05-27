@@ -24,7 +24,7 @@ module Moose
 
           abort_if_automatic_group(groups)
 
-          context = Moose::Inventory::InventoryContext.new(db: db)
+          context = inventory_context
           operation = Moose::Inventory::Operations::AddAssociations.new(context: context)
 
           db.transaction do

@@ -12,13 +12,14 @@ module Moose
       extend self
       # rubocop:enable Style/ModuleFunction
 
-      def start(args)
+      def start(args, config: Moose::Inventory::Config, db: Moose::Inventory::DB,
+                application: Moose::Inventory::Cli::Application)
         # initialization stuff.
-        Moose::Inventory::Config.init(args)
-        Moose::Inventory::DB.init
+        config.init(args)
+        db.init
 
         # Start the main application
-        Moose::Inventory::Cli::Application.start(Moose::Inventory::Config.application_args)
+        application.start(config.application_args)
       end
     end
   end

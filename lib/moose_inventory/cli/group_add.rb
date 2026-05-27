@@ -26,7 +26,7 @@ module Moose
           )
 
           result = Moose::Inventory::Operations::AddGroups
-                   .new(context: Moose::Inventory::InventoryContext.new(db: db))
+                   .new(context: inventory_context)
                    .call(names: names, hosts: hosts)
           render_add_groups_events(result.events)
 

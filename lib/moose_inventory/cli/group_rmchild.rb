@@ -39,7 +39,7 @@ module Moose
         private
 
         def remove_children_from_group(parent_name, child_names)
-          context = Moose::Inventory::InventoryContext.new(db: db)
+          context = inventory_context
           operation = Moose::Inventory::Operations::GroupChildRelations.new(context: context)
 
           begin

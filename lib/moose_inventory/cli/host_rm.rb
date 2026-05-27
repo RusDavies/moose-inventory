@@ -30,7 +30,7 @@ module Moose
 
         def remove_hosts_operation
           Moose::Inventory::Operations::RemoveHosts.new(
-            context: Moose::Inventory::InventoryContext.new(db: db)
+            context: inventory_context
           )
         end
 

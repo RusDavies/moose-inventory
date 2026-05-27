@@ -3,14 +3,14 @@
 module Moose
   module Inventory
     ##
-    # Thin facade over the current DB singleton.
+    # Thin facade over an explicitly supplied DB implementation.
     #
     # This gives new operation/service objects a small inventory-facing seam
     # without forcing the legacy CLI to stop using the DB singleton all at once.
     class InventoryContext
       AUTOMATIC_GROUP = 'ungrouped'
 
-      def initialize(db: Moose::Inventory::DB)
+      def initialize(db:)
         @db = db
       end
 

@@ -29,7 +29,7 @@ module Moose
 
         def query_inventory
           Moose::Inventory::Operations::QueryInventory.new(
-            context: Moose::Inventory::InventoryContext.new(db: db)
+            context: inventory_context
           )
         end
       end

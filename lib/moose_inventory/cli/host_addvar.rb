@@ -20,7 +20,7 @@ module Moose
           name = args[0].downcase
           vars = args.slice(1, args.length - 1).uniq
           operation = Moose::Inventory::Operations::AddVariables.new(
-            context: Moose::Inventory::InventoryContext.new(db: db),
+            context: inventory_context,
             entity_type: :host,
             emitter: host_addvar_emitter(name, vars)
           )

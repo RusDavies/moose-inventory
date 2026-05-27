@@ -44,7 +44,7 @@ module Moose
         end
 
         def query_context
-          Moose::Inventory::InventoryContext.new(db: db)
+          inventory_context
         end
       end
     end

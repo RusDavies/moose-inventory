@@ -14,6 +14,10 @@ module Moose
           Moose::Inventory::DB
         end
 
+        def inventory_context
+          @inventory_context ||= Moose::Inventory::InventoryContext.new(db: db)
+        end
+
         def fmt
           Moose::Inventory::Cli::Formatter
         end
@@ -55,7 +59,7 @@ module Moose
         end
 
         def automatic_group
-          db.models[:group].find_or_create(name: AUTOMATIC_GROUP)
+          inventory_context.automatic_group
         end
 
         def remove_automatic_group_from_host(host, indent:, message:)
