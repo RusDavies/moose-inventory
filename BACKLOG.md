@@ -1,3 +1,21 @@
+# Moose Inventory Process Conformance Backlog
+
+Process conformance status counts: 0 done / 1 open.
+
+## Open
+
+1. Re-read updated `SOFTWARE_PRODUCT_DEVELOPMENT_PROCESS.md`, perform a repository gap analysis, and propose a conformance plan.
+   - Compare Moose Inventory against the updated process documents, including tailoring/classification, approvals/governance, requirements, architecture, UX/product design if applicable, security/privacy, QA/test evidence, release, operations, documentation, and backlog/evidence practices.
+   - Produce a gap analysis that distinguishes documented/draft artifacts from approved gates; the existence of a document must not be treated as approval.
+   - Propose an ordered remediation plan to bring the repository into conformance with the updated process documents, including blockers, required human approvals, verification evidence, and backlog changes.
+   - Update repository process/conformance docs and backlog after the analysis, without claiming product, launch, release, or governance approval unless explicitly recorded by an approver.
+
+## Done
+
+_No completed process-conformance items._
+
+---
+
 # Moose Inventory Code Improvement Analysis Backlog
 
 Code improvement analysis status counts: 7 done / 3 open.
