@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
+require 'json'
 require 'thor'
 require_relative '../version'
 require 'yaml'
 
 require_relative '../config/config'
 require_relative '../operations/import_inventory_snapshot'
+require_relative '../operations/inventory_doctor'
 require_relative '../operations/inventory_snapshot'
 require_relative 'formatter'
 require_relative 'group'
@@ -23,6 +25,14 @@ module Moose
         desc 'version', 'Get the code version'
         def version
           puts "Version #{Moose::Inventory::VERSION}"
+        end
+
+        desc 'doctor', 'Run inventory health checks'
+        option :format, type: :string, desc: 'Emit doctor report as yaml|json|pjson'
+        def doctor
+          report = build_operation(Moose::Inventory::Operations::InventoryDoctor).call
+          render_doctor_report(report)
+          exit(1) unless report[:ok]
         end
 
         desc 'export [FILE]', 'Export a canonical inventory snapshot'
@@ -65,16 +75,40 @@ module Moose
 
         private
 
-        def serialize_snapshot(snapshot)
-          case output_format
-          when 'yaml', 'y'
-            snapshot.to_yaml
-          when 'prettyjson', 'pjson', 'p'
-            JSON.pretty_generate(snapshot)
-          when 'json', 'j'
-            snapshot.to_json
+        def render_doctor_report(report)
+          if options[:format]
+            puts serialize_data(report, options[:format].downcase)
           else
-            abort("Output format '#{output_format}' is not yet supported.")
+            render_human_doctor_report(report)
+          end
+        end
+
+        def render_human_doctor_report(report)
+          if report[:ok]
+            puts 'Inventory doctor found no issues.'
+            return
+          end
+
+          puts "Inventory doctor found #{report[:issue_count]} issue(s):"
+          report[:issues].each do |entry|
+            puts "- [#{entry[:severity]}] #{entry[:id]}: #{entry[:message]}"
+          end
+        end
+
+        def serialize_snapshot(snapshot)
+          serialize_data(snapshot, output_format)
+        end
+
+        def serialize_data(data, format)
+          case format
+          when 'yaml', 'y'
+            data.to_yaml
+          when 'prettyjson', 'pjson', 'p'
+            JSON.pretty_generate(data)
+          when 'json', 'j'
+            data.to_json
+          else
+            abort("Output format '#{format}' is not yet supported.")
           end
         end
       end

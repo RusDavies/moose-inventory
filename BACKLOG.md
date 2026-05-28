@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 4 done / 7 open.
+Feature value status counts: 5 done / 6 open.
 
 ## Open
-
-1. [HIGH] Add inventory doctor/lint checks.
-   - Add a `doctor`, `lint`, or equivalent command for CI-friendly inventory health checks.
-   - Detect orphaned groups, empty groups, circular child relationships, hosts only in `ungrouped`, duplicate-ish names, invalid variable shapes, missing DB config, and unsafe plaintext password configuration.
-   - Provide machine-readable output for automation plus readable CLI output for humans pretending to be automation.
 
 1. Add first-class Ansible inventory plugin mode.
    - Provide a documented modern Ansible inventory plugin/config path, not only legacy dynamic-inventory CLI usage.
@@ -45,6 +40,12 @@ Feature value status counts: 4 done / 7 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. [HIGH] Add inventory doctor/lint checks.
+   - Added top-level `doctor` command with human-readable default output and non-zero exit status when findings are present.
+   - Added `doctor --format yaml|json|pjson` for CI-friendly machine-readable reports.
+   - Checks cover missing DB config, plaintext DB passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
+   - Documented the new command in README.md per the project documentation rule.
 
 1. [HIGH] Add bulk import/export with validation.
    - Added top-level `export [FILE]` for canonical YAML/JSON/pjson snapshots containing version, hosts, host variables, memberships, groups, group variables, and child relationships.

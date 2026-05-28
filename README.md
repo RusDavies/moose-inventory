@@ -215,6 +215,37 @@ Snapshots can be imported from YAML or JSON.  Import validates the file before w
 
 Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
 
+###Inventory doctor
+The `doctor` command runs read-only inventory health checks and exits with a non-zero status if it finds issues.  This makes it suitable for CI checks, release gates, and pre-change reviews.
+
+    $ moose-inventory doctor
+    Inventory doctor found no issues.
+
+When findings are present, the human-readable output lists each issue with a severity and check id:
+
+    $ moose-inventory doctor
+    Inventory doctor found 2 issue(s):
+    - [warning] host_only_in_ungrouped: Host 'web01' is only in automatic group 'ungrouped'.
+    - [warning] orphaned_group: Group 'old_web' has no parents and no hosts.
+
+For automation, use `--format yaml`, `--format json`, or `--format pjson` on the doctor command itself:
+
+    $ moose-inventory doctor --format pjson
+    {
+      "ok": false,
+      "issue_count": 1,
+      "issues": [
+        {
+          "id": "host_only_in_ungrouped",
+          "severity": "warning",
+          "message": "Host 'web01' is only in automatic group 'ungrouped'.",
+          "subject": "web01"
+        }
+      ]
+    }
+
+Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
+
 ###Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.  
 
