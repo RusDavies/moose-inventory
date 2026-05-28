@@ -86,6 +86,20 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
+    it 'host rmvar HOST key --dry-run should not remove the host variable' do
+      host_name = 'test1'
+      @db.models[:host].create(name: host_name)
+      runner { @app.start(%W[host addvar #{host_name} var1=val1]) }
+
+      actual = runner { @app.start(%W[host rmvar #{host_name} var1 --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      host = @db.models[:host].find(name: host_name)
+      expect(host.hostvars_dataset[name: 'var1']).not_to be_nil
+    end
+
     it 'host rmvar HOST <valid args> ... should remove the host variable' do
       # 1. Should add the var to the db
       # 2. Should associate the host with the var

@@ -203,6 +203,24 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
+    it 'host addvar HOST key=value --dry-run should not create or update variables' do
+      host_name = 'test1'
+      @db.models[:host].create(name: host_name)
+      runner { @app.start(%W[host addvar #{host_name} var1=old]) }
+
+      actual = runner do
+        @app.start(%W[host addvar #{host_name} var1=new var2=val2 --dry-run])
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      host = @db.models[:host].find(name: host_name)
+      expect(host.hostvars_dataset[name: 'var1'][:value]).to eq('old')
+      expect(host.hostvars_dataset[name: 'var2']).to be_nil
+    end
+
+    #------------------------
     it 'host addvar HOST key=value ... should update an already existing association' do
       # 1. Should add the var to the db
       # 2. Should associate the host with the var

@@ -9,8 +9,9 @@ module Moose
       class RemoveVariables
         include EntityVariableOperationSupport
 
-        def call(name:, vars:)
+        def call(name:, vars:, dry_run: false)
           @events = []
+          @dry_run = dry_run
 
           emit(:entity_started, name: name)
           emit(:retrieving_entity, name: name)
@@ -25,19 +26,23 @@ module Moose
           end
 
           emit(:entity_complete)
+          emit(:dry_run_summary) if dry_run
           operation_result(events: events)
         ensure
           @events = nil
+          @dry_run = nil
         end
 
         private
+
+        attr_reader :dry_run
 
         def remove_variable(entity, dataset, variable)
           emit(:removing_variable, variable: variable)
           key = parse_variable_name(variable)
 
           existing = dataset[name: key]
-          unless existing.nil?
+          unless existing.nil? || dry_run
             entity.public_send("remove_#{entity_type}var", existing)
             existing.destroy
           end

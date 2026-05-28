@@ -9,8 +9,9 @@ module Moose
       class AddVariables
         include EntityVariableOperationSupport
 
-        def call(name:, vars:)
+        def call(name:, vars:, dry_run: false)
           @events = []
+          @dry_run = dry_run
 
           emit(:entity_started, name: name)
           emit(:retrieving_entity, name: name)
@@ -25,12 +26,16 @@ module Moose
           end
 
           emit(:entity_complete)
+          emit(:dry_run_summary) if dry_run
           operation_result(events: events)
         ensure
           @events = nil
+          @dry_run = nil
         end
 
         private
+
+        attr_reader :dry_run
 
         def add_variable(entity, dataset, variable)
           emit(:adding_variable, variable: variable)
@@ -38,13 +43,17 @@ module Moose
 
           existing = dataset[name: key]
           if existing.nil?
-            record = context.create_variable(entity_type, name: key, value: value)
-            entity.public_send("add_#{entity_type}var", record)
+            unless dry_run
+              record = context.create_variable(entity_type, name: key, value: value)
+              entity.public_send("add_#{entity_type}var", record)
+            end
           elsif existing[:value] != value
             emit(:updating_existing_variable)
-            update = context.find_variable(entity_type, existing[:id])
-            update[:value] = value
-            update.save
+            unless dry_run
+              update = context.find_variable(entity_type, existing[:id])
+              update[:value] = value
+              update.save
+            end
           end
 
           emit(:ok, indent: 4)

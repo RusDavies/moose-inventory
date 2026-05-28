@@ -1,15 +1,13 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 0 done / 10 open.
+Feature value status counts: 1 done / 9 open.
 
 ## Open
 
-1. [HIGH] Add inventory dry-run / plan mode.
-   - Add a `--dry-run` flag and/or `plan` command for mutating operations.
-   - Show the exact hosts, groups, variables, child relationships, and automatic `ungrouped` changes that would be applied.
-   - Keep planned operations transactional and side-effect-free so operators can review inventory surgery before trusting the monkey with the scalpel.
-   - Progress: added CLI/operation dry-run slices for `host add --dry-run`, `host rm --dry-run`, `group add --dry-run`, `group rm --dry-run`, `host addgroup --dry-run`, `host rmgroup --dry-run`, `group addhost --dry-run`, `group rmhost --dry-run`, `group addchild --dry-run`, and `group rmchild --dry-run`; dry-run output preserves the existing command progress shape, adds a no-changes-applied summary, and focused specs prove planned host/group rows, recursive cleanup paths, host-group associations, parent-child associations, and automatic `ungrouped` maintenance do not create, delete, or reassociate records.
-   - Remaining dry-run expansion TODOs: extend the same safety model across host/group variable mutations; then consider a dedicated `plan` command or machine-readable plan output.
+1. [HIGH] Add machine-readable plan output and/or a dedicated `plan` command.
+   - Build on the completed `--dry-run` support for mutating commands.
+   - Consider JSON/YAML plan output for CI, review workflows, and future bulk import/export validation.
+   - Decide whether this should be a top-level `plan` command, `--format` support for dry-run events, or both.
 
 1. [HIGH] Add bulk import/export with validation.
    - Support importing inventory definitions from YAML/JSON and applying them transactionally.
@@ -58,7 +56,11 @@ Feature value status counts: 0 done / 10 open.
 
 ## Done
 
-_No completed feature-value items yet._
+1. [HIGH] Add inventory dry-run / plan mode.
+   - Added `--dry-run` support for all mutating command families: host/group add/remove, host-group association add/remove, child-group relation add/remove, and host/group variable add/remove.
+   - Dry-run output preserves existing command progress rendering and adds `Dry run complete. No changes applied.`
+   - Focused operation and CLI specs prove dry-run does not create, update, delete, or reassociate records, including automatic `ungrouped` maintenance and recursive orphan cleanup paths.
+   - Remaining follow-up was split into a separate high-priority machine-readable plan output / dedicated `plan` command item.
 
 ---
 

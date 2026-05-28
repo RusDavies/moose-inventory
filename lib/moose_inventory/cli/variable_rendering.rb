@@ -25,6 +25,7 @@ module Moose
                                                    variables_label:))
           end
           return render_variable_change(event, entity_label) if variable_change_event?(event.type)
+          return puts 'Dry run complete. No changes applied.' if event.type == :dry_run_summary
 
           render_variable_status(event)
         end
