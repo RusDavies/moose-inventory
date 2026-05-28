@@ -1,3 +1,65 @@
+# Moose Inventory Feature Value Backlog
+
+Feature value status counts: 0 done / 10 open.
+
+## Open
+
+1. [HIGH] Add inventory dry-run / plan mode.
+   - Add a `--dry-run` flag and/or `plan` command for mutating operations.
+   - Show the exact hosts, groups, variables, child relationships, and automatic `ungrouped` changes that would be applied.
+   - Keep planned operations transactional and side-effect-free so operators can review inventory surgery before trusting the monkey with the scalpel.
+
+1. [HIGH] Add bulk import/export with validation.
+   - Support importing inventory definitions from YAML/JSON and applying them transactionally.
+   - Support exporting a canonical snapshot suitable for review, migration, backup, and version control.
+   - Validate entity references, variable shape, group hierarchy, duplicate names, and unsupported fields before writing.
+
+1. [HIGH] Add inventory doctor/lint checks.
+   - Add a `doctor`, `lint`, or equivalent command for CI-friendly inventory health checks.
+   - Detect orphaned groups, empty groups, circular child relationships, hosts only in `ungrouped`, duplicate-ish names, invalid variable shapes, missing DB config, and unsafe plaintext password configuration.
+   - Provide machine-readable output for automation plus readable CLI output for humans pretending to be automation.
+
+1. Add first-class Ansible inventory plugin mode.
+   - Provide a documented modern Ansible inventory plugin/config path, not only legacy dynamic-inventory CLI usage.
+   - Include example `ansible.cfg` and inventory plugin YAML so adoption is obvious.
+   - Preserve current CLI inventory output for compatibility.
+
+1. Add schema/versioned migrations and database lifecycle commands.
+   - Add commands such as `db backup`, `db restore`, `db migrate`, and `db doctor`.
+   - Make SQLite/MySQL/PostgreSQL lifecycle behavior explicit and safer for operational use.
+   - Document migration and recovery expectations for release upgrades.
+
+1. Add audit log / change history.
+   - Record who/what changed inventory state, when it happened, and which command or operation caused it.
+   - Store enough detail to support debugging, accountability, and future rollback tooling.
+   - Keep the model small and append-only unless a stronger history design is introduced.
+
+1. Add tagging / metadata support for hosts and groups.
+   - Add labels/tags separate from Ansible variables for metadata such as environment, owner, role, lifecycle, location, and criticality.
+   - Support listing and filtering by tags.
+   - Keep tag semantics simple and portable across database adapters.
+
+1. Add query/filter support for inventory listing.
+   - Support commands such as `host list --group web --tag prod --var os=fedora --format yaml`.
+   - Provide useful filters for hosts, groups, variables, tags, parent/child relationships, and membership.
+   - Ensure JSON/YAML output remains stable enough for scripts.
+
+1. Add a human-friendly interactive shell or TUI.
+   - Provide a `console`, `shell`, or small TUI for browsing hosts, groups, variables, and relationships.
+   - Start read-mostly, then consider safe guided edits after core commands are mature.
+   - Keep it optional so the CLI remains clean and scriptable.
+
+1. Add CI/CD integration examples.
+   - Provide GitHub Actions examples for validating inventory snapshots, running `inventory doctor`, and producing Ansible-compatible artifacts.
+   - Document how teams can use Moose Inventory safely in review pipelines before applying changes.
+   - Include examples that do not require secret-bearing production database access.
+
+## Done
+
+_No completed feature-value items yet._
+
+---
+
 # Moose Inventory Release Readiness Backlog
 
 Release readiness status counts: 14 done / 0 open.
