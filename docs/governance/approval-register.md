@@ -15,7 +15,9 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 
 ## Pending approvals
 
-_No pending approvals recorded._
+| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| GOV-REQ-001 | Approve, revise, or reject `docs/product/requirements-baseline.md` as the requirements and acceptance criteria baseline | Pending | TBD | TBD | Requirements and acceptance criteria for Moose Inventory | Draft prepared after product brief approval; document existence is not approval. |
 
 ## Approval rules
 
