@@ -25,27 +25,20 @@ module Moose
 
           abort_if_automatic_group(groups)
 
-          operation = build_operation(Moose::Inventory::Operations::RemoveAssociations)
-
-          db.transaction do
-            puts "Dissociate host '#{name}' from groups '#{groups.join(',')}':"
-            host = fetch_existing_host_for_rmgroup(name)
-            result = operation.host_from_groups(host: host, host_name: name, group_names: groups)
-            render_host_rmgroup_events(result.events)
-            fmt.puts 2, '- All OK'
-            print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
-          end
+          result = remove_groups_from_host(name, groups)
+          print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
         end
 
         private
 
-        def fetch_existing_host_for_rmgroup(name)
-          fmt.puts 2, "- Retrieve host '#{name}'..."
-          host = inventory_context.find_host(name)
-          raise db.exceptions[:moose], "The host '#{name}' was not found in the database." if host.nil?
-
-          fmt.puts 4, '- OK'
-          host
+        def remove_groups_from_host(name, groups)
+          operation = build_operation(Moose::Inventory::Operations::RemoveAssociations)
+          run_host_relation_transaction(heading: "Dissociate host '#{name}' from groups '#{groups.join(',')}':") do
+            host = fetch_existing_host_or_raise(name)
+            result = operation.host_from_groups(host: host, host_name: name, group_names: groups)
+            render_host_rmgroup_events(result.events)
+            result
+          end
         end
 
         def render_host_rmgroup_events(events)

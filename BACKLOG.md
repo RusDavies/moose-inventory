@@ -259,27 +259,27 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 62 done / 4 open.
+Code quality status counts: 63 done / 3 open.
 
 ## Open
 
-1. Align `host addgroup` and `host rmgroup` with shared relation transaction helpers.
-   - The host-side association commands still open their own DB transactions, print headings directly, fetch hosts through command-local helpers, and pass custom warning summary text.
-   - Refactor them toward the helper pattern already used by `group addhost` / `group rmhost`, while preserving the existing user-visible output contract.
-
-2. Extract shared Ansible single-target `listvars` argument handling.
+1. Extract shared Ansible single-target `listvars` argument handling.
    - `host listvars` and `group listvars` duplicate the Ansible-only single-argument validation helper and near-identical missing-entity warning flow.
    - Add a small CLI helper or support module so future host/group variable listing changes do not drift, keeping current warning text/newline behavior covered by specs.
 
-3. Split `Host#render_add_hosts_event` into smaller rendering helpers.
+2. Split `Host#render_add_hosts_event` into smaller rendering helpers.
    - The method still carries a scoped `Metrics/CyclomaticComplexity` disable because all add-host event rendering lives in one case statement.
    - Break the dispatch into small private helpers or a simple event-handler map without changing output strings.
 
-4. Add focused specs for `OperationEventSupport` result defaults and event construction.
+3. Add focused specs for `OperationEventSupport` result defaults and event construction.
    - The helper is covered through operation integration specs, but its default `warning_count: 0` behavior is important because CLI summary code calls `zero?`.
    - Add direct unit coverage to lock the default result/event contract before future operation refactors lean on it further.
 
 ## Done
+
+1. Align `host addgroup` and `host rmgroup` with shared relation transaction helpers.
+   - Added `RelationTransactionSupport` for shared host/group relation transaction wrappers and existing-entity fetch helpers.
+   - Refactored `host addgroup` and `host rmgroup` toward the same operation/result flow as `group addhost` / `group rmhost`, while preserving existing output strings and warning summaries.
 
 1. Extract a small shared operation event emitter/result helper.
    - Added `OperationEventSupport` for shared structured event/result construction and array event emission.
