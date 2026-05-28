@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 6 done / 5 open.
+Feature value status counts: 7 done / 4 open.
 
 ## Open
-
-1. Add schema/versioned migrations and database lifecycle commands.
-   - Add commands such as `db backup`, `db restore`, `db migrate`, and `db doctor`.
-   - Make SQLite/MySQL/PostgreSQL lifecycle behavior explicit and safer for operational use.
-   - Document migration and recovery expectations for release upgrades.
 
 1. Add audit log / change history.
    - Record who/what changed inventory state, when it happened, and which command or operation caused it.
@@ -35,6 +30,12 @@ Feature value status counts: 6 done / 5 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add schema/versioned migrations and database lifecycle commands.
+   - Added schema metadata table with current schema version tracking.
+   - Added `db status`, `db doctor`, `db migrate`, and SQLite-only `db backup FILE`.
+   - Documented current migration/recovery expectations and explicit SQLite-vs-MySQL/PostgreSQL backup behavior in README.md.
+   - Left destructive restore semantics out of this slice pending a safer design.
 
 1. Add first-class Ansible inventory plugin mode.
    - Added `examples/ansible/inventory_plugins/moose_inventory.py` as a modern Ansible inventory plugin that shells out to `moose-inventory` for group and host data.

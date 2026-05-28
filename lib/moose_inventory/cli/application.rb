@@ -9,6 +9,7 @@ require_relative '../config/config'
 require_relative '../operations/import_inventory_snapshot'
 require_relative '../operations/inventory_doctor'
 require_relative '../operations/inventory_snapshot'
+require_relative 'db'
 require_relative 'formatter'
 require_relative 'group'
 require_relative 'helpers'
@@ -62,6 +63,10 @@ module Moose
         rescue db.exceptions[:moose] => e
           abort("ERROR: #{e.message}")
         end
+
+        map 'db' => :database
+        desc 'database ACTION', 'Inspect and manage database lifecycle state'
+        subcommand 'database', Moose::Inventory::Cli::Db
 
         desc 'group ACTION',
              'Manipulate groups in the inventory. ' \

@@ -246,6 +246,34 @@ For automation, use `--format yaml`, `--format json`, or `--format pjson` on the
 
 Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
 
+###Database lifecycle commands
+Moose Inventory records a small schema metadata table and exposes database lifecycle commands under `db`.  These commands are intentionally conservative: they inspect, create missing schema metadata, and back up SQLite databases, but they do not silently rewrite production databases into a modern art installation.
+
+    $ moose-inventory db status
+    Adapter: sqlite3
+    Schema version: 1
+    Expected schema version: 1
+    SQLite file: /home/russ/.moose/db/dev.db
+    Tables:
+    - hosts: present
+    - hostvars: present
+    - groups: present
+
+    $ moose-inventory db doctor
+    Database doctor found no issues.
+
+    $ moose-inventory db migrate
+    Database schema is at version 1.
+
+`db migrate` is currently a lightweight schema bootstrap/metadata command.  It creates any missing known tables and records the current schema version.  Future release migrations should extend this path instead of hiding schema changes inside unrelated commands.
+
+SQLite users can create a direct database-file backup:
+
+    $ moose-inventory db backup ./backup/moose-inventory.sqlite3
+    Backed up database to /absolute/path/backup/moose-inventory.sqlite3.
+
+`db backup` is currently supported for SQLite only.  For MySQL and PostgreSQL, use native database tools such as `mysqldump` or `pg_dump`, because those engines already have adult supervision built in.
+
 ###Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.
 
