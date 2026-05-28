@@ -8,20 +8,20 @@ module Moose
         private
 
         def fetch_existing_group_or_abort(name)
-          fmt.puts 2, "- retrieve group '#{name}'..."
+          fmt.puts 2, "- retrieve group '#{name}'..." unless machine_plan_output_requested?
           group = inventory_context.find_group(name)
           abort("ERROR: The group '#{name}' does not exist.") if group.nil?
 
-          fmt.puts 4, '- OK'
+          fmt.puts 4, '- OK' unless machine_plan_output_requested?
           group
         end
 
         def fetch_existing_host_or_raise(name)
-          fmt.puts 2, "- Retrieve host '#{name}'..."
+          fmt.puts 2, "- Retrieve host '#{name}'..." unless machine_plan_output_requested?
           host = inventory_context.find_host(name)
           raise db.exceptions[:moose], "The host '#{name}' was not found in the database." if host.nil?
 
-          fmt.puts 4, '- OK'
+          fmt.puts 4, '- OK' unless machine_plan_output_requested?
           host
         end
 
@@ -34,12 +34,13 @@ module Moose
         end
 
         def run_relation_transaction(heading:, all_ok_message:, on_error: nil)
+          result = nil
           db.transaction do
-            puts heading
+            puts heading unless machine_plan_output_requested?
             result = yield
-            fmt.puts 2, all_ok_message
-            result
+            fmt.puts 2, all_ok_message unless machine_plan_output_requested?
           end
+          result
         rescue db.exceptions[:moose] => e
           message = on_error ? on_error.call(e) : e.message
           abort("ERROR: #{message}")

@@ -106,6 +106,35 @@ RSpec.describe Moose::Inventory::Cli::Host do
       expect(@db.models[:group].find(name: group_name)).to be_nil
     end
     # --------------------
+    it 'HOST --dry-run --plan-format json should emit a machine-readable plan only' do
+      name = 'plan-host'
+
+      actual = runner { @app.start(%W[host add #{name} --dry-run --plan-format json]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDERR]).to eq('')
+      expect(actual[:STDOUT]).not_to include('Succeeded')
+      plan = JSON.parse(actual[:STDOUT])
+      expect(plan['command']).to eq('host add')
+      expect(plan['dry_run']).to eq(true)
+      expect(plan['changes_applied']).to eq(false)
+      expect(plan['events'].map { |event| event['type'] }).to include('creating_host', 'dry_run_summary')
+      expect(@db.models[:host].find(name: name)).to be_nil
+    end
+
+    # --------------------
+    it 'HOST --plan-format json without --dry-run should abort before writing' do
+      name = 'plan-host-without-dry-run'
+
+      actual = runner { @app.start(%W[host add #{name} --plan-format json]) }
+
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to eq("ERROR: --plan-format requires --dry-run.\n")
+      expect(@db.models[:host].find(name: name)).to be_nil
+    end
+
+    # --------------------
     it 'HOST ... should skip HOST creation if HOST already exists' do
       name = 'test-host-add'
       runner { @app.start(%W[host add #{name}]) }

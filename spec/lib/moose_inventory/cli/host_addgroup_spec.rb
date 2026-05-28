@@ -101,6 +101,27 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
+    it 'host addgroup HOST GROUP --dry-run --plan-format json should emit a pure relation plan' do
+      name = 'test1'
+      group_name = 'drygroup'
+      runner { @app.start(%W[host add #{name}]) }
+
+      actual = runner { @app.start(%W[host addgroup #{name} #{group_name} --dry-run --plan-format json]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).not_to include('Associate host')
+      plan = JSON.parse(actual[:STDOUT])
+      expect(plan['command']).to eq('host addgroup')
+      expect(plan['events'].map do |event|
+        event['type']
+      end).to include('adding_host_group_association', 'dry_run_summary')
+      expect(@db.models[:group].find(name: group_name)).to be_nil
+      host = @db.models[:host].find(name: name)
+      expect(host.groups_dataset[name: 'ungrouped']).not_to be_nil
+    end
+
+    #------------------------
     it 'HOST \'ungrouped\' ... should abort with an error' do
       name = 'test1'
       group_name = 'ungrouped'

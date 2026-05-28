@@ -17,8 +17,10 @@ module Moose
         desc 'addgroup HOSTNAME GROUPNAME [GROUPNAME ...]',
              'Associate the host with a group'
         option :dry_run, type: :boolean
+        option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def addgroup(*args)
           abort_if_missing_args(args, 2, '2 or more')
+          validate_machine_plan_request!
 
           name = args[0].downcase
           groups = normalize_names(args.slice(1, args.length - 1))
@@ -26,7 +28,12 @@ module Moose
           abort_if_automatic_group(groups)
 
           result = add_groups_to_host(name, groups)
-          print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
+          unless machine_plan_output_rendered?(
+            result, command: 'host addgroup'
+          )
+            print_warning_summary(result, success_message: 'Succeeded',
+                                          warning_message: 'Succeeded')
+          end
         end
 
         private
@@ -37,7 +44,7 @@ module Moose
             host = fetch_existing_host_or_raise(name)
             result = operation.host_to_groups(host: host, host_name: name, group_names: groups,
                                               dry_run: options[:dry_run])
-            render_host_addgroup_events(result.events)
+            render_host_addgroup_events(result.events) unless machine_plan_output_requested?
             result
           end
         end
