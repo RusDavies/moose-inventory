@@ -15,7 +15,7 @@ module Moose
           attr_reader :context
 
           def variables_hash(dataset)
-            dataset.to_h { |variable| [variable[:name].to_sym, variable[:value]] }
+            dataset.order(:id).to_h { |variable| [variable[:name].to_sym, variable[:value]] }
           end
         end
       end

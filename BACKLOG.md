@@ -1,13 +1,8 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 3 done / 7 open.
+Code improvement analysis status counts: 4 done / 6 open.
 
 ## Open
-
-1. Add database uniqueness constraints and indexes for relationship and variable tables.
-   - Add DB-level protection against duplicate host/group variables, duplicate host-group links, duplicate group-child links, and duplicate tag joins.
-   - Add lookup-supporting indexes for common query/filter paths such as host/group name, variable owner/name, tag name, and association joins.
-   - Include migration safety for existing databases that may already contain duplicate records.
 
 1. Split DB connection, schema, migration, lifecycle, and retry responsibilities out of `Moose::Inventory::DB`.
    - `lib/moose_inventory/db/db.rb` currently owns connection setup, schema definitions, schema version state, backup/reset, retry handling, purge behavior, and model binding.
@@ -39,6 +34,13 @@ Code improvement analysis status counts: 3 done / 7 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Add database uniqueness constraints and indexes for relationship and variable tables.
+   - Bumped schema to version 4 and added an ordered v4 migration for uniqueness and lookup indexes.
+   - Added DB-level unique indexes for per-owner host/group variables, host-group joins, group-child joins, host-tag joins, and group-tag joins.
+   - Added reverse lookup indexes for association/tag query paths.
+   - Added migration cleanup for exact duplicate join/variable rows and a clear refusal path for conflicting duplicate variable values.
+   - Added specs for v4 indexes, uniqueness enforcement, duplicate cleanup, and conflicting duplicate refusal.
 
 1. Replace version bumping with explicit ordered migrations.
    - Added `SCHEMA_MIGRATIONS` with ordered migration versions 1, 2, and 3.
