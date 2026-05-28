@@ -4,6 +4,7 @@ require_relative '../inventory_context'
 require_relative 'association_rendering'
 require_relative 'child_relation_rendering'
 require_relative 'factory'
+require_relative 'relation_transaction_support'
 require_relative 'variable_rendering'
 
 module Moose
@@ -14,6 +15,7 @@ module Moose
       module Helpers
         include Moose::Inventory::Cli::AssociationRendering
         include Moose::Inventory::Cli::ChildRelationRendering
+        include Moose::Inventory::Cli::RelationTransactionSupport
         include Moose::Inventory::Cli::VariableRendering
 
         AUTOMATIC_GROUP = 'ungrouped'
@@ -78,27 +80,6 @@ module Moose
 
         def association_exists?(dataset, name)
           !dataset.nil? && !dataset[name: name].nil?
-        end
-
-        def fetch_existing_group_or_abort(name)
-          fmt.puts 2, "- retrieve group '#{name}'..."
-          group = inventory_context.find_group(name)
-          abort("ERROR: The group '#{name}' does not exist.") if group.nil?
-
-          fmt.puts 4, '- OK'
-          group
-        end
-
-        def run_group_relation_transaction(heading:, on_error: nil)
-          db.transaction do
-            puts heading
-            result = yield
-            fmt.puts 2, '- all OK'
-            result
-          end
-        rescue db.exceptions[:moose] => e
-          message = on_error ? on_error.call(e) : e.message
-          abort("ERROR: #{message}")
         end
 
         def exception_to_s(error)

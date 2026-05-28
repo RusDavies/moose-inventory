@@ -14,6 +14,7 @@ bundle exec rubocop \
   lib/moose_inventory/inventory_context.rb \
   lib/moose_inventory/cli/application.rb \
   lib/moose_inventory/cli/factory.rb \
+  lib/moose_inventory/cli/relation_transaction_support.rb \
   lib/moose_inventory/cli/association_rendering.rb \
   lib/moose_inventory/cli/association_rendering_support.rb \
   lib/moose_inventory/cli/child_relation_rendering.rb \
