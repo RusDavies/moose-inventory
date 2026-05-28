@@ -259,13 +259,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 59 done / 3 open.
+Code quality status counts: 60 done / 2 open.
 
 ## Open
-
-1. Resolve the missing-parent behavior question for `group addchild`.
-   - `spec/lib/moose_inventory/cli/group_addchild_spec.rb` still asks whether missing parent groups should be created instead of aborting, unlike some host/group association flows that create missing counterpart entities.
-   - Decide the intended CLI contract, document it in the spec/backlog, then either preserve-and-clarify the abort behavior or implement explicit parent creation.
 
 1. Clarify the empty-hosts shape for `group get` output.
    - `spec/lib/moose_inventory/cli/group_get_spec.rb` still has a TODO asking whether an empty `hosts: []` key should be present for groups with no hosts.
@@ -276,6 +272,10 @@ Code quality status counts: 59 done / 3 open.
    - A bounded helper, similar in spirit to the variable-operation support extraction, would reduce duplication without touching CLI output rendering.
 
 ## Done
+
+1. Resolve the missing-parent behavior question for `group addchild`.
+   - Kept the existing contract: `group addchild PARENT CHILD` requires the parent group to already exist, while missing child groups may be auto-created.
+   - Replaced the stale TODO with a contract note and asserted that missing-parent aborts do not create either parent or child groups.
 
 1. Audit the `host rm` Moose-exception rescue branch.
    - Confirmed the branch was stale defensive code; `RemoveHosts` does not raise Moose DB exceptions directly and DB transaction handling owns Moose-exception rollback/abort behavior centrally.
