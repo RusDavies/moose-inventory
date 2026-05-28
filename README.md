@@ -128,6 +128,53 @@ For example,
 ###Transactional Behaviour
 The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.  
 
+###Dry-run and plan output
+Mutating commands support a `--dry-run` option.  This renders the same kind of progress output as the real command, but does not write anything to the database.  This is useful when checking inventory surgery before applying it, particularly for operations that affect automatic `ungrouped` associations or child-group cleanup.
+
+Examples:
+
+    $ moose-inventory host add web01 --groups web --dry-run
+    Add host 'web01':
+      - Creating host 'web01'...
+        - OK
+      - Adding association {host:web01 <-> group:web}...
+        - OK
+      - All OK
+    Dry run complete. No changes applied.
+    Succeeded
+
+    $ moose-inventory group rm --recursive old_parent_group --dry-run
+    $ moose-inventory host addvar web01 owner=russ env=prod --dry-run
+    $ moose-inventory group addhost web web01 web02 --dry-run
+    $ moose-inventory group rmchild --delete-orphans parent_group child_group --dry-run
+
+The following mutating command families support `--dry-run`:
+
+ 1. `host add` and `host rm`
+ 2. `group add` and `group rm`
+ 3. `host addvar`, `host rmvar`, `group addvar`, and `group rmvar`
+ 4. `host addgroup`, `host rmgroup`, `group addhost`, and `group rmhost`
+ 5. `group addchild` and `group rmchild`
+
+For automation and review workflows, dry-run events can also be emitted as YAML, JSON, or pretty JSON with `--plan-format`.  This option requires `--dry-run`; without it, the command aborts before making changes.
+
+    $ moose-inventory host add web01 --groups web --dry-run --plan-format pjson
+    {
+      "command": "host add",
+      "dry_run": true,
+      "changes_applied": false,
+      "events": [
+        {
+          "type": "host_started",
+          "payload": {
+            "name": "web01"
+          }
+        }
+      ]
+    }
+
+The actual `events` array includes the full ordered plan for the command.  Each event has a `type` and a `payload`, so scripts can inspect planned host, group, variable, association, automatic `ungrouped`, and child-group cleanup actions without scraping human-readable output.
+
 ###Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.  
 
