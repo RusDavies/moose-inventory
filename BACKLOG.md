@@ -1,6 +1,6 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 1 done / 9 open.
+Code improvement analysis status counts: 2 done / 8 open.
 
 ## Open
 
@@ -21,11 +21,6 @@ Code improvement analysis status counts: 1 done / 9 open.
    - Preserve the current additive-table compatibility path for old databases where safe, but stop treating "missing tables created" as equivalent to a complete schema migration.
    - Refuse to run against a future schema version with a clear error rather than risking writes from older code.
    - Detect dirty or partially migrated schemas and report them through `db doctor` instead of blindly updating `schema_info.version`.
-
-1. Add regression coverage for existing-database upgrade behavior.
-   - Build fixture databases for pre-schema-info, schema version 1, schema version 2, current schema, future schema, and dirty/partial schema states.
-   - Assert startup, `db status`, `db doctor`, and `db migrate` behavior for each fixture.
-   - Prove that old-but-migratable databases are upgraded safely, future schemas are rejected, and partial schemas are diagnosed without optimistic version scribbling.
 
 1. Refactor inventory snapshot import into validation and application components.
    - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
@@ -52,6 +47,12 @@ Code improvement analysis status counts: 1 done / 9 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Add regression coverage for existing-database upgrade behavior.
+   - Added SQLite fixture coverage for pre-`schema_info`, schema version 1, schema version 2, current schema, future schema, and dirty/partial schema states.
+   - Proved old additive schemas are brought to the current schema version while known tables are created.
+   - Added future-schema guards so startup and `db migrate` refuse databases newer than the supported schema version instead of downgrading `schema_info` by accident.
+   - Added `db doctor` coverage for dirty partial schemas with missing known tables and documented future-schema refusal / dirty-schema diagnosis in README.md.
 
 1. Replace the hand-maintained RuboCop file list with dynamic Ruby file discovery.
    - Replaced the explicit RuboCop file list with repository-rooted discovery for `bin/*`, `lib/**/*.rb`, `scripts/**/*.rb`, `spec/**/*.rb`, root gemspecs, `Gemfile`, and `Rakefile`.

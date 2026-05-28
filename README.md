@@ -310,7 +310,7 @@ Moose Inventory records a small schema metadata table and exposes database lifec
     $ moose-inventory db migrate
     Database schema is at version 3.
 
-`db migrate` is currently a lightweight schema bootstrap/metadata command.  It creates any missing known tables and records the current schema version.  Future release migrations should extend this path instead of hiding schema changes inside unrelated commands.
+`db migrate` is currently a lightweight schema bootstrap/metadata command.  It creates any missing known tables and records the current schema version.  Future release migrations should extend this path instead of hiding schema changes inside unrelated commands.  Moose Inventory refuses to open or migrate a database whose recorded schema version is newer than the tool supports; upgrade the tool instead of letting old code write to a future schema.  `db doctor` reports missing known tables in a dirty or partially migrated database.
 
 SQLite users can create a direct database-file backup:
 

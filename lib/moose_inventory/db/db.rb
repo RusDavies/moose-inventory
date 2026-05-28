@@ -125,6 +125,7 @@ module Moose
 
         Sequel::Model.plugin :json_serializer
         connect
+        reject_future_schema!
         create_tables
         ensure_schema_version!
         bind_models!
@@ -227,6 +228,7 @@ module Moose
       end
 
       def self.migrate!
+        reject_future_schema!
         create_tables
         ensure_schema_version!
         status
@@ -253,11 +255,22 @@ module Moose
       def self.ensure_schema_version!
         return unless @db.table_exists?(:schema_info)
 
+        reject_future_schema!
         if @db[:schema_info].empty?
           @db[:schema_info].insert(version: SCHEMA_VERSION)
         elsif schema_version != SCHEMA_VERSION
           @db[:schema_info].update(version: SCHEMA_VERSION)
         end
+      end
+
+      def self.reject_future_schema!
+        return unless @db.table_exists?(:schema_info)
+
+        current_version = schema_version
+        return if current_version.nil? || current_version <= SCHEMA_VERSION
+
+        raise @exceptions[:moose], "Database schema version #{current_version} is newer than supported version " \
+                                   "#{SCHEMA_VERSION}. Upgrade moose-inventory before using this database."
       end
 
       def self.sqlite_adapter?
