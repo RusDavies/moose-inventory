@@ -68,6 +68,7 @@ bundle exec rubocop \
   spec/lib/moose_inventory/operations/group_child_relations_spec.rb \
   spec/lib/moose_inventory/operations/remove_groups_spec.rb \
   spec/lib/moose_inventory/operations/add_variables_spec.rb \
+  spec/lib/moose_inventory/operations/operation_event_support_spec.rb \
   spec/lib/moose_inventory/operations/remove_variables_spec.rb \
   spec/lib/moose_inventory/operations/remove_hosts_spec.rb \
   spec/lib/moose_inventory/operations/query_inventory_spec.rb \
