@@ -113,20 +113,11 @@ RSpec.describe 'Moose::Inventory::DB' do
     def create_fixture_table(db, table)
       return if db.table_exists?(table)
 
-      case table
-      when :hosts, :groups, :tags
-        db.create_table(table) do
-          primary_key :id
-          column :name, :text
-        end
-      when :schema_info
-        db.create_table(:schema_info) do
-          primary_key :id
-          column :version, :integer, null: false
-        end
-      else
-        raise "Unsupported fixture table #{table}"
-      end
+      @db::TABLE_DEFINITIONS.fetch(table).call(db)
+    end
+
+    def fixture_tables_through(version)
+      @db::SCHEMA_MIGRATIONS.values_at(*(1..version)).flatten
     end
 
     def expect_current_schema_after_init
@@ -146,12 +137,82 @@ RSpec.describe 'Moose::Inventory::DB' do
         expect(@db).to receive(:apply_schema_migration!).ordered.with(1).and_call_original
         expect(@db).to receive(:apply_schema_migration!).ordered.with(2).and_call_original
         expect(@db).to receive(:apply_schema_migration!).ordered.with(3).and_call_original
+        expect(@db).to receive(:apply_schema_migration!).ordered.with(4).and_call_original
 
         @db.migrate_schema!
 
         expect(@db.schema_version).to eq(@db::SCHEMA_VERSION)
         expect(@db.status[:tables][:audit_events]).to eq(true)
         expect(@db.status[:tables][:tags]).to eq(true)
+      end
+    end
+
+    it 'creates unique and lookup indexes in schema version 4' do
+      expected = {
+        hostvars: :idx_hostvars_host_id_name,
+        groupvars: :idx_groupvars_group_id_name,
+        groups_hosts: :idx_groups_hosts_host_id_group_id,
+        groups_groups: :idx_groups_groups_parent_id_child_id,
+        hosts_tags: :idx_hosts_tags_host_id_tag_id,
+        groups_tags: :idx_groups_tags_group_id_tag_id
+      }
+
+      expected.each do |table, index_name|
+        expect(@db.db.indexes(table)).to include(index_name)
+        expect(@db.db.indexes(table).fetch(index_name)[:unique]).to eq(true)
+      end
+    end
+
+    it 'enforces unique host variable names per host' do
+      @db.reset
+      host = @db.models[:host].create(name: 'indexed-host')
+      @db.db[:hostvars].insert(host_id: host.id, name: 'env', value: 'prod')
+
+      expect do
+        @db.db[:hostvars].insert(host_id: host.id, name: 'env', value: 'prod')
+      end.to raise_error(Sequel::UniqueConstraintViolation)
+    end
+
+    it 'enforces unique host-group associations' do
+      @db.reset
+      host = @db.models[:host].create(name: 'indexed-host')
+      group = @db.models[:group].create(name: 'indexed-group')
+      @db.db[:groups_hosts].insert(host_id: host.id, group_id: group.id)
+
+      expect do
+        @db.db[:groups_hosts].insert(host_id: host.id, group_id: group.id)
+      end.to raise_error(Sequel::UniqueConstraintViolation)
+    end
+
+    it 'removes duplicate rows with identical values before adding unique indexes' do
+      with_sqlite_fixture(schema_version: 3, tables: fixture_tables_through(3)) do
+        @db.init_sqlite3
+        host_id = @db.db[:hosts].insert(name: 'dup-host')
+        group_id = @db.db[:groups].insert(name: 'dup-group')
+        @db.db[:hostvars].insert(host_id: host_id, name: 'env', value: 'prod')
+        @db.db[:hostvars].insert(host_id: host_id, name: 'env', value: 'prod')
+        @db.db[:groups_hosts].insert(host_id: host_id, group_id: group_id)
+        @db.db[:groups_hosts].insert(host_id: host_id, group_id: group_id)
+
+        @db.migrate_schema!
+
+        expect(@db.schema_version).to eq(@db::SCHEMA_VERSION)
+        expect(@db.db[:hostvars].where(host_id: host_id, name: 'env').count).to eq(1)
+        expect(@db.db[:groups_hosts].where(host_id: host_id, group_id: group_id).count).to eq(1)
+      end
+    end
+
+    it 'refuses index migration when duplicate variable rows have conflicting values' do
+      with_sqlite_fixture(schema_version: 3, tables: fixture_tables_through(3)) do
+        @db.init_sqlite3
+        host_id = @db.db[:hosts].insert(name: 'conflict-host')
+        @db.db[:hostvars].insert(host_id: host_id, name: 'env', value: 'prod')
+        @db.db[:hostvars].insert(host_id: host_id, name: 'env', value: 'dev')
+
+        expect { @db.migrate_schema! }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /conflicting duplicates/
+        )
       end
     end
 
@@ -199,15 +260,14 @@ RSpec.describe 'Moose::Inventory::DB' do
       end
     end
 
-    it 'reports dirty partial schemas without changing the recorded schema version' do
+    it 'repairs dirty partial schemas during startup without changing the final schema version' do
       with_sqlite_fixture(schema_version: @db::SCHEMA_VERSION, tables: %i[hosts groups schema_info]) do
         @db.init
-        @db.db.drop_table(:audit_events)
 
         status = @db.status
 
         expect(status[:schema_version]).to eq(@db::SCHEMA_VERSION)
-        expect(status[:tables][:audit_events]).to eq(false)
+        expect(status[:tables].values).to all(eq(true))
       end
     end
   end

@@ -296,8 +296,8 @@ Moose Inventory records a small schema metadata table and exposes database lifec
 
     $ moose-inventory db status
     Adapter: sqlite3
-    Schema version: 3
-    Expected schema version: 3
+    Schema version: 4
+    Expected schema version: 4
     SQLite file: /home/russ/.moose/db/dev.db
     Tables:
     - hosts: present
@@ -308,9 +308,9 @@ Moose Inventory records a small schema metadata table and exposes database lifec
     Database doctor found no issues.
 
     $ moose-inventory db migrate
-    Database schema is at version 3.
+    Database schema is at version 4.
 
-`db migrate` runs explicit ordered schema migrations up to the current schema version.  The current migration chain is `1 -> 2 -> 3`: version 1 creates the core inventory tables and schema metadata, version 2 adds audit history, and version 3 adds tag metadata.  Moose Inventory refuses to open or migrate a database whose recorded schema version is newer than the tool supports; upgrade the tool instead of letting old code write to a future schema.  `db doctor` reports missing known tables in a dirty or partially migrated database.
+`db migrate` runs explicit ordered schema migrations up to the current schema version.  The current migration chain is `1 -> 2 -> 3 -> 4`: version 1 creates the core inventory tables and schema metadata, version 2 adds audit history, version 3 adds tag metadata, and version 4 adds DB-level uniqueness and lookup indexes for variables, host/group relationships, group-child relationships, and tag joins.  Moose Inventory refuses to open or migrate a database whose recorded schema version is newer than the tool supports; upgrade the tool instead of letting old code write to a future schema.  `db doctor` reports missing known tables in a dirty or partially migrated database.
 
 SQLite users can create a direct database-file backup:
 
