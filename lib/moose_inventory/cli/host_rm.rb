@@ -15,10 +15,11 @@ module Moose
         #==========================
         desc 'rm HOSTNAME_1 [HOSTNAME_2 ...]',
              'Remove hosts HOSTNAME_n from the inventory'
+        option :dry_run, type: :boolean
         def rm(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
 
-          result = remove_hosts_operation.call(names: normalize_names(argv))
+          result = remove_hosts_operation.call(names: normalize_names(argv), dry_run: options[:dry_run])
           render_remove_hosts_events(result.events)
           print_warning_summary(result)
         end
@@ -41,7 +42,9 @@ module Moose
           return fmt.puts(payload[:indent], '- No such host, skipping.') if event.type == :missing_skipping
           return fmt.puts(payload[:indent], '- OK') if event.type == :ok
 
-          fmt.puts 2, '- All OK' if event.type == :host_complete
+          return fmt.puts 2, '- All OK' if event.type == :host_complete
+
+          puts 'Dry run complete. No changes applied.' if event.type == :dry_run_summary
         end
 
         def host_rm_progress_event?(type)

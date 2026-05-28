@@ -20,8 +20,18 @@ module Moose
           @context = context
         end
 
-        def call(names:, groups:)
+        def call(names:, groups:, dry_run: false)
           events = []
+          @dry_run = dry_run
+
+          if dry_run
+            names.each do |name|
+              add_host(name, groups, events)
+            end
+            emit(events, :dry_run_summary)
+            return operation_result(events: events)
+          end
+
           context.transaction do
             names.each do |name|
               add_host(name, groups, events)
@@ -32,7 +42,7 @@ module Moose
 
         private
 
-        attr_reader :context
+        attr_reader :context, :dry_run
 
         def add_host(name, groups, events)
           emit(events, :host_started, name: name)
@@ -42,7 +52,7 @@ module Moose
             add_group_association(host, name, group_name, groups_dataset, events)
           end
 
-          add_automatic_group_if_needed(host, name, events)
+          add_automatic_group_if_needed(host, name, groups, groups_dataset, events)
           emit(events, :host_complete)
         end
 
@@ -52,7 +62,7 @@ module Moose
           groups_dataset = nil
 
           if host.nil?
-            host = context.create_host(name)
+            host = context.create_host(name) unless dry_run
           else
             emit(events, :host_exists, name: name)
             groups_dataset = host.groups_dataset
@@ -70,7 +80,7 @@ module Moose
 
           if association_exists?(groups_dataset, group_name)
             emit(events, :association_exists, host: host_name, group: group_name)
-          else
+          elsif !dry_run
             host.add_group(group)
           end
 
@@ -82,16 +92,22 @@ module Moose
           return group unless group.nil?
 
           emit(events, :group_missing_created, name: name)
-          context.create_group(name)
+          context.create_group(name) unless dry_run
         end
 
-        def add_automatic_group_if_needed(host, host_name, events)
-          groups_dataset = host.groups_dataset
-          return if groups_dataset.nil? || groups_dataset.any?
+        def add_automatic_group_if_needed(host, host_name, requested_groups, groups_dataset, events)
+          return unless automatic_group_needed?(host, requested_groups, groups_dataset)
 
           emit(events, :adding_automatic_group, host: host_name, group: AUTOMATIC_GROUP)
-          host.add_group(automatic_group)
+          host.add_group(automatic_group) unless dry_run
           emit(events, :ok, indent: 4)
+        end
+
+        def automatic_group_needed?(host, requested_groups, groups_dataset)
+          return requested_groups.empty? && (host.nil? || groups_dataset.nil? || groups_dataset.none?) if dry_run
+
+          groups_dataset = host.groups_dataset
+          !groups_dataset.nil? && groups_dataset.none?
         end
 
         def automatic_group
