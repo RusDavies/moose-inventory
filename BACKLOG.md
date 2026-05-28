@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 10 done / 1 open.
+Feature value status counts: 11 done / 0 open.
 
 ## Open
-
-1. Add a human-friendly interactive shell or TUI.
-   - Provide a `console`, `shell`, or small TUI for browsing hosts, groups, variables, and relationships.
-   - Start read-mostly, then consider safe guided edits after core commands are mature.
-   - Keep it optional so the CLI remains clean and scriptable.
 
 1. Add CI/CD integration examples.
    - Provide GitHub Actions examples for validating inventory snapshots, running `inventory doctor`, and producing Ansible-compatible artifacts.
@@ -15,6 +10,12 @@ Feature value status counts: 10 done / 1 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add a human-friendly interactive shell or TUI.
+   - Added `console`, a small read-only interactive browsing shell.
+   - Console commands include `help`, `hosts`, `groups`, `host NAME`, `group NAME`, `tags host NAME`, `tags group NAME`, `audit [LIMIT]`, and `quit`/`exit`.
+   - The console intentionally avoids mutation in this slice; future guided edits should preserve confirmation, dry-run, and audit semantics.
+   - Documented console behavior in README.md.
 
 1. Add query/filter support for inventory listing.
    - Added `host list --group`, `host list --tag`, and `host list --var key=value` filters.
