@@ -17,7 +17,9 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 
 ## Pending approvals
 
-_No pending approvals recorded._
+| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| GOV-ARCH-001 | Approve, revise, or reject `docs/architecture/architecture-and-digital-estate.md` as the architecture, trust-boundary, and digital-estate baseline | Pending | TBD | TBD | Architecture, trust boundaries, and digital estate for Moose Inventory | Draft prepared after CLI UX approval; document existence is not approval. |
 
 ## Approval rules
 
