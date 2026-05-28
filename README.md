@@ -1,11 +1,11 @@
 # moose-inventory
 
-The [moose-inventory](https://github.com/RusDavies/moose-inventory) software is a tool for managing dynamic inventories, intended for use with [Ansible](http://www.ansible.com/home). 
+The [moose-inventory](https://github.com/RusDavies/moose-inventory) software is a tool for managing dynamic inventories, intended for use with [Ansible](http://www.ansible.com/home).
 
 Note 1: For many, the really interesting part of this tool will be it's ability to write to the inventory database from within Ansible, as described at the end of this document.  If that's what tickles your fancy, then I encourage you to get a sense of the capability by [jumping to that section first](https://github.com/RusDavies/moose-inventory#writing-to-the-dynamic-inventory-from-ansible). ;o)
 
 
-Note 2: This software is intended for use on UNIX/Linux systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry. 
+Note 2: This software is intended for use on UNIX/Linux systems.  It will likely not work on Windows, due to some hard-wired search paths - I may fix that in the future but, for now, sorry.
 
 ## Installation
 
@@ -25,11 +25,11 @@ gem 'moose-inventory'
 
 
 ## Configuration
-The [moose-inventory](https://github.com/RusDavies/moose-inventory) tool makes use of a simple YAML configuration file.  
+The [moose-inventory](https://github.com/RusDavies/moose-inventory) tool makes use of a simple YAML configuration file.
 
 
 ###File Location
- 
+
 The following locations, in descending order of precedence, are  searched for a configuration file:
 
  1. location passed via the `--config` option
@@ -39,13 +39,13 @@ The following locations, in descending order of precedence, are  searched for a 
  6. /etc/moose-tools/inventory/config
 
 ###Format
-The file consists of a mandatory *general* section, and at least one *environment* section. For example: 
+The file consists of a mandatory *general* section, and at least one *environment* section. For example:
 ```yaml
 ---
 general:
   defaultenv: moose_dev
 
-moose_dev: 
+moose_dev:
   db:
     adapter: "sqlite3"
     file:    "~/.moose/db/dev.db"
@@ -69,12 +69,12 @@ another_example_section:
 ```
 
 ###The *general* section
-The general section is mandatory, and contains a single parameter **defaultenv**, which points to the name of the default environment section.   
+The general section is mandatory, and contains a single parameter **defaultenv**, which points to the name of the default environment section.
 
 ###Environment sections
 You may add as many environment sections as you desire. The intention is to enable the user to easily manage multiple environments, such as development, staging, production, etc., via a single configuration file.  The name of each environment section must be unique, but can otherwise be any valid YAML tag.
 
-At present,  each environment section contains only a **db** subsection, describing database connection parameters.  Additional subsections may be added in the future, as functionality increases. 
+At present,  each environment section contains only a **db** subsection, describing database connection parameters.  Additional subsections may be added in the future, as functionality increases.
 
 Each **db** section must include an **adapter** parameter. Currently supported adapter types are *sqlite3*, *mysql*, and *postgresql*. The test suite exercises SQLite with a local database file and includes adapter dispatch/error-path smoke coverage for MySQL and PostgreSQL without requiring live database servers.
 
@@ -103,14 +103,14 @@ The tool itself provides a convenient help feature.  For example, try each of th
 #### Option `--config <FILE>`
 The `--config` flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to search the locations previously mentioned.
 
-For example, 
+For example,
 
     $ moose-inventory --config ./mystuff.conf host list
 
 #### Option `--env <SECTION>`
-The *--env* flag sets the section in the configuration file to be used as the environment configuration.  If set, then the section must exist.  If not set, then what ever default is provided by the **defaultenv** parameter will be used. 
+The *--env* flag sets the section in the configuration file to be used as the environment configuration.  If set, then the section must exist.  If not set, then what ever default is provided by the **defaultenv** parameter will be used.
 
-For example, 
+For example,
 
     $ moose-inventory --env my_section host list
 
@@ -126,7 +126,7 @@ For example,
         - ungrouped
 
 ###Transactional Behaviour
-The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.  
+The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.
 
 ###Dry-run and plan output
 Mutating commands support a `--dry-run` option.  This renders the same kind of progress output as the real command, but does not write anything to the database.  This is useful when checking inventory surgery before applying it, particularly for operations that affect automatic `ungrouped` associations or child-group cleanup.
@@ -247,9 +247,9 @@ For automation, use `--format yaml`, `--format json`, or `--format pjson` on the
 Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
 
 ###Walk-through example
-This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.  
+This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.
 
-We start by creating three hosts, in this case named *host1*,  *host2*, and *host3*.  Note, we can add as many hosts as we desire via this single command.  Also, although we have used short names here, we could equally have used fully qualified names. 
+We start by creating three hosts, in this case named *host1*,  *host2*, and *host3*.  Note, we can add as many hosts as we desire via this single command.  Also, although we have used short names here, we could equally have used fully qualified names.
 
     $ moose-inventory add host host1 host2 host3
     Add host 'host1':
@@ -272,7 +272,7 @@ We start by creating three hosts, in this case named *host1*,  *host2*, and *hos
       - all OK
     Succeeded.
 
-Notice that each host is initially associated with an automatic group, *ungrouped*.   
+Notice that each host is initially associated with an automatic group, *ungrouped*.
 
 Now we can list our hosts, to see that they are stored as expected.  In this example, we will request the output be formatted as YAML.  If we didn't specify a format, then it would default to regular JSON.
 
@@ -295,7 +295,7 @@ Now we can list our hosts, to see that they are stored as expected.  In this exa
       }
     }
 
-The *host list* command simply lists all hosts, in the order that they were entered into the database.  We can also get a specific host, or hosts, by name.  In this example, we'll get only *host3* and *host1*, outputting the result in YAML.  
+The *host list* command simply lists all hosts, in the order that they were entered into the database.  We can also get a specific host, or hosts, by name.  In this example, we'll get only *host3* and *host1*, outputting the result in YAML.
 
     $ moose-inventory host get host3 host1 --format yaml
     ---
@@ -318,7 +318,7 @@ Now we'll add some host variables.  Again, we can add as many variables to a hos
         - OK
       - all OK
     Succeeded.
-    
+
     $ moose-inventory host addvar host2 owner=caroline id=54321
     Add variables 'owner=caroline,id=54321' to host 'host2':
       - retrieve host 'host2'...
@@ -352,7 +352,7 @@ Let's list our hosts again, to see what that looks like.
 
 As you can see, the hosts with variables each have a new section, hostvars, in which those variables are listed.  Try also with *--format pjson*.
 
-We can do the same with groups.  In the following example, the output has been omitted for compactness. Nevertheless, you will see that the form of the commands is as for hosts.  Of note, when listing the groups, you will see that the *ungrouped* group is shown.   This is an automatic group which cannot be manipulated manually. 
+We can do the same with groups.  In the following example, the output has been omitted for compactness. Nevertheless, you will see that the form of the commands is as for hosts.  Of note, when listing the groups, you will see that the *ungrouped* group is shown.   This is an automatic group which cannot be manipulated manually.
 
     $ moose-inventory group add group1 group2 group3
     $ moose-inventory group list --format yaml
@@ -362,7 +362,7 @@ We can do the same with groups.  In the following example, the output has been o
 
 At this point, we have three hosts and three groups, some of each with variables.  Let's now associate hosts with groups.  We can either associate one or more hosts with a group,
 
-    $ moose-inventory group addhost group1 host1 host2 
+    $ moose-inventory group addhost group1 host1 host2
     Associate group 'group1' with host(s) 'host1,host2':
       - retrieve group 'group1'...
         - OK
@@ -379,7 +379,7 @@ At this point, we have three hosts and three groups, some of each with variables
 
 or one or more groups with a host,
 
-    $ moose-inventory host addgroup host3 group2 group3 
+    $ moose-inventory host addgroup host3 group2 group3
     Associate host 'host3' with groups 'group2,group3':
       - Retrieve host 'host3'...
         - OK
@@ -447,7 +447,32 @@ By default, deleting a group preserves its child groups as root groups. Use `gro
 
 The *moose-inventory* tool is compliant with the Ansible specifications for [dynamic inventory sources](http://docs.ansible.com/developing_inventory.html).
 
-However, to make use of *moose-inventory's* multiple environment and configuration file options, a shim script should be used as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like the following.  
+The preferred modern integration is the example inventory plugin shipped in `examples/ansible/inventory_plugins/moose_inventory.py`.  Copy or vendor that plugin into your Ansible project, then point `ansible.cfg` at the plugin directory and inventory source file:
+
+```ini
+[defaults]
+inventory = inventory/moose_inventory.yml
+inventory_plugins = inventory_plugins
+```
+
+The inventory source file is plain YAML:
+
+```yaml
+---
+plugin: moose_inventory
+executable: moose-inventory
+config: ./example.conf
+env: dev
+```
+
+With those files in place, Ansible can use Moose Inventory directly:
+
+    $ ansible-inventory -i inventory/moose_inventory.yml --list
+    $ ansible -i inventory/moose_inventory.yml -u ubuntu us-east-1d -m ping
+
+The plugin calls `moose-inventory` for group and host data, preserving Moose Inventory's own configuration file and environment selection instead of hiding them in a shell wrapper.  The shipped `examples/ansible/` directory contains a complete minimal `ansible.cfg`, inventory source, and plugin file.
+
+A legacy external-inventory shim still works, and remains useful on older Ansible installs or when you want the simplest possible integration.  To make use of *moose-inventory's* multiple environment and configuration file options with the shim approach, use a script as the target for the [external inventory script](http://docs.ansible.com/intro_dynamic_inventory.html). A trivial example may look something like the following.
 
 ```shell
 #!/bin/bash
@@ -464,16 +489,16 @@ exit $?
 
     $ ./shim.sh host add example
     $ ./shim.sh host addvar example "my var"="hello world"
-     
 
-When Ansible calls the external inventory script, it passes certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below. 
+
+When Ansible calls the external inventory script, it passes certain parameters, which *moose-inventory* automatically recognises and responds to.  The Ansible parameters, and their equivalent *moose-inventory* parameters are shown below.
 
 Ansible          | moose-inventory
 ---------------- |-------------
-`--list`         | `--ansible group list`    
+`--list`         | `--ansible group list`
 `--host HOSTNAME` | `--ansible host listvars HOSTNAME`
 
-Note, the above conversions are performed automatically within *moose-inventory*. 
+Note, the above conversions are performed automatically within *moose-inventory*.
 
 With *moose-inventory* installed and configured, and a shim script (e.g. *shim.sh*) in place, then integration with Ansible can be acheived via Ansible's `-i <file>` option.
 
@@ -482,18 +507,18 @@ With *moose-inventory* installed and configured, and a shim script (e.g. *shim.s
 Alternatively, if using an [Ansible configuration file](http://docs.ansible.com/intro_configuration.html), then one may set the [inventory](http://docs.ansible.com/intro_configuration.html#inventory) option,
 
     inventory = ./shim.sh
-    
-Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.    
+
+Yet another option is to copy the shim script to */etc/ansible/hosts* and `chmod +x` it.  However, since this would essentially fix the config file and environment used, doing so would defeat the flexibility intended for *moose-inventory*.
 
 #### Writing to the dynamic inventory from Ansible
 A useful aspect of dynamic inventories is the possibility of writing data to the inventory. To persist data from Ansible to the inventory, simply call the shim script via a local_action command, for example:
 
 ```shell
 - set_fact: mydata="Hello world"
-- local_action: command shim.sh host addvar {{ inventory_hostname }} mydata="{{ mydata }}" 
+- local_action: command shim.sh host addvar {{ inventory_hostname }} mydata="{{ mydata }}"
 ```
 
- 
+
 ## Development checks
 
 Run the local verification gate before committing changes:
@@ -520,7 +545,7 @@ That installs `gitleaks` and `osv-scanner` into `tmp/security-tools/bin` unless 
 5. Create a new Pull Request
 
 
-    
+
 
 
 

@@ -1,0 +1,5 @@
+---
+plugin: moose_inventory
+executable: moose-inventory
+config: ./example.conf
+env: dev
