@@ -68,6 +68,50 @@ RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot do
     expect(@db.models[:group].count).to eq(0)
   end
 
+  it 'rejects whitespace-only entity names before writing anything' do
+    snapshot = {
+      version: 1,
+      hosts: { '   ' => { groups: [], vars: {} } },
+      groups: {}
+    }
+
+    expect do
+      operation.call(snapshot: snapshot)
+    end.to raise_error(Moose::Inventory::DB.exceptions[:moose], /host name cannot be empty/)
+
+    expect(@db.models[:host].count).to eq(0)
+  end
+
+  it 'rejects duplicate normalized keys before applying the snapshot' do
+    snapshot = {
+      'version' => 1,
+      :version => 1,
+      hosts: {},
+      groups: {}
+    }
+
+    expect do
+      operation.call(snapshot: snapshot)
+    end.to raise_error(Moose::Inventory::DB.exceptions[:moose], /duplicate normalized key 'version'/)
+
+    expect(@db.models[:host].count).to eq(0)
+    expect(@db.models[:group].count).to eq(0)
+  end
+
+  it 'rejects whitespace-only variable names before writing anything' do
+    snapshot = {
+      version: 1,
+      hosts: { web01: { groups: [], vars: { '   ' => 'prod' } } },
+      groups: {}
+    }
+
+    expect do
+      operation.call(snapshot: snapshot)
+    end.to raise_error(Moose::Inventory::DB.exceptions[:moose], /variable name cannot be empty/)
+
+    expect(@db.models[:host].count).to eq(0)
+  end
+
   it 'rejects circular group hierarchies before writing anything' do
     snapshot = {
       version: 1,
