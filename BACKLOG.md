@@ -259,19 +259,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 64 done / 2 open.
+Code quality status counts: 65 done / 1 open.
 
 ## Open
 
-1. Split `Host#render_add_hosts_event` into smaller rendering helpers.
-   - The method still carries a scoped `Metrics/CyclomaticComplexity` disable because all add-host event rendering lives in one case statement.
-   - Break the dispatch into small private helpers or a simple event-handler map without changing output strings.
-
-2. Add focused specs for `OperationEventSupport` result defaults and event construction.
+1. Add focused specs for `OperationEventSupport` result defaults and event construction.
    - The helper is covered through operation integration specs, but its default `warning_count: 0` behavior is important because CLI summary code calls `zero?`.
    - Add direct unit coverage to lock the default result/event contract before future operation refactors lean on it further.
 
 ## Done
+
+1. Split `Host#render_add_hosts_event` into smaller rendering helpers.
+   - Replaced the single complex case statement with an event-to-renderer dispatch table and small private rendering methods.
+   - Removed the scoped `Metrics/CyclomaticComplexity` disable while preserving existing add-host output strings.
 
 1. Extract shared Ansible single-target `listvars` argument handling.
    - Added `ListvarsSupport` for shared listvars argument validation and Ansible missing-entity warnings.
