@@ -71,6 +71,51 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     # --------------------
+    it 'GROUP --dry-run should show planned group creation without writing to the db' do
+      name = 'dry-run-group'
+
+      actual = runner { @app.start(%W[group add #{name} --dry-run]) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Add group '#{name}':\n  " \
+        "- create group...\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
+        "Dry run complete. No changes applied.\n" \
+        "Succeeded\n"
+
+      expected(actual, desired)
+      expect(@db.models[:group].find(name: name)).to be_nil
+    end
+
+    # --------------------
+    it 'GROUP --hosts HOST --dry-run should not create the group or missing host' do
+      group_name = 'dry-run-group'
+      host_name = 'dry-run-host'
+
+      actual = runner { @app.start(%W[group add #{group_name} --hosts #{host_name} --dry-run]) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Add group '#{group_name}':\n  " \
+        "- create group...\n    " \
+        "- OK\n  " \
+        "- add association {group:#{group_name} <-> host:#{host_name}}...\n    " \
+        "- host doesn't exist, creating now...\n      " \
+        "- OK\n    " \
+        "- OK\n  " \
+        "- all OK\n" \
+        "Dry run complete. No changes applied.\n" \
+        "Succeeded, with warnings.\n"
+      desired[:STDERR] =
+        "WARNING: Host '#{host_name}' doesn't exist, but will be created.\n"
+
+      expected(actual, desired)
+      expect(@db.models[:group].find(name: group_name)).to be_nil
+      expect(@db.models[:host].find(name: host_name)).to be_nil
+    end
+    # --------------------
     it 'GROUP ... should skip GROUP creation if it already exists' do
       name = 'test-group'
       @db.models[:group].create(name: name)

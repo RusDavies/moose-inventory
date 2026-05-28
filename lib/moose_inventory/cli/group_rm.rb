@@ -16,6 +16,7 @@ module Moose
                type: :boolean,
                default: false,
                desc: 'Also delete child groups that become orphaned'
+        option :dry_run, type: :boolean
         desc 'rm NAME',
              'Remove a group NAME from the inventory'
         def rm(*argv)
@@ -38,7 +39,7 @@ module Moose
           operation = build_operation(Moose::Inventory::Operations::RemoveGroups)
 
           db.transaction do
-            result = operation.call(names: names, recursive: options[:recursive])
+            result = operation.call(names: names, recursive: options[:recursive], dry_run: options[:dry_run])
             render_group_rm_events(result.events)
             return result
           end
@@ -53,6 +54,7 @@ module Moose
 
           render_group_rm_warning(payload) if event.type == :group_missing
           return render_group_rm_progress(event.type, payload) if group_rm_progress?(event.type)
+          return puts 'Dry run complete. No changes applied.' if event.type == :dry_run_summary
 
           render_group_rm_status(event.type, payload)
         end

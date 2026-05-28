@@ -98,6 +98,45 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #---------------
+    it 'GROUP --dry-run should show planned removal without deleting the group' do
+      group_name = 'test1'
+      @db.models[:group].create(name: group_name)
+
+      actual = runner { @app.start(%W[group rm #{group_name} --dry-run]) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Remove group '#{group_name}':\n  " \
+        "- Retrieve group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- Destroy group '#{group_name}'...\n    " \
+        "- OK\n  " \
+        "- All OK\n" \
+        "Dry run complete. No changes applied.\n" \
+        "Succeeded.\n"
+
+      expected(actual, desired)
+      expect(@db.models[:group].find(name: group_name)).not_to be_nil
+    end
+
+    #---------------
+    it 'GROUP --recursive --dry-run should show recursive cleanup without deleting groups' do
+      runner { @app.start(%w[group add parent]) }
+      runner { @app.start(%w[group add child --hosts child-host]) }
+      runner { @app.start(%w[group addchild parent child]) }
+
+      actual = runner { @app.start(%w[group rm --recursive parent --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include("- Recursively delete orphaned group 'child'...\n")
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      expect(@db.models[:group].find(name: 'parent')).not_to be_nil
+      expect(@db.models[:group].find(name: 'child')).not_to be_nil
+      host = @db.models[:host].find(name: 'child-host')
+      expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+    end
+    #---------------
     it "GROUP ... should handle the automatic 'ungrouped' group for associated hosts" do
       host_name = 'test-host1'
       group_name = 'test-group1'

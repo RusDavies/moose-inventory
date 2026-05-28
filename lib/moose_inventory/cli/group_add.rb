@@ -14,6 +14,7 @@ module Moose
         #==========================
         desc 'add NAME', 'Add a group NAME to the inventory'
         option :hosts
+        option :dry_run, type: :boolean
         def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
 
@@ -26,7 +27,7 @@ module Moose
           )
 
           result = build_operation(Moose::Inventory::Operations::AddGroups)
-                   .call(names: names, hosts: hosts)
+                   .call(names: names, hosts: hosts, dry_run: options[:dry_run])
           render_add_groups_events(result.events)
           print_warning_summary(result, success_message: 'Succeeded')
         end
@@ -42,6 +43,7 @@ module Moose
 
           return render_add_groups_event_puts(event.type, payload) if puts_event?(event.type)
           return render_add_groups_event_warn(event.type, payload) if warn_event?(event.type)
+          return puts 'Dry run complete. No changes applied.' if event.type == :dry_run_summary
 
           render_add_groups_event_fmt(event.type, payload)
         end

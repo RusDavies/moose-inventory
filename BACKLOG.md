@@ -8,8 +8,8 @@ Feature value status counts: 0 done / 10 open.
    - Add a `--dry-run` flag and/or `plan` command for mutating operations.
    - Show the exact hosts, groups, variables, child relationships, and automatic `ungrouped` changes that would be applied.
    - Keep planned operations transactional and side-effect-free so operators can review inventory surgery before trusting the monkey with the scalpel.
-   - Progress: added the first CLI/operation slice for `host add --dry-run` and `host rm --dry-run`; dry-run output preserves the existing command progress shape, adds a no-changes-applied summary, and focused specs prove host/group rows are not created or deleted.
-   - Remaining dry-run expansion TODOs: extend the same safety model across `group add`/`group rm`, host/group association commands, child-group relation commands, and host/group variable mutations; then consider a dedicated `plan` command or machine-readable plan output.
+   - Progress: added CLI/operation dry-run slices for `host add --dry-run`, `host rm --dry-run`, `group add --dry-run`, and `group rm --dry-run`; dry-run output preserves the existing command progress shape, adds a no-changes-applied summary, and focused specs prove planned host/group rows and recursive cleanup paths do not create, delete, or reassociate records.
+   - Remaining dry-run expansion TODOs: extend the same safety model across host/group association commands, child-group relation commands, and host/group variable mutations; then consider a dedicated `plan` command or machine-readable plan output.
 
 1. [HIGH] Add bulk import/export with validation.
    - Support importing inventory definitions from YAML/JSON and applying them transactionally.
