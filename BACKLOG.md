@@ -259,13 +259,9 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 58 done / 4 open.
+Code quality status counts: 59 done / 3 open.
 
 ## Open
-
-1. Audit the `host rm` Moose-exception rescue branch.
-   - Fresh coverage review shows the only remaining uncovered production line is the `host rm` rescue/abort path in `lib/moose_inventory/cli/host_rm.rb`.
-   - Determine whether it is reachable now that DB transaction handling aborts Moose exceptions centrally; either remove the dead rescue or add focused coverage if it is intentionally defensive.
 
 1. Resolve the missing-parent behavior question for `group addchild`.
    - `spec/lib/moose_inventory/cli/group_addchild_spec.rb` still asks whether missing parent groups should be created instead of aborting, unlike some host/group association flows that create missing counterpart entities.
@@ -280,6 +276,10 @@ Code quality status counts: 58 done / 4 open.
    - A bounded helper, similar in spirit to the variable-operation support extraction, would reduce duplication without touching CLI output rendering.
 
 ## Done
+
+1. Audit the `host rm` Moose-exception rescue branch.
+   - Confirmed the branch was stale defensive code; `RemoveHosts` does not raise Moose DB exceptions directly and DB transaction handling owns Moose-exception rollback/abort behavior centrally.
+   - Removed the unreachable command-level rescue so `host_rm.rb` no longer carries an untestable abort path.
 
 1. Clean the duplicated `## Open` heading drift in `BACKLOG.md`.
    - Reconciled the code-quality backlog open section now that it has no remaining active items.
