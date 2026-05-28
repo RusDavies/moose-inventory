@@ -18,10 +18,11 @@ module Moose
           )
         end
 
-        def add_children(parent_group:, parent_name:, child_names:)
+        def add_children(parent_group:, parent_name:, child_names:, dry_run: false)
           events = []
           warning_count = 0
           children_dataset = parent_group.children_dataset
+          @dry_run = dry_run
 
           child_names.each do |child_name|
             next if child_name.nil? || child_name.empty?
@@ -29,13 +30,17 @@ module Moose
             warning_count += add_child(parent_group, parent_name, child_name, children_dataset, events)
           end
 
+          emit(events, :dry_run_summary) if dry_run
+
           operation_result(events: events, warning_count: warning_count)
         end
 
-        def remove_children(parent_group:, parent_name:, child_names:, delete_orphans: false)
+        def remove_children(parent_group:, parent_name:, child_names:, delete_orphans: false, dry_run: false)
           events = []
           warning_count = 0
           children_dataset = parent_group.children_dataset
+          @dry_run = dry_run
+          cleanup.dry_run = dry_run
 
           child_names.each do |child_name|
             next if child_name.nil? || child_name.empty?
@@ -47,17 +52,20 @@ module Moose
                 child_name: child_name,
                 children_dataset: children_dataset,
                 events: events,
-                delete_orphans: delete_orphans
+                delete_orphans: delete_orphans,
+                dry_run: dry_run
               }
             )
           end
+
+          emit(events, :dry_run_summary) if dry_run
 
           operation_result(events: events, warning_count: warning_count)
         end
 
         private
 
-        attr_reader :cleanup, :context
+        attr_reader :cleanup, :context, :dry_run
 
         def add_child(parent_group, parent_name, child_name, children_dataset, events)
           emit(events, :adding_child_association, parent: parent_name, child: child_name)
@@ -74,12 +82,12 @@ module Moose
           if child_group.nil?
             emit(events, :child_group_missing, name: child_name)
             emit(events, :child_group_creating_now, name: child_name)
-            child_group = context.create_group(child_name)
+            child_group = context.create_group(child_name) unless dry_run
             emit(events, :ok, indent: 6)
             warning_count = 1
           end
 
-          parent_group.add_child(child_group)
+          parent_group.add_child(child_group) unless dry_run
           emit(events, :ok, indent: 4)
           warning_count
         end
@@ -100,9 +108,11 @@ module Moose
           end
 
           child_group = context.find_group(input[:child_name])
-          input[:parent_group].remove_child(child_group)
+          input[:parent_group].remove_child(child_group) unless input[:dry_run]
           emit(input[:events], :ok, indent: 4)
-          cleanup.delete_orphaned_group(child_group, input[:events]) if input[:delete_orphans]
+          if input[:delete_orphans]
+            cleanup.delete_orphaned_group(child_group, input[:events], ignored_parent: input[:parent_group])
+          end
           0
         end
 

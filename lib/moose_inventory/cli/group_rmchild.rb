@@ -19,6 +19,7 @@ module Moose
                desc: 'Delete child groups that become orphaned'
         desc 'rmchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Dissociate one or more child-groups CHILDGROUP_n from PARENTGROUP'
+        option :dry_run, type: :boolean
         def rmchild(*argv)
           abort_if_missing_args(argv, 2, '2 or more')
 
@@ -44,7 +45,8 @@ module Moose
               parent_group: parent_group,
               parent_name: parent_name,
               child_names: child_names,
-              delete_orphans: options[:delete_orphans]
+              delete_orphans: options[:delete_orphans],
+              dry_run: options[:dry_run]
             )
             render_rmchild_events(result.events)
             result
