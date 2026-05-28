@@ -1,13 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 5 done / 6 open.
+Process conformance status counts: 6 done / 5 open.
 
 ## Open
-
-1. Review and approve, revise, or reject the draft requirements and acceptance criteria baseline.
-   - Draft is in `docs/product/requirements-baseline.md`.
-   - Pending approval is recorded as `GOV-REQ-001` in `docs/governance/approval-register.md`.
-   - Do not treat the draft as approved requirements until a human approver records a durable decision.
 
 1. Add lightweight CLI UX/workflow notes.
    - Cover core workflows, destructive operations, dry-run/trust behavior, machine-readable output, error states, accessibility/readability expectations, and UX approval status.
@@ -27,6 +22,11 @@ Process conformance status counts: 5 done / 6 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Review and approve, revise, or reject the draft requirements and acceptance criteria baseline.
+   - Russ approved `docs/product/requirements-baseline.md` as the requirements and acceptance criteria baseline on 2026-05-28.
+   - Recorded approval as `GOV-REQ-001` in `docs/governance/approval-register.md`.
+   - Approval covers the requirements baseline only; CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, and open requirements questions still require separate decisions where applicable.
 
 1. Create requirements and acceptance criteria baseline.
    - Added `docs/product/requirements-baseline.md` as a draft requirements and acceptance criteria baseline.
