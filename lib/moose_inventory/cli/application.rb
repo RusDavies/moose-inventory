@@ -9,10 +9,11 @@ require_relative '../config/config'
 require_relative '../operations/import_inventory_snapshot'
 require_relative '../operations/inventory_doctor'
 require_relative '../operations/inventory_snapshot'
-require_relative 'db'
 require_relative 'formatter'
-require_relative 'group'
 require_relative 'helpers'
+require_relative 'audit'
+require_relative 'db'
+require_relative 'group'
 require_relative 'host'
 
 module Moose
@@ -53,6 +54,8 @@ module Moose
         def import(file)
           snapshot = YAML.safe_load_file(file, aliases: false)
           result = build_operation(Moose::Inventory::Operations::ImportInventorySnapshot).call(snapshot: snapshot)
+          record_audit({ command: 'import', action: 'import', entity_type: 'inventory',
+                         entity_names: file }, result: result)
           puts "Imported inventory snapshot from #{file}."
           puts "Created hosts: #{result.created_hosts}"
           puts "Created groups: #{result.created_groups}"
@@ -65,6 +68,9 @@ module Moose
         end
 
         map 'db' => :database
+        desc 'audit ACTION', 'Inspect append-only inventory change history'
+        subcommand 'audit', Moose::Inventory::Cli::Audit
+
         desc 'database ACTION', 'Inspect and manage database lifecycle state'
         subcommand 'database', Moose::Inventory::Cli::Db
 

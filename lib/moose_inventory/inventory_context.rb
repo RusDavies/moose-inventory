@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'time'
+
 module Moose
   module Inventory
     ##
@@ -56,6 +58,22 @@ module Moose
 
       def all_groups
         db.models[:group].all
+      end
+
+      def record_audit_event(attributes)
+        db.models[:audit_event].create(
+          created_at: Time.now.utc.iso8601,
+          actor: attributes[:actor],
+          command: attributes.fetch(:command),
+          action: attributes.fetch(:action),
+          entity_type: attributes[:entity_type],
+          entity_name: attributes[:entity_name],
+          details: attributes[:details]
+        )
+      end
+
+      def audit_events(limit: 20)
+        db.models[:audit_event].reverse_order(:id).limit(limit).all
       end
 
       def moose_exception_class

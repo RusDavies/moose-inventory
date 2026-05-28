@@ -32,6 +32,8 @@ module Moose
                    .call(names: names, hosts: hosts, dry_run: options[:dry_run])
           return if machine_plan_output_rendered?(result, command: 'group add')
 
+          record_audit({ command: 'group add', action: 'add', entity_type: 'group',
+                         entity_names: names }, result: result, dry_run: options[:dry_run])
           render_add_groups_events(result.events)
           print_warning_summary(result, success_message: 'Succeeded')
         end

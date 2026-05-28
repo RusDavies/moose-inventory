@@ -31,7 +31,11 @@ module Moose
           abort_if_automatic_group([pname] + cnames)
 
           result = remove_children_from_group(pname, cnames)
-          print_warning_summary(result) unless machine_plan_output_rendered?(result, command: 'group rmchild')
+          return if machine_plan_output_rendered?(result, command: 'group rmchild')
+
+          record_audit({ command: 'group rmchild', action: 'dissociate_child', entity_type: 'group',
+                         entity_names: pname }, result: result, dry_run: options[:dry_run])
+          print_warning_summary(result)
         end
 
         private

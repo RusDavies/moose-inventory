@@ -26,7 +26,11 @@ module Moose
           abort_if_automatic_group([name])
 
           result = add_hosts_to_group(name, hosts)
-          print_warning_summary(result) unless machine_plan_output_rendered?(result, command: 'group addhost')
+          return if machine_plan_output_rendered?(result, command: 'group addhost')
+
+          record_audit({ command: 'group addhost', action: 'associate', entity_type: 'group',
+                         entity_names: name }, result: result, dry_run: options[:dry_run])
+          print_warning_summary(result)
         end
 
         private

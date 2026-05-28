@@ -38,6 +38,11 @@ module Moose
       class Groupvar < Sequel::Model
         many_to_one :groups
       end
+
+      ##
+      # Append-only audit event records.
+      class AuditEvent < Sequel::Model
+      end
     end
   end
 end

@@ -20,7 +20,7 @@ module Moose
       @exceptions = nil
       attr_reader :db, :models, :exceptions
 
-      SCHEMA_VERSION = 1
+      SCHEMA_VERSION = 2
 
       TABLE_DEFINITIONS = {
         hosts: lambda do |db|
@@ -70,6 +70,18 @@ module Moose
             primary_key :id
             column :version, :integer, null: false
           end
+        end,
+        audit_events: lambda do |db|
+          db.create_table(:audit_events) do
+            primary_key :id
+            column :created_at, :text, null: false
+            column :actor, :text
+            column :command, :text, null: false
+            column :action, :text, null: false
+            column :entity_type, :text
+            column :entity_name, :text
+            column :details, :text
+          end
         end
       }.freeze
 
@@ -77,7 +89,8 @@ module Moose
         host: :Host,
         hostvar: :Hostvar,
         group: :Group,
-        groupvar: :Groupvar
+        groupvar: :Groupvar,
+        audit_event: :AuditEvent
       }.freeze
 
       BUSY_RETRY_LIMIT = 10
@@ -250,6 +263,7 @@ module Moose
 
         Groupvar.all.each(&:destroy)
         Hostvar.all.each(&:destroy)
+        AuditEvent.all.each(&:destroy) if @db.table_exists?(:audit_events)
       end
 
       #--------------------
