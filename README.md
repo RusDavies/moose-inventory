@@ -541,6 +541,25 @@ By default, deleting a group preserves its child groups as root groups. Use `gro
     $ moose-inventory host rmvar host1 owner id
     $ moose-inventory host rm host1 host2 host3
 
+###CI/CD integration examples
+The `examples/ci/` directory contains a pull-request review pattern for inventory changes that does not require production database credentials.  It imports a proposed snapshot into a temporary SQLite database, runs `doctor`, exports a canonical snapshot, lists hosts, and writes an Ansible-compatible inventory artifact.
+
+Run the example locally with:
+
+    $ MOOSE_INVENTORY_CMD="bundle exec ruby -Ilib bin/moose-inventory" \
+        examples/ci/scripts/validate-inventory-snapshot.sh \
+        examples/ci/inventory/example-snapshot.yml \
+        tmp/inventory-ci-artifacts
+
+The script writes:
+
+    tmp/inventory-ci-artifacts/doctor.txt
+    tmp/inventory-ci-artifacts/inventory.yml
+    tmp/inventory-ci-artifacts/hosts.json
+    tmp/inventory-ci-artifacts/ansible-inventory.json
+
+`examples/ci/github-actions/inventory-review.yml` shows the same pattern as a GitHub Actions workflow.  It is stored under `examples/` rather than `.github/workflows/` so teams can adapt paths, snapshot locations, artifact names, and deployment rules before enabling it.  Use this as a review gate before applying inventory changes to a shared or production Moose Inventory database; CI should validate proposals, not casually scribble on prod like a bored intern.
+
 ### Using moose-inventory with Ansible
 
 

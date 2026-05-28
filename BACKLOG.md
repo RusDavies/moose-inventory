@@ -1,15 +1,18 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 11 done / 0 open.
+Feature value status counts: 12 done / 0 open.
 
 ## Open
 
-1. Add CI/CD integration examples.
-   - Provide GitHub Actions examples for validating inventory snapshots, running `inventory doctor`, and producing Ansible-compatible artifacts.
-   - Document how teams can use Moose Inventory safely in review pipelines before applying changes.
-   - Include examples that do not require secret-bearing production database access.
+_No open feature-value items._
 
 ## Done
+
+1. Add CI/CD integration examples.
+   - Added `examples/ci/inventory/example-snapshot.yml`, `examples/ci/scripts/validate-inventory-snapshot.sh`, and `examples/ci/github-actions/inventory-review.yml`.
+   - The validation script imports a proposed snapshot into a temporary SQLite database, runs `doctor`, exports a canonical snapshot, lists hosts, and emits an Ansible-compatible inventory artifact.
+   - Added `examples/ci/README.md` and README.md documentation for adapting the pattern safely before enabling it in CI.
+   - Added specs that parse the examples, syntax-check the script, and run it against the sample snapshot without production credentials.
 
 1. Add a human-friendly interactive shell or TUI.
    - Added `console`, a small read-only interactive browsing shell.

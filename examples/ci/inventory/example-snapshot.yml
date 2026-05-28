@@ -1,0 +1,19 @@
+---
+version: 1
+hosts:
+  web01:
+    groups:
+      - web
+    tags:
+      - prod
+      - public-edge
+    vars:
+      os: fedora
+      owner: platform
+groups:
+  web:
+    children: []
+    tags:
+      - frontend
+    vars:
+      role: frontend

@@ -106,6 +106,28 @@ bundle exec rubocop \
   spec/lib/moose_inventory/db/db_spec.rb \
   spec/lib/moose_inventory/db/exceptions_spec.rb \
   spec/lib/moose_inventory/db/models_spec.rb \
+  lib/moose_inventory/operations/import_inventory_snapshot.rb \
+  lib/moose_inventory/operations/inventory_doctor.rb \
+  lib/moose_inventory/operations/inventory_snapshot.rb \
+  lib/moose_inventory/cli/audit.rb \
+  lib/moose_inventory/cli/audit_recording.rb \
+  lib/moose_inventory/cli/console.rb \
+  lib/moose_inventory/cli/db.rb \
+  lib/moose_inventory/cli/group_tags.rb \
+  lib/moose_inventory/cli/host_tags.rb \
+  lib/moose_inventory/cli/plan_rendering.rb \
+  lib/moose_inventory/cli/tag_support.rb \
+  spec/examples/ci_examples_spec.rb \
+  spec/lib/moose_inventory/ansible_plugin_examples_spec.rb \
+  spec/lib/moose_inventory/cli/application_doctor_spec.rb \
+  spec/lib/moose_inventory/cli/application_import_export_spec.rb \
+  spec/lib/moose_inventory/cli/audit_spec.rb \
+  spec/lib/moose_inventory/cli/console_spec.rb \
+  spec/lib/moose_inventory/cli/tags_spec.rb \
+  spec/lib/moose_inventory/db_lifecycle_spec.rb \
+  spec/lib/moose_inventory/operations/import_inventory_snapshot_spec.rb \
+  spec/lib/moose_inventory/operations/inventory_doctor_spec.rb \
+  spec/lib/moose_inventory/operations/inventory_snapshot_spec.rb \
   lib/moose_inventory/version.rb \
   moose-inventory.gemspec \
   scripts/files.rb

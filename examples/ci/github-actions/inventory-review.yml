@@ -1,0 +1,38 @@
+name: Inventory review example
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'inventory/**'
+      - 'examples/ci/inventory/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+
+      - name: Validate proposed inventory snapshot
+        env:
+          MOOSE_INVENTORY_CMD: bundle exec ruby -Ilib bin/moose-inventory
+        run: |
+          examples/ci/scripts/validate-inventory-snapshot.sh \
+            examples/ci/inventory/example-snapshot.yml \
+            tmp/inventory-ci-artifacts
+
+      - name: Upload inventory review artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-review
+          path: tmp/inventory-ci-artifacts
