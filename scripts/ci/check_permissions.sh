@@ -3,6 +3,7 @@ set -euo pipefail
 
 allowed_executables=(
   "bin/moose-inventory"
+  "examples/ci/scripts/validate-inventory-snapshot.sh"
   "scripts/check.sh"
   "scripts/ci/check_permissions.sh"
   "scripts/ci/check_rubocop.sh"
