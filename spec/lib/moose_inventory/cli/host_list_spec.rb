@@ -53,6 +53,35 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       expected(actual, desired)
     end
+
+    it 'filters hosts by group, tag, and variable' do
+      runner { @app.start(%w[group add web]) }
+      runner { @app.start(%w[host add web01 --groups web]) }
+      runner { @app.start(%w[host add db01]) }
+      runner { @app.start(%w[host addtag web01 prod]) }
+      runner { @app.start(%w[host addvar web01 os=fedora]) }
+      runner { @app.start(%w[host addtag db01 prod]) }
+      runner { @app.start(%w[host addvar db01 os=debian]) }
+
+      actual = runner { @app.start(%w[host list --group web --tag prod --var os=fedora]) }
+
+      desired = { aborted: false, STDERR: '' }
+      desired[:STDOUT] = {
+        web01: {
+          groups: ['web'],
+          tags: ['prod'],
+          hostvars: { os: 'fedora' }
+        }
+      }.to_yaml
+      expected(actual, desired)
+    end
+
+    it 'aborts on invalid variable filters' do
+      actual = runner { @app.start(%w[host list --var broken]) }
+
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to include("ERROR: Invalid variable filter 'broken'. Expected key=value.")
+    end
   end
 end
 # rubocop:enable Metrics/BlockLength

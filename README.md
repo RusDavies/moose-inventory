@@ -425,6 +425,12 @@ Let's list our hosts again, to see what that looks like.
 
 As you can see, the hosts with variables each have a new section, hostvars, in which those variables are listed.  Try also with *--format pjson*.
 
+Host listing can also be filtered by group, metadata tag, and host variable.  Multiple comma-separated values are treated as an AND filter: the host must match all requested groups, all requested tags, and all requested variable key/value pairs.
+
+    $ moose-inventory host list --group web --tag prod --var os=fedora --format yaml
+
+Variable filters use `key=value` syntax.  Metadata tags appear under a `tags` section when present; hosts without tags keep the older compact output.  Group-side listing filters are still part of the remaining query/filter backlog, because one haunted query surface per slice is plenty.
+
 We can do the same with groups.  In the following example, the output has been omitted for compactness. Nevertheless, you will see that the form of the commands is as for hosts.  Of note, when listing the groups, you will see that the *ungrouped* group is shown.   This is an automatic group which cannot be manipulated manually.
 
     $ moose-inventory group add group1 group2 group3

@@ -46,6 +46,28 @@ RSpec.describe Moose::Inventory::Operations::QueryInventory do
     )
   end
 
+  it 'filters listed hosts by group, tag, and variable' do
+    host = @db.models[:host].create(name: 'web01')
+    other = @db.models[:host].create(name: 'db01')
+    group = @db.models[:group].find_or_create(name: 'web')
+    tag = @db.models[:tag].find_or_create(name: 'prod')
+    host.add_group(group)
+    host.add_tag(tag)
+    other.add_tag(tag)
+    hostvar = @db.models[:hostvar].create(name: 'os', value: 'fedora')
+    other_var = @db.models[:hostvar].create(name: 'os', value: 'debian')
+    host.add_hostvar(hostvar)
+    other.add_hostvar(other_var)
+
+    expect(operation.list_hosts(filters: { groups: ['web'], tags: ['prod'], variables: { 'os' => 'fedora' } })).to eq(
+      web01: {
+        groups: ['web'],
+        tags: ['prod'],
+        hostvars: { os: 'fedora' }
+      }
+    )
+  end
+
   it 'gets group data while omitting empty relationship collections' do
     @db.models[:group].create(name: 'group1')
 

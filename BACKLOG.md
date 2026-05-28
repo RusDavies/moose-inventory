@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 9 done / 2 open.
+Feature value status counts: 10 done / 1 open.
 
 ## Open
-
-1. Add query/filter support for inventory listing.
-   - Support commands such as `host list --group web --tag prod --var os=fedora --format yaml`.
-   - Provide useful filters for hosts, groups, variables, tags, parent/child relationships, and membership.
-   - Ensure JSON/YAML output remains stable enough for scripts.
 
 1. Add a human-friendly interactive shell or TUI.
    - Provide a `console`, `shell`, or small TUI for browsing hosts, groups, variables, and relationships.
@@ -20,6 +15,13 @@ Feature value status counts: 9 done / 2 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add query/filter support for inventory listing.
+   - Added `host list --group`, `host list --tag`, and `host list --var key=value` filters.
+   - Filters are AND-style and support comma-separated group, tag, and variable filters.
+   - Host list output now includes `tags` only when present, preserving compact output for untagged hosts.
+   - Group-side relationship/parent-child filters remain future expansion if needed.
+   - Documented host-list query filters in README.md.
 
 1. Add tagging / metadata support for hosts and groups.
    - Added portable `tags`, `hosts_tags`, and `groups_tags` tables and schema version bump to 3.
