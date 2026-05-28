@@ -1,0 +1,72 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/BlockLength
+require 'spec_helper'
+require 'tmpdir'
+
+RSpec.describe Moose::Inventory::Cli::Application do
+  before(:all) do
+    setup_cli_harness(command_class: described_class)
+  end
+
+  before(:each) do
+    reset_cli_harness
+  end
+
+  it 'exports the current inventory snapshot as yaml' do
+    runner { @app.start(%w[host add web01]) }
+    runner { @app.start(%w[group add web]) }
+    runner { @app.start(%w[host addgroup web01 web]) }
+
+    actual = runner { @app.start(%w[export]) }
+
+    expect(actual[:unexpected]).to eq(false)
+    expect(actual[:aborted]).to eq(false)
+    expect(actual[:STDERR]).to eq('')
+    snapshot = YAML.safe_load(actual[:STDOUT])
+    expect(snapshot['version']).to eq(1)
+    expect(snapshot.dig('hosts', 'web01', 'groups')).to include('web')
+    expect(snapshot['groups']).to have_key('web')
+  end
+
+  it 'imports a validated inventory snapshot file' do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'inventory.yml')
+      File.write(
+        path,
+        {
+          'version' => 1,
+          'hosts' => { 'web01' => { 'groups' => ['web'], 'vars' => { 'env' => 'prod' } } },
+          'groups' => { 'web' => { 'children' => [], 'vars' => { 'role' => 'frontend' } } }
+        }.to_yaml
+      )
+
+      actual = runner { @app.start(['import', path]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDERR]).to eq('')
+      expect(actual[:STDOUT]).to include("Imported inventory snapshot from #{path}.")
+      host = @db.models[:host].find(name: 'web01')
+      expect(host.groups_dataset[name: 'web']).not_to be_nil
+      expect(host.hostvars_dataset[name: 'env'][:value]).to eq('prod')
+    end
+  end
+
+  it 'aborts on invalid snapshot input without writing' do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'inventory.yml')
+      File.write(
+        path,
+        { 'version' => 1, 'hosts' => { 'web01' => { 'groups' => ['missing'], 'vars' => {} } }, 'groups' => {} }.to_yaml
+      )
+
+      actual = runner { @app.start(['import', path]) }
+
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to include("Invalid inventory snapshot: host 'web01' references unknown group 'missing'.")
+      expect(@db.models[:host].count).to eq(0)
+    end
+  end
+end
+# rubocop:enable Metrics/BlockLength
