@@ -1,13 +1,8 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 4 done / 6 open.
+Code improvement analysis status counts: 5 done / 5 open.
 
 ## Open
-
-1. Split DB connection, schema, migration, lifecycle, and retry responsibilities out of `Moose::Inventory::DB`.
-   - `lib/moose_inventory/db/db.rb` currently owns connection setup, schema definitions, schema version state, backup/reset, retry handling, purge behavior, and model binding.
-   - Extract focused modules/classes so future schema work does not keep expanding the DB singleton.
-   - Preserve the public DB API used by existing CLI and tests during the transition.
 
 1. Refactor inventory snapshot import into validation and application components.
    - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
@@ -34,6 +29,12 @@ Code improvement analysis status counts: 4 done / 6 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Split DB connection, schema, migration, lifecycle, and retry responsibilities out of `Moose::Inventory::DB`.
+   - Extracted schema definitions, ordered migration metadata, index definitions, migration execution, schema version recording, future-schema refusal, duplicate cleanup, index creation, and table creation helpers into `Moose::Inventory::DB::SchemaMigrations`.
+   - Kept public DB constants and methods available through `Moose::Inventory::DB` for existing callers and specs.
+   - Left connection setup, retry handling, model binding, reset/purge, backup, and adapter lifecycle in `db.rb` for later smaller splits.
+   - Added regression coverage proving DB-level schema constants expose the extracted module definitions.
 
 1. Add database uniqueness constraints and indexes for relationship and variable tables.
    - Bumped schema to version 4 and added an ordered v4 migration for uniqueness and lookup indexes.
