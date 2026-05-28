@@ -1,12 +1,13 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 4 done / 6 open.
+Process conformance status counts: 5 done / 6 open.
 
 ## Open
 
-1. Create requirements and acceptance criteria baseline.
-   - Cover CLI behavior, DB backends/schema migrations, Ansible integration, import/export, dry-run/plan output, audit log, release/package integrity, compatibility, documentation, and security expectations.
-   - Include approval status and change-control note.
+1. Review and approve, revise, or reject the draft requirements and acceptance criteria baseline.
+   - Draft is in `docs/product/requirements-baseline.md`.
+   - Pending approval is recorded as `GOV-REQ-001` in `docs/governance/approval-register.md`.
+   - Do not treat the draft as approved requirements until a human approver records a durable decision.
 
 1. Add lightweight CLI UX/workflow notes.
    - Cover core workflows, destructive operations, dry-run/trust behavior, machine-readable output, error states, accessibility/readability expectations, and UX approval status.
@@ -26,6 +27,11 @@ Process conformance status counts: 4 done / 6 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Create requirements and acceptance criteria baseline.
+   - Added `docs/product/requirements-baseline.md` as a draft requirements and acceptance criteria baseline.
+   - Covered CLI behavior, configuration/environment selection, DB adapters/lifecycle/schema migrations, inventory mutations, dry-run/plan output, snapshots, doctor, audit log, tags, Ansible integration, CI examples, release/package integrity, security/privacy expectations, compatibility, documentation, and release acceptance.
+   - Recorded pending approval as `GOV-REQ-001`; the baseline remains draft until explicitly approved, revised, or rejected.
 
 1. Review and approve, revise, or reject the draft product brief.
    - Russ approved `docs/product/product-brief.md` as the product-framing baseline on 2026-05-28.
