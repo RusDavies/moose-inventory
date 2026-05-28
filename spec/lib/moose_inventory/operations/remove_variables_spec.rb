@@ -57,6 +57,18 @@ RSpec.describe Moose::Inventory::Operations::RemoveVariables do
     expect(@db.models[:groupvar].count).to eq(0)
   end
 
+  it 'dry-runs removing variables without deleting records' do
+    host = @db.models[:host].create(name: 'test1')
+    var = @db.models[:hostvar].create(name: 'var1', value: 'val1')
+    host.add_hostvar(var)
+
+    result = build_operation(:host).call(name: 'test1', vars: ['var1'], dry_run: true)
+
+    expect(result.events.map(&:type)).to include(:removing_variable, :dry_run_summary)
+    expect(host.hostvars_dataset[name: 'var1']).not_to be_nil
+    expect(@db.models[:hostvar].count).to eq(1)
+  end
+
   it 'emits partial progress before raising on malformed group variable removal input' do
     @db.models[:group].create(name: 'testgroup')
     emitted = []

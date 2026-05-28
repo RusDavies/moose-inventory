@@ -171,6 +171,24 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
+    it 'GROUP key=value --dry-run should not create or update variables' do
+      group_name = 'test1'
+      @db.models[:group].create(name: group_name)
+      runner { @app.start(%W[group addvar #{group_name} var1=old]) }
+
+      actual = runner do
+        @app.start(%W[group addvar #{group_name} var1=new var2=val2 --dry-run])
+      end
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      group = @db.models[:group].find(name: group_name)
+      expect(group.groupvars_dataset[name: 'var1'][:value]).to eq('old')
+      expect(group.groupvars_dataset[name: 'var2']).to be_nil
+    end
+
+    #------------------------
     it 'GROUP key=value ... should update an already existing association' do
       # 1. Should add the var to the db
       # 2. Should associate the host with the var

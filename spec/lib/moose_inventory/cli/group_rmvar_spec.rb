@@ -86,6 +86,21 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
+    it 'GROUP key --dry-run should not remove the group variable' do
+      group_name = 'group_test'
+      @db.models[:group].create(name: group_name)
+      runner { @app.start(%W[group addvar #{group_name} var1=val1]) }
+
+      actual = runner { @app.start(%W[group rmvar #{group_name} var1 --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      group = @db.models[:group].find(name: group_name)
+      expect(group.groupvars_dataset[name: 'var1']).not_to be_nil
+    end
+
+    #------------------------
     it 'GROUP <valid args> ... should remove the group variable' do
       group_name = 'group_test'
       var = { name: 'foo', value: 'bar' }

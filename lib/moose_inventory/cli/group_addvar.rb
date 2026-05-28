@@ -13,6 +13,7 @@ module Moose
         #==========================
         desc 'addvar NAME VARNAME=VALUE',
              'Add a variable VARNAME with value VALUE to the group NAME'
+        option :dry_run, type: :boolean
         def addvar(*args)
           abort_if_missing_args(args, 2, '2 or more')
 
@@ -23,7 +24,7 @@ module Moose
                                       emitter: group_addvar_emitter(name, vars))
 
           db.transaction do
-            operation.call(name: name, vars: vars)
+            operation.call(name: name, vars: vars, dry_run: options[:dry_run])
           end
 
           print_success_summary

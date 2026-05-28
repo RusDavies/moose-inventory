@@ -57,6 +57,22 @@ RSpec.describe Moose::Inventory::Operations::AddVariables do
     expect(@db.models[:groupvar].count).to eq(1)
   end
 
+  it 'dry-runs adding and updating variables without writing records' do
+    host = @db.models[:host].create(name: 'test1')
+    existing = @db.models[:hostvar].create(name: 'var1', value: 'old')
+    host.add_hostvar(existing)
+
+    result = build_operation(:host).call(
+      name: 'test1',
+      vars: %w[var1=new var2=val2],
+      dry_run: true
+    )
+
+    expect(result.events.map(&:type)).to include(:updating_existing_variable, :dry_run_summary)
+    expect(host.hostvars_dataset[name: 'var1'][:value]).to eq('old')
+    expect(host.hostvars_dataset[name: 'var2']).to be_nil
+  end
+
   it 'uses the shared variable operation support for missing entity errors' do
     operation = build_operation(:host)
 
