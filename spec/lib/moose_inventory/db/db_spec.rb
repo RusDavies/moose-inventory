@@ -130,6 +130,13 @@ RSpec.describe 'Moose::Inventory::DB' do
       expect(@db.migration_versions).to eq((1..@db::SCHEMA_VERSION).to_a)
     end
 
+    it 'exposes schema definitions from the schema migration module' do
+      expect(@db::SCHEMA_VERSION).to eq(@db::SchemaMigrations::SCHEMA_VERSION)
+      expect(@db::TABLE_DEFINITIONS).to equal(@db::SchemaMigrations::TABLE_DEFINITIONS)
+      expect(@db::SCHEMA_MIGRATIONS).to equal(@db::SchemaMigrations::SCHEMA_MIGRATIONS)
+      expect(@db::INDEX_DEFINITIONS).to equal(@db::SchemaMigrations::INDEX_DEFINITIONS)
+    end
+
     it 'applies schema migrations one version at a time' do
       with_sqlite_fixture(schema_version: 1, tables: %i[hosts groups schema_info]) do
         @db.init_sqlite3
