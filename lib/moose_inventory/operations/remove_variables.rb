@@ -9,8 +9,6 @@ module Moose
       class RemoveVariables
         include EntityVariableOperationSupport
 
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, keyword_init: true)
         def call(name:, vars:)
           @events = []
 
@@ -27,7 +25,7 @@ module Moose
           end
 
           emit(:entity_complete)
-          Result.new(events: events)
+          operation_result(events: events)
         ensure
           @events = nil
         end

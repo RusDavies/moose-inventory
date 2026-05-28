@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 module Moose
   module Inventory
     module Operations
       # Recursively cleans up orphaned groups and their dependent relations.
       class GroupCleanup
+        include OperationEventSupport
+
         AUTOMATIC_GROUP = 'ungrouped'
 
         def initialize(context:, emitter:)

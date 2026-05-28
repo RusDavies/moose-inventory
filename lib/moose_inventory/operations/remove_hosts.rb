@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 module Moose
   module Inventory
     module Operations
       # Removes hosts and returns structured progress/warning events.
       class RemoveHosts
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, :warning_count, keyword_init: true)
+        include OperationEventSupport
 
         def initialize(context:)
           @context = context
@@ -22,7 +23,7 @@ module Moose
             end
           end
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         private
@@ -49,10 +50,6 @@ module Moose
           emit(events, :ok, indent: 4)
           emit(events, :host_complete)
           0
-        end
-
-        def emit(events, type, payload = {})
-          events << Event.new(type: type, payload: payload)
         end
       end
     end
