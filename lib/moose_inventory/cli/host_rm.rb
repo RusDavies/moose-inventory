@@ -21,8 +21,6 @@ module Moose
           result = remove_hosts_operation.call(names: normalize_names(argv))
           render_remove_hosts_events(result.events)
           print_warning_summary(result)
-        rescue db.exceptions[:moose] => e
-          abort("ERROR: #{e}")
         end
 
         private
