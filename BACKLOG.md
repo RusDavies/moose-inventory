@@ -259,15 +259,17 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 65 done / 1 open.
+Code quality status counts: 66 done / 0 open.
 
 ## Open
 
-1. Add focused specs for `OperationEventSupport` result defaults and event construction.
-   - The helper is covered through operation integration specs, but its default `warning_count: 0` behavior is important because CLI summary code calls `zero?`.
-   - Add direct unit coverage to lock the default result/event contract before future operation refactors lean on it further.
+_No open code-quality items._
 
 ## Done
+
+1. Add focused specs for `OperationEventSupport` result defaults and event construction.
+   - Added direct unit coverage for default empty event payloads, explicit payload preservation, event emission, default `warning_count: 0`, and explicit warning counts.
+   - Added the new helper spec to the targeted RuboCop gate.
 
 1. Split `Host#render_add_hosts_event` into smaller rendering helpers.
    - Replaced the single complex case statement with an event-to-renderer dispatch table and small private rendering methods.
