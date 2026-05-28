@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 3 done / 8 open.
+Feature value status counts: 4 done / 7 open.
 
 ## Open
-
-1. [HIGH] Add bulk import/export with validation.
-   - Support importing inventory definitions from YAML/JSON and applying them transactionally.
-   - Support exporting a canonical snapshot suitable for review, migration, backup, and version control.
-   - Validate entity references, variable shape, group hierarchy, duplicate names, and unsupported fields before writing.
 
 1. [HIGH] Add inventory doctor/lint checks.
    - Add a `doctor`, `lint`, or equivalent command for CI-friendly inventory health checks.
@@ -50,6 +45,12 @@ Feature value status counts: 3 done / 8 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. [HIGH] Add bulk import/export with validation.
+   - Added top-level `export [FILE]` for canonical YAML/JSON/pjson snapshots containing version, hosts, host variables, memberships, groups, group variables, and child relationships.
+   - Added top-level `import FILE` for additive/update-oriented YAML or JSON snapshot import.
+   - Import validates structure, references, variable maps, unsupported fields, and circular child-group relationships before writing.
+   - Documented the new commands in README.md per the project documentation rule.
 
 1. [HIGH] Document new dry-run and machine-readable plan features in README.md.
    - Added README coverage for `--dry-run` across mutating command families, including host/group lifecycle commands, variables, host-group associations, and child-group relationships.

@@ -175,6 +175,46 @@ For automation and review workflows, dry-run events can also be emitted as YAML,
 
 The actual `events` array includes the full ordered plan for the command.  Each event has a `type` and a `payload`, so scripts can inspect planned host, group, variable, association, automatic `ungrouped`, and child-group cleanup actions without scraping human-readable output.
 
+###Import and export snapshots
+The full inventory can be exported as a portable snapshot.  The snapshot contains a version number, hosts, host variables, host-to-group memberships, groups, group variables, and child-group relationships.  It is intended for review, backup, migration, and automation workflows.
+
+    $ moose-inventory --format yaml export inventory.yml
+    Exported inventory snapshot to inventory.yml.
+
+    $ moose-inventory --format pjson export
+    {
+      "version": 1,
+      "hosts": {
+        "web01": {
+          "groups": [
+            "web"
+          ],
+          "vars": {
+            "env": "prod"
+          }
+        }
+      },
+      "groups": {
+        "web": {
+          "children": [],
+          "vars": {
+            "role": "frontend"
+          }
+        }
+      }
+    }
+
+Snapshots can be imported from YAML or JSON.  Import validates the file before writing anything.  It rejects malformed snapshots, unknown host/group references, unsupported fields, invalid variable shapes, and circular child-group hierarchies.
+
+    $ moose-inventory import inventory.yml
+    Imported inventory snapshot from inventory.yml.
+    Created hosts: 1
+    Created groups: 1
+    Variables changed: 2
+    Associations added: 1
+
+Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
+
 ###Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.  
 
