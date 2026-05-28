@@ -2,7 +2,7 @@
 
 ## Approval status
 
-Status: **Draft — not approved**
+Status: **Draft - not approved**
 
 This document captures lightweight CLI UX/workflow expectations for Moose Inventory. It is prepared from the approved product brief, approved requirements baseline, README, specs, and current CLI behavior.
 
