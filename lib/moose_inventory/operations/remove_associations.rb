@@ -14,9 +14,10 @@ module Moose
           @context = context
         end
 
-        def host_from_groups(host:, host_name:, group_names:)
+        def host_from_groups(host:, host_name:, group_names:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
 
           group_names.each do |group_name|
             next if group_name.nil? || group_name.empty?
@@ -24,14 +25,17 @@ module Moose
             warning_count += remove_group_from_host(host, host_name, group_name, events)
           end
 
-          add_automatic_group_if_needed(host, host_name, events)
+          add_automatic_group_if_needed(host, host_name, events,
+                                        planned_empty: planned_host_groups_empty?(host, group_names))
+          emit(events, :dry_run_summary) if dry_run
 
           operation_result(events: events, warning_count: warning_count)
         end
 
-        def group_from_hosts(group:, group_name:, host_names:)
+        def group_from_hosts(group:, group_name:, host_names:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
           hosts_dataset = group.hosts_dataset
 
           host_names.each do |host_name|
@@ -40,12 +44,14 @@ module Moose
             warning_count += remove_host_from_group(group, group_name, host_name, hosts_dataset, events)
           end
 
+          emit(events, :dry_run_summary) if dry_run
+
           operation_result(events: events, warning_count: warning_count)
         end
 
         private
 
-        attr_reader :context
+        attr_reader :context, :dry_run
 
         def remove_group_from_host(host, host_name, group_name, events)
           groups_dataset = host.groups_dataset
@@ -59,7 +65,7 @@ module Moose
           end
 
           group = context.find_group(group_name)
-          host.remove_group(group) unless group.nil?
+          host.remove_group(group) unless group.nil? || dry_run
           emit(events, :ok, indent: 4)
           0
         end
@@ -75,18 +81,27 @@ module Moose
           end
 
           host = context.find_host(host_name)
-          group.remove_host(host) unless host.nil?
+          group.remove_host(host) unless host.nil? || dry_run
           emit(events, :ok, indent: 4)
-          add_automatic_group_if_needed(host, host_name, events)
+          add_automatic_group_if_needed(host, host_name, events,
+                                        planned_empty: dry_run && !host.nil? && host.groups_dataset.one?)
           0
         end
 
-        def add_automatic_group_if_needed(host, host_name, events)
-          return unless host.groups_dataset.none?
+        def add_automatic_group_if_needed(host, host_name, events, planned_empty: false)
+          return if host.nil?
+          return unless planned_empty || host.groups_dataset.none?
 
           emit(events, :adding_automatic_group, host: host_name)
-          host.add_group(context.automatic_group)
+          host.add_group(context.automatic_group) unless dry_run
           emit(events, :ok, indent: 4)
+        end
+
+        def planned_host_groups_empty?(host, group_names)
+          return false unless dry_run
+
+          remaining = host.groups_dataset.map(&:name) - group_names
+          remaining.empty?
         end
 
         def association_exists?(dataset, name)

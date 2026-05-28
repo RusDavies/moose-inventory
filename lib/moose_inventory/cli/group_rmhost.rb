@@ -14,6 +14,7 @@ module Moose
         #==========================
         desc 'rmhost GROUPNAME HOSTNAME_1 [HOSTNAME_2 ...]',
              'Dissociate the hosts HOSTNAME_n from the group NAME'
+        option :dry_run, type: :boolean
         def rmhost(*args)
           abort_if_missing_args(args, 2, '2 or more')
 
@@ -32,7 +33,8 @@ module Moose
           operation = build_operation(Moose::Inventory::Operations::RemoveAssociations)
           run_group_relation_transaction(heading: "Dissociate group '#{name}' from host(s) '#{hosts.join(',')}':") do
             group = fetch_existing_group_or_abort(name)
-            result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts)
+            result = operation.group_from_hosts(group: group, group_name: name, host_names: hosts,
+                                                dry_run: options[:dry_run])
             render_group_rmhost_events(result.events)
             result
           end

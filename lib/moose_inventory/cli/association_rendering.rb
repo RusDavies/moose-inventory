@@ -28,8 +28,13 @@ module Moose
 
           return render_addition_warning(event.type, payload, perspective:) if addition_warning_event?(event.type)
           return render_addition_existing(payload, perspective:) if event.type == :already_exists_skipping
+          return render_association_dry_run_summary if event.type == :dry_run_summary
 
-          case event.type
+          render_addition_action_event(event.type, payload, perspective:)
+        end
+
+        def render_addition_action_event(type, payload, perspective:)
+          case type
           when :adding_host_group_association, :adding_group_host_association
             fmt.puts 2, "- #{verb_for(:add, perspective)} association #{association_label(payload, perspective:)}..."
           when :group_creating_now, :host_creating_now
@@ -42,11 +47,16 @@ module Moose
           end
         end
 
+        def render_association_dry_run_summary
+          puts 'Dry run complete. No changes applied.'
+        end
+
         def render_host_group_association_removal_event(event, perspective:)
           payload = event.payload
 
           return render_removal_warning(payload, perspective:) if removal_warning_event?(event.type)
           return render_removal_missing(payload, perspective:) if event.type == :missing_skipping
+          return render_association_dry_run_summary if event.type == :dry_run_summary
 
           case event.type
           when :removing_host_group_association, :removing_group_host_association

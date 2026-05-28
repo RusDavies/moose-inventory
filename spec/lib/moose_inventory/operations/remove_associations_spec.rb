@@ -50,6 +50,41 @@ RSpec.describe Moose::Inventory::Operations::RemoveAssociations do
     expect(host.groups_dataset[name: 'ungrouped']).not_to be_nil
   end
 
+  it 'dry-runs removing groups from a host without removing associations or adding ungrouped' do
+    host = @db.models[:host].create(name: 'host1')
+    group = @db.models[:group].create(name: 'group1')
+    host.add_group(group)
+
+    result = operation.host_from_groups(
+      host: host,
+      host_name: 'host1',
+      group_names: ['group1'],
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(0)
+    expect(result.events.map(&:type)).to include(:adding_automatic_group, :dry_run_summary)
+    expect(host.groups_dataset[name: 'group1']).not_to be_nil
+    expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+  end
+
+  it 'dry-runs removing hosts from a group without removing associations or adding ungrouped' do
+    group = @db.models[:group].create(name: 'group1')
+    host = @db.models[:host].create(name: 'host1')
+    group.add_host(host)
+
+    result = operation.group_from_hosts(
+      group: group,
+      group_name: 'group1',
+      host_names: ['host1'],
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(0)
+    expect(result.events.map(&:type)).to include(:adding_automatic_group, :dry_run_summary)
+    expect(group.hosts_dataset[name: 'host1']).not_to be_nil
+    expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+  end
   it 'removes hosts from a group and reports missing associations and ungrouped reattachment' do
     group = @db.models[:group].create(name: 'group1')
     host1 = @db.models[:host].create(name: 'host1')

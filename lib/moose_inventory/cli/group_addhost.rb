@@ -14,6 +14,7 @@ module Moose
         #==========================
         desc 'addhost NAME HOSTNAME',
              'Associate a host HOSTNAME with the group NAME'
+        option :dry_run, type: :boolean
         def addhost(*args)
           abort_if_missing_args(args, 2, '2 or more')
 
@@ -32,7 +33,8 @@ module Moose
           operation = build_operation(Moose::Inventory::Operations::AddAssociations)
           run_group_relation_transaction(heading: "Associate group '#{name}' with host(s) '#{hosts.join(',')}':") do
             group = fetch_existing_group_or_abort(name)
-            result = operation.group_to_hosts(group: group, group_name: name, host_names: hosts)
+            result = operation.group_to_hosts(group: group, group_name: name, host_names: hosts,
+                                              dry_run: options[:dry_run])
             render_group_addhost_events(result.events)
             result
           end

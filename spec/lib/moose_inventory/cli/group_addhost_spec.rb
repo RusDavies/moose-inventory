@@ -95,6 +95,22 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
+    it 'group addhost GROUP HOST --dry-run should not create the host or association' do
+      host_name = 'dry-host'
+      group_name = 'testgroup1'
+      runner { @app.start(%W[group add #{group_name}]) }
+
+      actual = runner { @app.start(%W[group addhost #{group_name} #{host_name} --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      expect(@db.models[:host].find(name: host_name)).to be_nil
+      group = @db.models[:group].find(name: group_name)
+      expect(group.hosts_dataset[name: host_name]).to be_nil
+    end
+
+    #------------------------
     it '\'ungrouped\' HOST... should abort with an error' do
       host_name = 'test1'
       group_name = 'ungrouped'

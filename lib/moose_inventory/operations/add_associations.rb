@@ -14,9 +14,10 @@ module Moose
           @context = context
         end
 
-        def host_to_groups(host:, host_name:, group_names:)
+        def host_to_groups(host:, host_name:, group_names:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
 
           group_names.each do |group_name|
             next if group_name.nil? || group_name.empty?
@@ -25,13 +26,15 @@ module Moose
           end
 
           remove_automatic_group_from_host(host, host_name, events)
+          emit(events, :dry_run_summary) if dry_run
 
           operation_result(events: events, warning_count: warning_count)
         end
 
-        def group_to_hosts(group:, group_name:, host_names:)
+        def group_to_hosts(group:, group_name:, host_names:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
           hosts_dataset = group.hosts_dataset
 
           host_names.each do |host_name|
@@ -46,12 +49,14 @@ module Moose
             )
           end
 
+          emit(events, :dry_run_summary) if dry_run
+
           operation_result(events: events, warning_count: warning_count)
         end
 
         private
 
-        attr_reader :context
+        attr_reader :context, :dry_run
 
         def add_group_to_host(host, host_name, group_name, events)
           warning_count = 0
@@ -70,12 +75,12 @@ module Moose
           if group.nil?
             emit(events, :group_missing_created, name: group_name)
             emit(events, :group_creating_now, name: group_name)
-            group = context.create_group(group_name)
+            group = context.create_group(group_name) unless dry_run
             emit(events, :ok, indent: 6)
             warning_count += 1
           end
 
-          host.add_group(group)
+          host.add_group(group) unless dry_run
           emit(events, :ok, indent: 4)
           warning_count
         end
@@ -95,23 +100,25 @@ module Moose
           if host.nil?
             emit(events, :host_missing_created, name: host_name)
             emit(events, :host_creating_now, name: host_name)
-            host = context.create_host(host_name)
+            host = context.create_host(host_name) unless dry_run
             emit(events, :ok, indent: 6)
             warning_count += 1
           end
 
-          group.add_host(host)
+          group.add_host(host) unless dry_run
           emit(events, :ok, indent: 4)
           remove_automatic_group_from_host(host, host_name, events)
           warning_count
         end
 
         def remove_automatic_group_from_host(host, host_name, events)
+          return if host.nil?
+
           ungrouped = host.groups_dataset[name: AUTOMATIC_GROUP]
           return if ungrouped.nil?
 
           emit(events, :removing_automatic_group, host: host_name)
-          host.remove_group(ungrouped)
+          host.remove_group(ungrouped) unless dry_run
           emit(events, :ok, indent: 4)
         end
 
