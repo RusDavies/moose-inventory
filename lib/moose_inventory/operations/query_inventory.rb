@@ -18,8 +18,8 @@ module Moose
           host_queries.get_hosts(names: names)
         end
 
-        def list_hosts
-          host_queries.list_hosts
+        def list_hosts(filters: {})
+          host_queries.list_hosts(filters: filters)
         end
 
         def list_host_vars(names:, ansible:)

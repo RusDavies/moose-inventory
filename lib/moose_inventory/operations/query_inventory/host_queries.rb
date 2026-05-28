@@ -15,8 +15,8 @@ module Moose
             end
           end
 
-          def list_hosts
-            context.all_hosts.to_h do |host|
+          def list_hosts(filters: {})
+            context.all_hosts.select { |host| host_matches_filters?(host, filters) }.to_h do |host|
               [host.name.to_sym, host_data(host)]
             end
           end
@@ -39,9 +39,39 @@ module Moose
               groups = host.groups_dataset.map(:name)
               data[:groups] = groups unless groups.empty?
 
+              tags = host.tags_dataset.map(:name).sort
+              data[:tags] = tags unless tags.empty?
+
               hostvars = variables_hash(host.hostvars_dataset)
               data[:hostvars] = hostvars unless hostvars.empty?
             end
+          end
+
+          def host_matches_filters?(host, filters)
+            groups_match?(host, filters.fetch(:groups, [])) &&
+              tags_match?(host, filters.fetch(:tags, [])) &&
+              variables_match?(host, filters.fetch(:variables, {}))
+          end
+
+          def groups_match?(host, groups)
+            return true if groups.empty?
+
+            host_groups = host.groups_dataset.map(:name)
+            (groups - host_groups).empty?
+          end
+
+          def tags_match?(host, tags)
+            return true if tags.empty?
+
+            host_tags = host.tags_dataset.map(:name)
+            (tags - host_tags).empty?
+          end
+
+          def variables_match?(host, variables)
+            return true if variables.empty?
+
+            hostvars = variables_hash(host.hostvars_dataset).transform_keys(&:to_s)
+            variables.all? { |name, value| hostvars[name] == value }
           end
 
           def ansible_host_vars(name)
