@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 require_relative 'group_cleanup'
 
 module Moose
   module Inventory
     module Operations
       class GroupChildRelations
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, :warning_count, keyword_init: true)
+        include OperationEventSupport
 
         def initialize(context:)
           @context = context
@@ -28,7 +29,7 @@ module Moose
             warning_count += add_child(parent_group, parent_name, child_name, children_dataset, events)
           end
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         def remove_children(parent_group:, parent_name:, child_names:, delete_orphans: false)
@@ -51,7 +52,7 @@ module Moose
             )
           end
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         private
@@ -107,10 +108,6 @@ module Moose
 
         def association_exists?(dataset, name)
           !dataset.nil? && !dataset[name: name].nil?
-        end
-
-        def emit(events, type, payload = {})
-          events << Event.new(type: type, payload: payload)
         end
       end
     end

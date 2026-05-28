@@ -27,6 +27,7 @@ bundle exec rubocop \
   lib/moose_inventory/operations/remove_groups.rb \
   lib/moose_inventory/operations/add_variables.rb \
   lib/moose_inventory/operations/entity_variable_operation_support.rb \
+  lib/moose_inventory/operations/operation_event_support.rb \
   lib/moose_inventory/operations/remove_variables.rb \
   lib/moose_inventory/operations/remove_hosts.rb \
   lib/moose_inventory/operations/query_inventory.rb \

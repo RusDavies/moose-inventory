@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 module Moose
   module Inventory
     module Operations
       # Removes host/group associations for existing primary entities.
       class RemoveAssociations
         AUTOMATIC_GROUP = 'ungrouped'
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, :warning_count, keyword_init: true)
+        include OperationEventSupport
 
         def initialize(context:)
           @context = context
@@ -25,7 +26,7 @@ module Moose
 
           add_automatic_group_if_needed(host, host_name, events)
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         def group_from_hosts(group:, group_name:, host_names:)
@@ -39,7 +40,7 @@ module Moose
             warning_count += remove_host_from_group(group, group_name, host_name, hosts_dataset, events)
           end
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         private
@@ -90,10 +91,6 @@ module Moose
 
         def association_exists?(dataset, name)
           !dataset.nil? && !dataset[name: name].nil?
-        end
-
-        def emit(events, type, payload = {})
-          events << Event.new(type: type, payload: payload)
         end
       end
     end

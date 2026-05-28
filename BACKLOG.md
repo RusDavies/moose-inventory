@@ -259,15 +259,17 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 61 done / 1 open.
+Code quality status counts: 62 done / 0 open.
 
 ## Open
 
-1. Extract a small shared operation event emitter/result helper.
-   - Several operation classes still define their own `Event`, `Result`, and `emit(events, type, payload = {})` plumbing.
-   - A bounded helper, similar in spirit to the variable-operation support extraction, would reduce duplication without touching CLI output rendering.
+_No open code-quality items._
 
 ## Done
+
+1. Extract a small shared operation event emitter/result helper.
+   - Added `OperationEventSupport` for shared structured event/result construction and array event emission.
+   - Refactored operation classes and variable-operation support to use the shared helper without changing CLI rendering or event payload contracts.
 
 1. Clarify the empty-hosts shape for `group get` output.
    - Kept the existing default output contract: `group get` omits empty relationship collections such as `hosts: []` for compact human/data output.

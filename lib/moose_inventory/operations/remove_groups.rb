@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 require_relative 'group_cleanup'
 
 module Moose
@@ -7,8 +9,7 @@ module Moose
     module Operations
       # Removes top-level groups and their direct associations.
       class RemoveGroups
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, :warning_count, keyword_init: true)
+        include OperationEventSupport
 
         def initialize(context:)
           @context = context
@@ -26,7 +27,7 @@ module Moose
             warning_count += remove_group(name, events, recursive: recursive)
           end
 
-          Result.new(events: events, warning_count: warning_count)
+          operation_result(events: events, warning_count: warning_count)
         end
 
         private
@@ -68,10 +69,6 @@ module Moose
             emit(events, :ok, indent: 4)
             cleanup.delete_orphaned_group(child, events) if recursive
           end
-        end
-
-        def emit(events, type, payload = {})
-          events << Event.new(type: type, payload: payload)
         end
       end
     end

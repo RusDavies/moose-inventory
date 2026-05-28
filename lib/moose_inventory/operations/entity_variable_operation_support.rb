@@ -1,9 +1,13 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 module Moose
   module Inventory
     module Operations
       module EntityVariableOperationSupport
+        include OperationEventSupport
+
         def initialize(context:, entity_type:, emitter: nil)
           @context = context
           @entity_type = entity_type
@@ -31,7 +35,7 @@ module Moose
         end
 
         def emit(type, payload = {})
-          event = self.class::Event.new(type: type, payload: payload)
+          event = build_event(type, payload)
           events << event
           emitter&.call(event)
           event

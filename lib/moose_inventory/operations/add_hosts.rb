@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'operation_event_support'
+
 module Moose
   module Inventory
     module Operations
@@ -12,8 +14,7 @@ module Moose
       # to progress text.
       class AddHosts
         AUTOMATIC_GROUP = 'ungrouped'
-        Event = Struct.new(:type, :payload, keyword_init: true)
-        Result = Struct.new(:events, keyword_init: true)
+        include OperationEventSupport
 
         def initialize(context:)
           @context = context
@@ -26,7 +27,7 @@ module Moose
               add_host(name, groups, events)
             end
           end
-          Result.new(events: events)
+          operation_result(events: events)
         end
 
         private
@@ -99,10 +100,6 @@ module Moose
 
         def association_exists?(dataset, name)
           !dataset.nil? && !dataset[name: name].nil?
-        end
-
-        def emit(events, type, payload = {})
-          events << Event.new(type: type, payload: payload)
         end
       end
     end
