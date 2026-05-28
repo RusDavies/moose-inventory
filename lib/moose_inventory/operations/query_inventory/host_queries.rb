@@ -16,7 +16,10 @@ module Moose
           end
 
           def list_hosts(filters: {})
-            context.all_hosts.select { |host| host_matches_filters?(host, filters) }.to_h do |host|
+            dataset = filtered_hosts_dataset(filters)
+            return {} if dataset.nil?
+
+            dataset.order(:id).all.to_h do |host|
               [host.name.to_sym, host_data(host)]
             end
           end
@@ -47,31 +50,41 @@ module Moose
             end
           end
 
-          def host_matches_filters?(host, filters)
-            groups_match?(host, filters.fetch(:groups, [])) &&
-              tags_match?(host, filters.fetch(:tags, [])) &&
-              variables_match?(host, filters.fetch(:variables, {}))
+          def filtered_hosts_dataset(filters)
+            dataset = context.hosts_dataset
+            dataset = filter_hosts_by_groups(dataset, filters.fetch(:groups, []))
+            return nil if dataset.nil?
+
+            dataset = filter_hosts_by_tags(dataset, filters.fetch(:tags, []))
+            return nil if dataset.nil?
+
+            filter_hosts_by_variables(dataset, filters.fetch(:variables, {}))
           end
 
-          def groups_match?(host, groups)
-            return true if groups.empty?
+          def filter_hosts_by_groups(dataset, groups)
+            groups.reduce(dataset) do |current_dataset, group_name|
+              group = context.find_group(group_name)
+              return nil if group.nil?
 
-            host_groups = host.groups_dataset.map(:name)
-            (groups - host_groups).empty?
+              current_dataset.where(id: context.db_dataset(:groups_hosts).where(group_id: group.id).select(:host_id))
+            end
           end
 
-          def tags_match?(host, tags)
-            return true if tags.empty?
+          def filter_hosts_by_tags(dataset, tags)
+            tags.reduce(dataset) do |current_dataset, tag_name|
+              tag = context.find_tag(tag_name)
+              return nil if tag.nil?
 
-            host_tags = host.tags_dataset.map(:name)
-            (tags - host_tags).empty?
+              current_dataset.where(id: context.db_dataset(:hosts_tags).where(tag_id: tag.id).select(:host_id))
+            end
           end
 
-          def variables_match?(host, variables)
-            return true if variables.empty?
-
-            hostvars = variables_hash(host.hostvars_dataset).transform_keys(&:to_s)
-            variables.all? { |name, value| hostvars[name] == value }
+          def filter_hosts_by_variables(dataset, variables)
+            variables.reduce(dataset) do |current_dataset, (name, value)|
+              current_dataset.where(
+                id: context.db_dataset(:hostvars).where(name: name, value: value).select(:host_id)
+              )
+            end
           end
 
           def ansible_host_vars(name)

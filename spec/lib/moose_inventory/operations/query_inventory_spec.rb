@@ -68,6 +68,45 @@ RSpec.describe Moose::Inventory::Operations::QueryInventory do
     )
   end
 
+  it 'uses DB-backed host filters without loading all hosts first' do
+    host = @db.models[:host].create(name: 'web01')
+    other = @db.models[:host].create(name: 'db01')
+    group = @db.models[:group].find_or_create(name: 'web')
+    tag = @db.models[:tag].find_or_create(name: 'prod')
+    host.add_group(group)
+    host.add_tag(tag)
+    other.add_tag(tag)
+    host.add_hostvar(@db.models[:hostvar].create(name: 'os', value: 'fedora'))
+    other.add_hostvar(@db.models[:hostvar].create(name: 'os', value: 'debian'))
+    context = Moose::Inventory::InventoryContext.new(db: @db)
+    expect(context).not_to receive(:all_hosts)
+
+    result = described_class.new(context: context).list_hosts(
+      filters: { groups: ['web'], tags: ['prod'], variables: { 'os' => 'fedora' } }
+    )
+
+    expect(result.keys).to eq([:web01])
+  end
+
+  it 'returns no listed hosts when a DB-backed filter references a missing group or tag' do
+    @db.models[:host].create(name: 'web01')
+
+    expect(operation.list_hosts(filters: { groups: ['missing'] })).to eq({})
+    expect(operation.list_hosts(filters: { tags: ['missing'] })).to eq({})
+  end
+
+  it 'applies multiple group filters as AND predicates' do
+    host = @db.models[:host].create(name: 'web01')
+    partial = @db.models[:host].create(name: 'web02')
+    web = @db.models[:group].find_or_create(name: 'web')
+    prod = @db.models[:group].find_or_create(name: 'prod')
+    host.add_group(web)
+    host.add_group(prod)
+    partial.add_group(web)
+
+    expect(operation.list_hosts(filters: { groups: %w[web prod] }).keys).to eq([:web01])
+  end
+
   it 'gets group data while omitting empty relationship collections' do
     @db.models[:group].create(name: 'group1')
 
