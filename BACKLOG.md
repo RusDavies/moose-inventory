@@ -1,3 +1,59 @@
+# Moose Inventory Code Improvement Analysis Backlog
+
+Code improvement analysis status counts: 0 done / 9 open.
+
+## Open
+
+1. Replace the hand-maintained RuboCop file list with dynamic Ruby file discovery.
+   - `scripts/ci/check_rubocop.sh` currently relies on a manually curated file list, which can silently miss new Ruby files and specs.
+   - Discover `lib/**/*.rb`, `spec/**/*.rb`, `bin/*`, gemspec/Rakefile/Gemfile, and other intentional Ruby entrypoints automatically while preserving the current standard check gate.
+   - Keep generated artifacts and non-source files out of the lint scope.
+
+1. Add database uniqueness constraints and indexes for relationship and variable tables.
+   - Add DB-level protection against duplicate host/group variables, duplicate host-group links, duplicate group-child links, and duplicate tag joins.
+   - Add lookup-supporting indexes for common query/filter paths such as host/group name, variable owner/name, tag name, and association joins.
+   - Include migration safety for existing databases that may already contain duplicate records.
+
+1. Split DB connection, schema, migration, lifecycle, and retry responsibilities out of `Moose::Inventory::DB`.
+   - `lib/moose_inventory/db/db.rb` currently owns connection setup, schema definitions, schema version state, backup/reset, retry handling, purge behavior, and model binding.
+   - Extract focused modules/classes so future schema work does not keep expanding the DB singleton.
+   - Preserve the public DB API used by existing CLI and tests during the transition.
+
+1. Replace version bumping with explicit ordered migrations.
+   - Current migration behavior creates missing tables and updates `schema_info.version` to the current constant.
+   - Add explicit migration steps, for example `1 -> 2`, `2 -> 3`, and future `3 -> 4`, so ALTERs, data backfills, indexes, and cleanup can be audited and tested.
+   - Ensure `db status`, `db doctor`, and `db migrate` clearly distinguish current, old-but-migratable, and unsupported future schemas.
+
+1. Refactor inventory snapshot import into validation and application components.
+   - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
+   - Extract an `InventorySnapshotValidator` and `InventorySnapshotApplier` or equivalent focused objects.
+   - Tighten validation for whitespace-only names and duplicate/conflicting normalized names while preserving additive import semantics.
+
+1. Push host list filters into database-backed queries when inventory size justifies it.
+   - `HostQueries#list_hosts` currently loads all hosts and applies group/tag/var filters in Ruby.
+   - Translate filters into Sequel joins and indexed predicates so large inventories do not pay full in-memory scan costs.
+   - Keep the existing AND-style CLI behavior and output shape unchanged.
+
+1. Improve read-only console parsing and validation.
+   - The console currently splits commands on whitespace, which prevents quoted names and makes usage errors fairly blunt.
+   - Consider `Shellwords.split`, explicit audit-limit validation, clearer command-specific usage messages, and regression tests for quoted names.
+   - Keep the console read-only unless future mutation flows preserve confirmation, dry-run, and audit behavior.
+
+1. Normalize tag casing consistently across snapshot import and CLI tag commands.
+   - CLI tag commands normalize tags to lowercase, but snapshot import currently uses tag strings as supplied.
+   - Decide whether tags are case-insensitive metadata; if yes, normalize imported tags the same way and document the rule.
+   - Add import/export regression coverage for mixed-case tags.
+
+1. Keep generated coverage reports out of source-oriented scans and commits.
+   - `spec/reports/coverage` is generated output and should remain ignored unless intentionally published.
+   - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
+
+## Done
+
+_No completed code-improvement analysis items yet._
+
+---
+
 # Moose Inventory Feature Value Backlog
 
 Feature value status counts: 12 done / 0 open.
