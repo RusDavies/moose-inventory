@@ -12,6 +12,7 @@ require_relative '../operations/inventory_snapshot'
 require_relative 'formatter'
 require_relative 'helpers'
 require_relative 'audit'
+require_relative 'console'
 require_relative 'db'
 require_relative 'group'
 require_relative 'host'
@@ -73,6 +74,11 @@ module Moose
 
         desc 'database ACTION', 'Inspect and manage database lifecycle state'
         subcommand 'database', Moose::Inventory::Cli::Db
+
+        desc 'console', 'Open a small read-only inventory browsing console'
+        def console
+          Moose::Inventory::Cli::Console.new(context: inventory_context).run
+        end
 
         desc 'group ACTION',
              'Manipulate groups in the inventory. ' \

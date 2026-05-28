@@ -509,6 +509,26 @@ We can also list hosts, to get the host-centric view.
       - group2
       - group3
 
+###Read-only console
+For human browsing, Moose Inventory includes a small read-only console.  It is intentionally conservative: the first console slice lets operators inspect inventory state, tags, and recent audit events, but does not mutate records.
+
+    $ moose-inventory console
+    Moose Inventory console (read-only). Type help or quit.
+
+Useful console commands include:
+
+    help
+    hosts
+    groups
+    host web01
+    group web
+    tags host web01
+    tags group web
+    audit 10
+    quit
+
+Use the normal CLI commands for edits.  Future interactive mutation can be added with confirmation, dry-run, and audit semantics instead of improvising a tiny foot-gun in a prompt loop.
+
 Removing variables, groups, and hosts is just as easy.  In the following examples, the output is again omitted for compactness; the reader is encouraged to work along to experience the tool.  Note, that although we show how to remove the variables, it is not strictly necessary to do so in this example, since deleting hosts and groups would delete all associated variables anyway.
 
 By default, deleting a group preserves its child groups as root groups. Use `group rm --recursive` when child groups that become orphaned should also be deleted. Similarly, `group rmchild --delete-orphans` removes a parent-child association and deletes the child subtree only when it becomes orphaned by that removal. Hosts whose last group is deleted are automatically moved to `ungrouped`.
