@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 2 done / 9 open.
+Feature value status counts: 3 done / 8 open.
 
 ## Open
-
-1. [HIGH] Document new dry-run and machine-readable plan features in README.md.
-   - Add README coverage for `--dry-run` across mutating command families: host/group add/remove, variable changes, host-group associations, and child-group relationships.
-   - Document `--plan-format yaml|json|pjson`, including the `--dry-run` requirement and example JSON/YAML output shape.
-   - Keep the prose and examples in the same practical style already used in README.md, with copy/paste-safe commands and short safety notes.
 
 1. [HIGH] Add bulk import/export with validation.
    - Support importing inventory definitions from YAML/JSON and applying them transactionally.
@@ -55,6 +50,11 @@ Feature value status counts: 2 done / 9 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. [HIGH] Document new dry-run and machine-readable plan features in README.md.
+   - Added README coverage for `--dry-run` across mutating command families, including host/group lifecycle commands, variables, host-group associations, and child-group relationships.
+   - Documented `--plan-format yaml|json|pjson`, the `--dry-run` requirement, and the structured event output shape.
+   - Kept examples in the existing README style with copy/paste-friendly command blocks.
 
 1. [HIGH] Add machine-readable plan output and/or a dedicated `plan` command.
    - Added `--plan-format yaml|json|pjson` support to all dry-run mutating command families so operators can emit structured dry-run event plans for CI/review automation.
