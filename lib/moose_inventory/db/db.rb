@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'sequel'
+require 'fileutils'
 require 'json'
 
 require_relative 'exceptions'
@@ -18,6 +19,8 @@ module Moose
       @models = nil
       @exceptions = nil
       attr_reader :db, :models, :exceptions
+
+      SCHEMA_VERSION = 1
 
       TABLE_DEFINITIONS = {
         hosts: lambda do |db|
@@ -61,6 +64,12 @@ module Moose
             foreign_key :host_id, :hosts
             foreign_key :group_id, :groups
           end
+        end,
+        schema_info: lambda do |db|
+          db.create_table(:schema_info) do
+            primary_key :id
+            column :version, :integer, null: false
+          end
         end
       }.freeze
 
@@ -83,6 +92,7 @@ module Moose
         Sequel::Model.plugin :json_serializer
         connect
         create_tables
+        ensure_schema_version!
         bind_models!
       end
 
@@ -129,6 +139,7 @@ module Moose
 
         purge
         create_tables
+        ensure_schema_version!
       end
 
       #===============================
@@ -171,8 +182,56 @@ module Moose
                        if_exists: true, cascade: true)
       end
 
+      def self.status
+        {
+          adapter: normalized_adapter,
+          schema_version: schema_version,
+          expected_schema_version: SCHEMA_VERSION,
+          tables: TABLE_DEFINITIONS.keys.to_h { |name| [name, @db.table_exists?(name)] },
+          sqlite_file: sqlite_adapter? ? sqlite_file : nil
+        }
+      end
+
+      def self.migrate!
+        create_tables
+        ensure_schema_version!
+        status
+      end
+
+      def self.backup(path)
+        raise @exceptions[:moose], 'Database backup is currently supported for sqlite3 only.' unless sqlite_adapter?
+
+        source = sqlite_file
+        raise @exceptions[:moose], "SQLite database file #{source} does not exist." unless File.exist?(source)
+
+        destination = File.expand_path(path)
+        FileUtils.mkdir_p(File.dirname(destination))
+        FileUtils.cp(source, destination)
+        destination
+      end
+
+      def self.schema_version
+        return nil unless @db.table_exists?(:schema_info)
+
+        @db[:schema_info].order(:id).last&.fetch(:version)
+      end
+
+      def self.ensure_schema_version!
+        return unless @db.table_exists?(:schema_info)
+
+        if @db[:schema_info].empty?
+          @db[:schema_info].insert(version: SCHEMA_VERSION)
+        elsif schema_version != SCHEMA_VERSION
+          @db[:schema_info].update(version: SCHEMA_VERSION)
+        end
+      end
+
       def self.sqlite_adapter?
         normalized_adapter == 'sqlite3'
+      end
+
+      def self.sqlite_file
+        File.expand_path(config_db_settings[:file])
       end
 
       def self.purge_sqlite_associations
