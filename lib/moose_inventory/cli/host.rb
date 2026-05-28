@@ -24,6 +24,7 @@ module Moose
         require_relative 'host_addvar'
         require_relative 'host_listvars'
         require_relative 'host_rmvar'
+        require_relative 'host_tags'
       end
     end
   end

@@ -20,7 +20,7 @@ module Moose
       @exceptions = nil
       attr_reader :db, :models, :exceptions
 
-      SCHEMA_VERSION = 2
+      SCHEMA_VERSION = 3
 
       TABLE_DEFINITIONS = {
         hosts: lambda do |db|
@@ -82,6 +82,26 @@ module Moose
             column :entity_name, :text
             column :details, :text
           end
+        end,
+        tags: lambda do |db|
+          db.create_table(:tags) do
+            primary_key :id
+            column :name, :text, unique: true, null: false
+          end
+        end,
+        hosts_tags: lambda do |db|
+          db.create_table(:hosts_tags) do
+            primary_key :id
+            foreign_key :host_id, :hosts
+            foreign_key :tag_id, :tags
+          end
+        end,
+        groups_tags: lambda do |db|
+          db.create_table(:groups_tags) do
+            primary_key :id
+            foreign_key :group_id, :groups
+            foreign_key :tag_id, :tags
+          end
         end
       }.freeze
 
@@ -90,7 +110,8 @@ module Moose
         hostvar: :Hostvar,
         group: :Group,
         groupvar: :Groupvar,
-        audit_event: :AuditEvent
+        audit_event: :AuditEvent,
+        tag: :Tag
       }.freeze
 
       BUSY_RETRY_LIMIT = 10
@@ -248,22 +269,31 @@ module Moose
       end
 
       def self.purge_sqlite_associations
+        purge_sqlite_groups
+        purge_sqlite_hosts
+        Groupvar.all.each(&:destroy)
+        Hostvar.all.each(&:destroy)
+        AuditEvent.all.each(&:destroy) if @db.table_exists?(:audit_events)
+        Tag.all.each(&:destroy) if @db.table_exists?(:tags)
+      end
+
+      def self.purge_sqlite_groups
         Group.all.each do |group|
           group.remove_all_hosts
           group.remove_all_groupvars
           group.remove_all_children
+          group.remove_all_tags if @db.table_exists?(:groups_tags)
           group.destroy
         end
+      end
 
+      def self.purge_sqlite_hosts
         Host.all.each do |host|
           host.remove_all_groups
           host.remove_all_hostvars
+          host.remove_all_tags if @db.table_exists?(:hosts_tags)
           host.destroy
         end
-
-        Groupvar.all.each(&:destroy)
-        Hostvar.all.each(&:destroy)
-        AuditEvent.all.each(&:destroy) if @db.table_exists?(:audit_events)
       end
 
       #--------------------

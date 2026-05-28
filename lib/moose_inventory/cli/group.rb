@@ -23,6 +23,7 @@ module Moose
         require_relative 'group_addvar'
         require_relative 'group_listvars'
         require_relative 'group_rmvar'
+        require_relative 'group_tags'
       end
     end
   end

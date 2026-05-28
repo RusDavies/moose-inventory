@@ -8,6 +8,7 @@ require_relative 'factory'
 require_relative 'listvars_support'
 require_relative 'plan_rendering'
 require_relative 'relation_transaction_support'
+require_relative 'tag_support'
 require_relative 'variable_rendering'
 
 module Moose
@@ -22,6 +23,7 @@ module Moose
         include Moose::Inventory::Cli::ListvarsSupport
         include Moose::Inventory::Cli::PlanRendering
         include Moose::Inventory::Cli::RelationTransactionSupport
+        include Moose::Inventory::Cli::TagSupport
         include Moose::Inventory::Cli::VariableRendering
 
         AUTOMATIC_GROUP = 'ungrouped'

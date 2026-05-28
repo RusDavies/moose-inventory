@@ -36,8 +36,8 @@ RSpec.describe Moose::Inventory::Cli::Application do
         path,
         {
           'version' => 1,
-          'hosts' => { 'web01' => { 'groups' => ['web'], 'vars' => { 'env' => 'prod' } } },
-          'groups' => { 'web' => { 'children' => [], 'vars' => { 'role' => 'frontend' } } }
+          'hosts' => { 'web01' => { 'groups' => ['web'], 'tags' => [], 'vars' => { 'env' => 'prod' } } },
+          'groups' => { 'web' => { 'children' => [], 'tags' => [], 'vars' => { 'role' => 'frontend' } } }
         }.to_yaml
       )
 

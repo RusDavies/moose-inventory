@@ -38,11 +38,11 @@ RSpec.describe Moose::Inventory::Operations::InventorySnapshot do
     expect(snapshot).to eq(
       'version' => 1,
       'hosts' => {
-        'web01' => { 'groups' => ['web'], 'vars' => { 'env' => 'prod' } }
+        'web01' => { 'groups' => ['web'], 'tags' => [], 'vars' => { 'env' => 'prod' } }
       },
       'groups' => {
-        'blue' => { 'children' => [], 'vars' => {} },
-        'web' => { 'children' => ['blue'], 'vars' => { 'role' => 'frontend' } }
+        'blue' => { 'children' => [], 'tags' => [], 'vars' => {} },
+        'web' => { 'children' => ['blue'], 'tags' => [], 'vars' => { 'role' => 'frontend' } }
       }
     )
   end
