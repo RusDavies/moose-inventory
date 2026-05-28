@@ -1,13 +1,8 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 5 done / 5 open.
+Code improvement analysis status counts: 6 done / 4 open.
 
 ## Open
-
-1. Refactor inventory snapshot import into validation and application components.
-   - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
-   - Extract an `InventorySnapshotValidator` and `InventorySnapshotApplier` or equivalent focused objects.
-   - Tighten validation for whitespace-only names and duplicate/conflicting normalized names while preserving additive import semantics.
 
 1. Push host list filters into database-backed queries when inventory size justifies it.
    - `HostQueries#list_hosts` currently loads all hosts and applies group/tag/var filters in Ruby.
@@ -29,6 +24,12 @@ Code improvement analysis status counts: 5 done / 5 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Refactor inventory snapshot import into validation and application components.
+   - Extracted `InventorySnapshotValidator` for normalization, shape checks, reference validation, duplicate normalized-key detection, whitespace-only entity/variable name rejection, and group-cycle detection.
+   - Extracted `InventorySnapshotApplier` for additive entity creation, variable create/update behavior, tag joins, group-child joins, and host-group joins.
+   - Reduced `ImportInventorySnapshot` to orchestration: validate first, then apply inside the existing transaction.
+   - Added regression coverage for whitespace-only names and duplicate normalized keys before any DB writes.
 
 1. Split DB connection, schema, migration, lifecycle, and retry responsibilities out of `Moose::Inventory::DB`.
    - Extracted schema definitions, ordered migration metadata, index definitions, migration execution, schema version recording, future-schema refusal, duplicate cleanup, index creation, and table creation helpers into `Moose::Inventory::DB::SchemaMigrations`.
