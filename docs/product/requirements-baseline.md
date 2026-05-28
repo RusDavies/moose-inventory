@@ -2,16 +2,16 @@
 
 ## Approval status
 
-Status: **Draft — not approved**
+Status: **Approved requirements and acceptance criteria baseline**
 
-This baseline is prepared from the approved product brief, current README, test/release/security evidence, and existing CLI behavior. It is not approved requirements, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
+Approval reference: `GOV-REQ-001` in `docs/governance/approval-register.md` approves this document as the requirements and acceptance criteria baseline for Moose Inventory.
 
 Approved references:
 
 - `GOV-TAILOR-001`: Moose Inventory is approved as Class 4 with target profile Software Library / Package.
 - `GOV-PRODUCT-001`: `docs/product/product-brief.md` is approved as the product-framing baseline.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this requirements baseline before it becomes the durable requirements baseline.
+Scope limit: this approval covers the requirements and acceptance criteria baseline only. It is not CLI UX approval, architecture approval, security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, RubyGems publishing approval, or approval of any open requirements question that requires a separate decision.
 
 ## Change-control note
 
