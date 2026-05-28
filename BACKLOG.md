@@ -1,6 +1,6 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 0 done / 9 open.
+Code improvement analysis status counts: 0 done / 10 open.
 
 ## Open
 
@@ -23,6 +23,14 @@ Code improvement analysis status counts: 0 done / 9 open.
    - Current migration behavior creates missing tables and updates `schema_info.version` to the current constant.
    - Add explicit migration steps, for example `1 -> 2`, `2 -> 3`, and future `3 -> 4`, so ALTERs, data backfills, indexes, and cleanup can be audited and tested.
    - Ensure `db status`, `db doctor`, and `db migrate` clearly distinguish current, old-but-migratable, and unsupported future schemas.
+   - Preserve the current additive-table compatibility path for old databases where safe, but stop treating "missing tables created" as equivalent to a complete schema migration.
+   - Refuse to run against a future schema version with a clear error rather than risking writes from older code.
+   - Detect dirty or partially migrated schemas and report them through `db doctor` instead of blindly updating `schema_info.version`.
+
+1. Add regression coverage for existing-database upgrade behavior.
+   - Build fixture databases for pre-schema-info, schema version 1, schema version 2, current schema, future schema, and dirty/partial schema states.
+   - Assert startup, `db status`, `db doctor`, and `db migrate` behavior for each fixture.
+   - Prove that old-but-migratable databases are upgraded safely, future schemas are rejected, and partial schemas are diagnosed without optimistic version scribbling.
 
 1. Refactor inventory snapshot import into validation and application components.
    - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
