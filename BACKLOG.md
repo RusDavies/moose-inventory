@@ -1,11 +1,13 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 8 done / 4 open.
+Process conformance status counts: 9 done / 4 open.
 
 ## Open
 
-1. Add architecture, trust-boundary, and digital-estate documentation.
-   - Cover CLI layers, operation objects, DB adapters/schema, Ansible plugin/shim, audit/import/export, CI/release pipeline, GitHub repo, RubyGems gem, trusted publishing, release environment, and maintainer ownership.
+1. Review and approve, revise, or reject the draft architecture, trust-boundary, and digital-estate baseline.
+   - Draft is in `docs/architecture/architecture-and-digital-estate.md`.
+   - Pending approval is recorded as `GOV-ARCH-001` in `docs/governance/approval-register.md`.
+   - Do not treat the draft as approved architecture evidence until a human approver records a durable decision.
 
 1. Add maintained security/privacy process docs.
    - Add threat model or abuse cases, data classification/flows for local DB/config/audit logs/artifacts, secrets/logging model, vulnerability intake/security patch policy, and accepted-risk register.
@@ -19,6 +21,11 @@ Process conformance status counts: 8 done / 4 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Add architecture, trust-boundary, and digital-estate documentation.
+   - Added `docs/architecture/architecture-and-digital-estate.md` as a draft architecture, trust-boundary, and digital-estate baseline.
+   - Covered high-level architecture, CLI/config/operation/DB/release layers, runtime data model, trust boundaries, data flows, digital estate register, maintainer ownership boundaries, architecture decisions, and open architecture/estate questions.
+   - Recorded pending approval as `GOV-ARCH-001`; the baseline remains draft until explicitly approved, revised, or rejected.
 
 1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
    - Russ approved `docs/ux/cli-workflow-notes.md` as the CLI UX/workflow baseline on 2026-05-28.
