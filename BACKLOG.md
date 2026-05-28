@@ -1,13 +1,8 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 6 done / 4 open.
+Code improvement analysis status counts: 7 done / 3 open.
 
 ## Open
-
-1. Push host list filters into database-backed queries when inventory size justifies it.
-   - `HostQueries#list_hosts` currently loads all hosts and applies group/tag/var filters in Ruby.
-   - Translate filters into Sequel joins and indexed predicates so large inventories do not pay full in-memory scan costs.
-   - Keep the existing AND-style CLI behavior and output shape unchanged.
 
 1. Improve read-only console parsing and validation.
    - The console currently splits commands on whitespace, which prevents quoted names and makes usage errors fairly blunt.
@@ -24,6 +19,12 @@ Code improvement analysis status counts: 6 done / 4 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Push host list filters into database-backed queries when inventory size justifies it.
+   - Reworked `HostQueries#list_hosts` to build a filtered Sequel dataset instead of loading every host and checking group/tag/variable filters in Ruby.
+   - Added `InventoryContext#hosts_dataset`, `#db_dataset`, and `#find_tag` as narrow DB-backed query seams.
+   - Preserved AND-style filter behavior for multiple groups/tags/variables, missing-filter empty results, insertion-order output, and existing CLI output shape.
+   - Added regression coverage proving filtered host listing does not call `all_hosts`, handles missing group/tag filters, and treats multiple group filters as AND predicates.
 
 1. Refactor inventory snapshot import into validation and application components.
    - Extracted `InventorySnapshotValidator` for normalization, shape checks, reference validation, duplicate normalized-key detection, whitespace-only entity/variable name rejection, and group-cycle detection.
