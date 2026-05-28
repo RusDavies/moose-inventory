@@ -135,6 +135,26 @@ RSpec.describe 'Moose::Inventory::DB' do
       expect(@db.status[:tables].values).to all(eq(true))
     end
 
+    it 'declares ordered migrations through the current schema version' do
+      expect(@db.migration_versions).to eq((1..@db::SCHEMA_VERSION).to_a)
+    end
+
+    it 'applies schema migrations one version at a time' do
+      with_sqlite_fixture(schema_version: 1, tables: %i[hosts groups schema_info]) do
+        @db.init_sqlite3
+
+        expect(@db).to receive(:apply_schema_migration!).ordered.with(1).and_call_original
+        expect(@db).to receive(:apply_schema_migration!).ordered.with(2).and_call_original
+        expect(@db).to receive(:apply_schema_migration!).ordered.with(3).and_call_original
+
+        @db.migrate_schema!
+
+        expect(@db.schema_version).to eq(@db::SCHEMA_VERSION)
+        expect(@db.status[:tables][:audit_events]).to eq(true)
+        expect(@db.status[:tables][:tags]).to eq(true)
+      end
+    end
+
     it 'upgrades a pre-schema-info sqlite database by creating missing additive tables' do
       with_sqlite_fixture(tables: %i[hosts groups]) do
         expect_current_schema_after_init

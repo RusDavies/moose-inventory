@@ -1,6 +1,6 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 2 done / 8 open.
+Code improvement analysis status counts: 3 done / 7 open.
 
 ## Open
 
@@ -13,14 +13,6 @@ Code improvement analysis status counts: 2 done / 8 open.
    - `lib/moose_inventory/db/db.rb` currently owns connection setup, schema definitions, schema version state, backup/reset, retry handling, purge behavior, and model binding.
    - Extract focused modules/classes so future schema work does not keep expanding the DB singleton.
    - Preserve the public DB API used by existing CLI and tests during the transition.
-
-1. Replace version bumping with explicit ordered migrations.
-   - Current migration behavior creates missing tables and updates `schema_info.version` to the current constant.
-   - Add explicit migration steps, for example `1 -> 2`, `2 -> 3`, and future `3 -> 4`, so ALTERs, data backfills, indexes, and cleanup can be audited and tested.
-   - Ensure `db status`, `db doctor`, and `db migrate` clearly distinguish current, old-but-migratable, and unsupported future schemas.
-   - Preserve the current additive-table compatibility path for old databases where safe, but stop treating "missing tables created" as equivalent to a complete schema migration.
-   - Refuse to run against a future schema version with a clear error rather than risking writes from older code.
-   - Detect dirty or partially migrated schemas and report them through `db doctor` instead of blindly updating `schema_info.version`.
 
 1. Refactor inventory snapshot import into validation and application components.
    - `ImportInventorySnapshot` currently handles normalization, validation, graph cycle checks, entity creation, variable updates, tag joins, and association creation in one class.
@@ -47,6 +39,13 @@ Code improvement analysis status counts: 2 done / 8 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Replace version bumping with explicit ordered migrations.
+   - Added `SCHEMA_MIGRATIONS` with ordered migration versions 1, 2, and 3.
+   - Version 1 creates core inventory tables plus `schema_info`, version 2 creates `audit_events`, and version 3 creates tag metadata tables.
+   - Replaced startup/reset/`db migrate` schema bootstrapping with `migrate_schema!`, which applies migration steps in version order and records each completed schema version.
+   - Preserved additive compatibility by creating missing tables for an already-recorded migration version while retaining future-schema refusal.
+   - Added specs proving migration version order and documented the migration chain in README.md.
 
 1. Add regression coverage for existing-database upgrade behavior.
    - Added SQLite fixture coverage for pre-`schema_info`, schema version 1, schema version 2, current schema, future schema, and dirty/partial schema states.
