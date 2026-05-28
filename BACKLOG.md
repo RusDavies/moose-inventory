@@ -4,8 +4,8 @@ Process conformance status counts: 9 done / 4 open.
 
 ## Open
 
-1. Review and approve, revise, or reject the draft architecture, trust-boundary, and digital-estate baseline.
-   - Draft is in `docs/architecture/architecture-and-digital-estate.md`.
+1. Review and approve, revise, or reject the draft architecture and trust-boundary baseline.
+   - Draft is in `docs/architecture/architecture-and-trust-boundaries.md`.
    - Pending approval is recorded as `GOV-ARCH-001` in `docs/governance/approval-register.md`.
    - Do not treat the draft as approved architecture evidence until a human approver records a durable decision.
 
@@ -18,13 +18,13 @@ Process conformance status counts: 9 done / 4 open.
    - Add documentation plan/checklist, release checklist, release security gate, accepted-risk disposition, package yank/deprecation/rollback path, and post-release review template.
 
 1. Add package maintenance runbook and AI-agent operation boundaries.
-   - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
+   - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
 
-1. Add architecture, trust-boundary, and digital-estate documentation.
-   - Added `docs/architecture/architecture-and-digital-estate.md` as a draft architecture, trust-boundary, and digital-estate baseline.
-   - Covered high-level architecture, CLI/config/operation/DB/release layers, runtime data model, trust boundaries, data flows, digital estate register, maintainer ownership boundaries, architecture decisions, and open architecture/estate questions.
+1. Add architecture and trust-boundary documentation.
+   - Added `docs/architecture/architecture-and-trust-boundaries.md` as a draft architecture and trust-boundary baseline.
+   - Covered high-level architecture, CLI/config/operation/DB/release layers, runtime data model, trust boundaries, data flows, maintainer ownership boundaries, architecture decisions, and open architecture questions.
    - Recorded pending approval as `GOV-ARCH-001`; the baseline remains draft until explicitly approved, revised, or rejected.
 
 1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
