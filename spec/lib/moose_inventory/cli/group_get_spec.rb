@@ -56,7 +56,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       mock = {}
       mock[name.to_sym] = {}
-      # mock[name.to_sym][:hosts] = [] # TODO: Should this be present or not?
+      # Contract: `group get` omits empty relationship collections in the default
+      # human/data output. `group list --ansible` keeps `hosts: []` because
+      # Ansible inventory consumers expect the key to exist.
 
       desired = { aborted: false, STDOUT: '', STDERR: '' }
       desired[:STDOUT] = mock.to_yaml

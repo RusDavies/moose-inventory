@@ -46,6 +46,14 @@ RSpec.describe Moose::Inventory::Operations::QueryInventory do
     )
   end
 
+  it 'gets group data while omitting empty relationship collections' do
+    @db.models[:group].create(name: 'group1')
+
+    expect(operation.get_groups(names: ['group1'])).to eq(
+      group1: {}
+    )
+  end
+
   it 'lists groups in ansible mode with hosts arrays and vars key' do
     group = @db.models[:group].create(name: 'group1')
     var = @db.models[:groupvar].create(name: 'foo', value: 'bar')
