@@ -268,10 +268,16 @@ A new or changed CLI workflow is UX-ready when:
 - Tests cover success, failure, and safety boundaries.
 - Any unresolved UX risk is recorded as a backlog item or accepted risk.
 
+## UX decisions recorded from review
+
+These decisions were provided by Russ during review on 2026-05-28. They are captured here as product/UX direction for future implementation, but this draft UX baseline still requires explicit approval through `GOV-UX-001` before it becomes approved UX evidence.
+
+1. Destructive commands should eventually require explicit confirmation unless `--yes` or an equivalent non-interactive acknowledgement is provided.
+2. Human-readable output compatibility should be formally versioned, not only machine-readable output compatibility.
+3. Read-only console support for quoted names and richer validation through `Shellwords.split` should be prioritized before adding more CLI features.
+4. Audit history should remain evidence only; future rollback/change-set UX should not be introduced through audit history.
+5. Snapshot import should eventually offer a formal preview/diff mode distinct from command-level dry-run planning, but this is future work and does not block the current UX baseline.
+
 ## Open UX questions
 
-1. Should destructive commands eventually require explicit confirmation unless `--yes` or equivalent is provided, or is dry-run plus explicit command naming sufficient for this CLI?
-2. Should human-readable output compatibility be formally versioned, or should compatibility guarantees focus mainly on machine-readable formats?
-3. Should the read-only console support quoted names and richer validation through `Shellwords.split` as a priority before more CLI features?
-4. Should future rollback/change-set UX be introduced for audit history, or should audit remain evidence only?
-5. Should snapshot import offer a formal preview/diff mode distinct from command-level dry-run planning?
+No open UX questions remain in this draft. Future questions should be added here only when they are not already represented as a decision, backlog item, or accepted scope limit.

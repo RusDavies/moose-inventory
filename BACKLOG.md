@@ -7,6 +7,7 @@ Process conformance status counts: 7 done / 5 open.
 1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
    - Draft is in `docs/ux/cli-workflow-notes.md`.
    - Pending approval is recorded as `GOV-UX-001` in `docs/governance/approval-register.md`.
+   - Russ answered the original open UX questions on 2026-05-28; the resulting implementation follow-ups are tracked in the UX implementation backlog below.
    - Do not treat the draft as approved UX/workflow evidence until a human approver records a durable decision.
 
 1. Add architecture, trust-boundary, and digital-estate documentation.
@@ -60,6 +61,37 @@ Process conformance status counts: 7 done / 5 open.
    - Added `docs/process/conformance-gap-analysis-2026-05-28.md` with current evidence, approval-vs-document distinctions, recommended Class 4 + Software Library / Package tailoring, gaps, and remediation phases.
    - Added `docs/governance/approval-register.md` seeded with pending tailoring approval and explicit approval rules.
    - Added follow-up backlog items for tailoring approval, product/requirements/UX/architecture/security/QA/release/maintenance/agent-boundary remediation.
+
+---
+
+# Moose Inventory UX Implementation Backlog
+
+UX implementation status counts: 0 done / 4 open.
+
+## Open
+
+1. Add explicit confirmation for destructive commands.
+   - Destructive commands should eventually require explicit confirmation unless `--yes` or an equivalent non-interactive acknowledgement is provided.
+   - Preserve dry-run behavior and ensure invalid inputs/options fail before prompting or writing.
+   - Document confirmation behavior in README when implemented.
+
+1. Define and document output compatibility versioning.
+   - Human-readable output compatibility should be formally versioned alongside machine-readable output compatibility.
+   - Decide where version identifiers live and how breaking output changes are approved, tested, and communicated.
+
+1. Prioritize read-only console quoted-name parsing and richer validation.
+   - Implement `Shellwords.split` or equivalent parsing for quoted names.
+   - Add command-specific validation and regression tests while keeping the console read-only.
+   - This overlaps the existing code-improvement backlog item and should satisfy or narrow that item when implemented.
+
+1. Add snapshot import preview/diff mode.
+   - Future snapshot import should offer a formal preview/diff mode distinct from command-level dry-run planning.
+   - Show creates, updates, unchanged/skipped records, conflicts, validation failures, and any unsupported/destructive implications before DB writes.
+   - This is future work and does not block approval of the current CLI UX baseline.
+
+## Done
+
+_No completed UX implementation items._
 
 ---
 
