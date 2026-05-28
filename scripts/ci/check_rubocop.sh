@@ -1,133 +1,33 @@
 #!/bin/bash
 set -euo pipefail
 
-bundle exec rubocop \
-  Gemfile \
-  Rakefile \
-  bin/moose-inventory \
-  lib/moose_inventory.rb \
-  lib/moose_inventory/config/config.rb \
-  lib/moose_inventory/db/db.rb \
-  lib/moose_inventory/db/exceptions.rb \
-  lib/moose_inventory/db/models.rb \
-  lib/moose_inventory/runtime_options.rb \
-  lib/moose_inventory/inventory_context.rb \
-  lib/moose_inventory/cli/application.rb \
-  lib/moose_inventory/cli/factory.rb \
-  lib/moose_inventory/cli/listvars_support.rb \
-  lib/moose_inventory/cli/relation_transaction_support.rb \
-  lib/moose_inventory/cli/association_rendering.rb \
-  lib/moose_inventory/cli/association_rendering_support.rb \
-  lib/moose_inventory/cli/child_relation_rendering.rb \
-  lib/moose_inventory/cli/variable_rendering.rb \
-  lib/moose_inventory/operations/add_hosts.rb \
-  lib/moose_inventory/operations/add_groups.rb \
-  lib/moose_inventory/operations/add_associations.rb \
-  lib/moose_inventory/operations/remove_associations.rb \
-  lib/moose_inventory/operations/group_cleanup.rb \
-  lib/moose_inventory/operations/group_child_relations.rb \
-  lib/moose_inventory/operations/remove_groups.rb \
-  lib/moose_inventory/operations/add_variables.rb \
-  lib/moose_inventory/operations/entity_variable_operation_support.rb \
-  lib/moose_inventory/operations/operation_event_support.rb \
-  lib/moose_inventory/operations/remove_variables.rb \
-  lib/moose_inventory/operations/remove_hosts.rb \
-  lib/moose_inventory/operations/query_inventory.rb \
-  lib/moose_inventory/operations/query_inventory/base_query.rb \
-  lib/moose_inventory/operations/query_inventory/host_queries.rb \
-  lib/moose_inventory/operations/query_inventory/group_queries.rb \
-  lib/moose_inventory/cli/formatter.rb \
-  lib/moose_inventory/cli/group.rb \
-  lib/moose_inventory/cli/helpers.rb \
-  spec/lib/moose_inventory/cli/helpers_spec.rb \
-  lib/moose_inventory/cli/host.rb \
-  lib/moose_inventory/cli/host_add.rb \
-  lib/moose_inventory/cli/group_add.rb \
-  lib/moose_inventory/cli/host_addgroup.rb \
-  lib/moose_inventory/cli/group_addhost.rb \
-  lib/moose_inventory/cli/host_rmgroup.rb \
-  lib/moose_inventory/cli/group_rmhost.rb \
-  lib/moose_inventory/cli/group_addchild.rb \
-  lib/moose_inventory/cli/group_rmchild.rb \
-  lib/moose_inventory/cli/group_rm.rb \
-  lib/moose_inventory/cli/host_addvar.rb \
-  lib/moose_inventory/cli/host_rmvar.rb \
-  lib/moose_inventory/cli/host_rm.rb \
-  lib/moose_inventory/cli/group_addvar.rb \
-  lib/moose_inventory/cli/group_rmvar.rb \
-  lib/moose_inventory/cli/host_get.rb \
-  lib/moose_inventory/cli/host_list.rb \
-  lib/moose_inventory/cli/host_listvars.rb \
-  lib/moose_inventory/cli/group_get.rb \
-  lib/moose_inventory/cli/group_list.rb \
-  lib/moose_inventory/cli/group_listvars.rb \
-  spec/lib/moose_inventory/operations/add_hosts_spec.rb \
-  spec/lib/moose_inventory/operations/add_groups_spec.rb \
-  spec/lib/moose_inventory/operations/add_associations_spec.rb \
-  spec/lib/moose_inventory/operations/remove_associations_spec.rb \
-  spec/lib/moose_inventory/operations/group_child_relations_spec.rb \
-  spec/lib/moose_inventory/operations/remove_groups_spec.rb \
-  spec/lib/moose_inventory/operations/add_variables_spec.rb \
-  spec/lib/moose_inventory/operations/operation_event_support_spec.rb \
-  spec/lib/moose_inventory/operations/remove_variables_spec.rb \
-  spec/lib/moose_inventory/operations/remove_hosts_spec.rb \
-  spec/lib/moose_inventory/operations/query_inventory_spec.rb \
-  spec/lib/moose_inventory/inventory_context_spec.rb \
-  spec/lib/moose_inventory/cli/application_spec.rb \
-  spec/lib/moose_inventory/cli/cli_spec.rb \
-  spec/lib/moose_inventory/cli/factory_spec.rb \
-  spec/lib/moose_inventory/cli/formatter_spec.rb \
-  spec/lib/moose_inventory/cli/group_add_spec.rb \
-  spec/lib/moose_inventory/cli/group_addchild_spec.rb \
-  spec/lib/moose_inventory/cli/group_addhost_spec.rb \
-  spec/lib/moose_inventory/cli/group_addvar_spec.rb \
-  spec/lib/moose_inventory/cli/group_get_spec.rb \
-  spec/lib/moose_inventory/cli/group_list_spec.rb \
-  spec/lib/moose_inventory/cli/group_listvar_spec.rb \
-  spec/lib/moose_inventory/cli/group_rmchild_spec.rb \
-  spec/lib/moose_inventory/cli/group_rm_spec.rb \
-  spec/lib/moose_inventory/cli/group_rmhost_spec.rb \
-  spec/lib/moose_inventory/cli/group_rmvar_spec.rb \
-  spec/lib/moose_inventory/cli/group_spec.rb \
-  spec/lib/moose_inventory/cli/host_add_spec.rb \
-  spec/lib/moose_inventory/cli/host_addgroup_spec.rb \
-  spec/lib/moose_inventory/cli/host_addvar_spec.rb \
-  spec/lib/moose_inventory/cli/host_get_spec.rb \
-  spec/lib/moose_inventory/cli/host_list_spec.rb \
-  spec/lib/moose_inventory/cli/host_listvar_spec.rb \
-  spec/lib/moose_inventory/cli/host_rmgroup_spec.rb \
-  spec/lib/moose_inventory/cli/host_rmvar_spec.rb \
-  spec/lib/moose_inventory/cli/host_rm_spec.rb \
-  spec/lib/moose_inventory/cli/host_spec.rb \
-  spec/shared/shared_config_setup.rb \
-  spec/spec_helper.rb \
-  spec/support/cli_harness.rb \
-  spec/lib/moose_inventory/config/config_spec.rb \
-  spec/lib/moose_inventory/db/db_spec.rb \
-  spec/lib/moose_inventory/db/exceptions_spec.rb \
-  spec/lib/moose_inventory/db/models_spec.rb \
-  lib/moose_inventory/operations/import_inventory_snapshot.rb \
-  lib/moose_inventory/operations/inventory_doctor.rb \
-  lib/moose_inventory/operations/inventory_snapshot.rb \
-  lib/moose_inventory/cli/audit.rb \
-  lib/moose_inventory/cli/audit_recording.rb \
-  lib/moose_inventory/cli/console.rb \
-  lib/moose_inventory/cli/db.rb \
-  lib/moose_inventory/cli/group_tags.rb \
-  lib/moose_inventory/cli/host_tags.rb \
-  lib/moose_inventory/cli/plan_rendering.rb \
-  lib/moose_inventory/cli/tag_support.rb \
-  spec/examples/ci_examples_spec.rb \
-  spec/lib/moose_inventory/ansible_plugin_examples_spec.rb \
-  spec/lib/moose_inventory/cli/application_doctor_spec.rb \
-  spec/lib/moose_inventory/cli/application_import_export_spec.rb \
-  spec/lib/moose_inventory/cli/audit_spec.rb \
-  spec/lib/moose_inventory/cli/console_spec.rb \
-  spec/lib/moose_inventory/cli/tags_spec.rb \
-  spec/lib/moose_inventory/db_lifecycle_spec.rb \
-  spec/lib/moose_inventory/operations/import_inventory_snapshot_spec.rb \
-  spec/lib/moose_inventory/operations/inventory_doctor_spec.rb \
-  spec/lib/moose_inventory/operations/inventory_snapshot_spec.rb \
-  lib/moose_inventory/version.rb \
-  moose-inventory.gemspec \
-  scripts/files.rb
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+rubocop_files=(
+  Gemfile
+  Rakefile
+)
+
+while IFS= read -r -d '' file; do
+  rubocop_files+=("$file")
+done < <(find bin -maxdepth 1 -type f -print0 | sort -z)
+
+while IFS= read -r -d '' file; do
+  rubocop_files+=("$file")
+done < <(
+  find \
+    lib \
+    scripts \
+    spec \
+    -path 'spec/reports' -prune -o \
+    -path 'spec/reports/*' -prune -o \
+    -type f \( -name '*.rb' -o -name '*.gemspec' \) \
+    -print0 | sort -z
+)
+
+while IFS= read -r -d '' file; do
+  rubocop_files+=("$file")
+done < <(find . -maxdepth 1 -type f -name '*.gemspec' -print0 | sort -z)
+
+bundle exec rubocop "${rubocop_files[@]}"

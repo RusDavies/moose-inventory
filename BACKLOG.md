@@ -1,13 +1,8 @@
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 0 done / 10 open.
+Code improvement analysis status counts: 1 done / 9 open.
 
 ## Open
-
-1. Replace the hand-maintained RuboCop file list with dynamic Ruby file discovery.
-   - `scripts/ci/check_rubocop.sh` currently relies on a manually curated file list, which can silently miss new Ruby files and specs.
-   - Discover `lib/**/*.rb`, `spec/**/*.rb`, `bin/*`, gemspec/Rakefile/Gemfile, and other intentional Ruby entrypoints automatically while preserving the current standard check gate.
-   - Keep generated artifacts and non-source files out of the lint scope.
 
 1. Add database uniqueness constraints and indexes for relationship and variable tables.
    - Add DB-level protection against duplicate host/group variables, duplicate host-group links, duplicate group-child links, and duplicate tag joins.
@@ -58,7 +53,10 @@ Code improvement analysis status counts: 0 done / 10 open.
 
 ## Done
 
-_No completed code-improvement analysis items yet._
+1. Replace the hand-maintained RuboCop file list with dynamic Ruby file discovery.
+   - Replaced the explicit RuboCop file list with repository-rooted discovery for `bin/*`, `lib/**/*.rb`, `scripts/**/*.rb`, `spec/**/*.rb`, root gemspecs, `Gemfile`, and `Rakefile`.
+   - Pruned generated coverage reports under `spec/reports` from source-oriented lint discovery.
+   - Verified the dynamic gate still inspects 129 files and reports no offenses.
 
 ---
 
