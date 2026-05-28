@@ -15,28 +15,13 @@ module Moose
         #==========================
         desc 'listvar', 'List all variables associated with the host'
         def listvars(*argv)
-          if ansible_mode?
-            abort_if_wrong_ansible_arg_count(argv, 1)
-          else
-            abort_if_missing_args(argv, 1, '1 or more')
-          end
+          validate_listvars_args(argv)
 
           names = normalize_names(argv)
           results = inventory_query.list_host_vars(names: names, ansible: ansible_mode?)
-
-          if ansible_mode? && inventory_context.find_host(names.first).nil?
-            fmt.warn "The host #{names.first} does not exist.\n"
-          end
+          warn_if_missing_ansible_listvars_entity(:host, names.first)
 
           fmt.dump(results, output_format)
-        end
-
-        private
-
-        def abort_if_wrong_ansible_arg_count(args, expected)
-          return if args.length == expected
-
-          abort("ERROR: Wrong number of arguments for Ansible mode, #{args.length} for #{expected}.")
         end
       end
     end

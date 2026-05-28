@@ -4,6 +4,7 @@ require_relative '../inventory_context'
 require_relative 'association_rendering'
 require_relative 'child_relation_rendering'
 require_relative 'factory'
+require_relative 'listvars_support'
 require_relative 'relation_transaction_support'
 require_relative 'variable_rendering'
 
@@ -15,6 +16,7 @@ module Moose
       module Helpers
         include Moose::Inventory::Cli::AssociationRendering
         include Moose::Inventory::Cli::ChildRelationRendering
+        include Moose::Inventory::Cli::ListvarsSupport
         include Moose::Inventory::Cli::RelationTransactionSupport
         include Moose::Inventory::Cli::VariableRendering
 
