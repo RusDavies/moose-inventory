@@ -15,8 +15,10 @@ module Moose
         desc 'addchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Associate one or more child-groups CHILDGROUP_n with PARENTGROUP'
         option :dry_run, type: :boolean
+        option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def addchild(*argv)
           abort_if_missing_args(argv, 2, '2 or more')
+          validate_machine_plan_request!
 
           pname = argv[0].downcase
           cnames = normalize_names(argv.slice(1, argv.length - 1))
@@ -24,7 +26,7 @@ module Moose
           abort_if_automatic_group([pname] + cnames)
 
           result = add_children_to_group(pname, cnames)
-          print_warning_summary(result)
+          print_warning_summary(result) unless machine_plan_output_rendered?(result, command: 'group addchild')
         end
 
         private
@@ -42,7 +44,7 @@ module Moose
               child_names: child_names,
               dry_run: options[:dry_run]
             )
-            render_addchild_events(result.events)
+            render_addchild_events(result.events) unless machine_plan_output_requested?
             result
           end
         end

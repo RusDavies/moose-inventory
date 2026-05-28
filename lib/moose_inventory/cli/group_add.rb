@@ -15,8 +15,10 @@ module Moose
         desc 'add NAME', 'Add a group NAME to the inventory'
         option :hosts
         option :dry_run, type: :boolean
+        option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
+          validate_machine_plan_request!
 
           names = normalize_names(argv)
           hosts = csv_option_names(options[:hosts])
@@ -28,6 +30,8 @@ module Moose
 
           result = build_operation(Moose::Inventory::Operations::AddGroups)
                    .call(names: names, hosts: hosts, dry_run: options[:dry_run])
+          return if machine_plan_output_rendered?(result, command: 'group add')
+
           render_add_groups_events(result.events)
           print_warning_summary(result, success_message: 'Succeeded')
         end

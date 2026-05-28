@@ -17,10 +17,12 @@ module Moose
                default: false,
                desc: 'Also delete child groups that become orphaned'
         option :dry_run, type: :boolean
+        option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         desc 'rm NAME',
              'Remove a group NAME from the inventory'
         def rm(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
+          validate_machine_plan_request!
 
           names = normalize_names(argv)
 
@@ -30,7 +32,7 @@ module Moose
           )
 
           result = remove_groups(names)
-          print_warning_summary(result)
+          print_warning_summary(result) unless machine_plan_output_requested?
         end
 
         private
@@ -40,7 +42,7 @@ module Moose
 
           db.transaction do
             result = operation.call(names: names, recursive: options[:recursive], dry_run: options[:dry_run])
-            render_group_rm_events(result.events)
+            machine_plan_output_rendered?(result, command: 'group rm') || render_group_rm_events(result.events)
             return result
           end
         end

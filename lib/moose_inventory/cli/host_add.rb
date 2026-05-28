@@ -33,8 +33,10 @@ module Moose
              'Add a hosts HOSTNAME_n to the inventory'
         option :groups
         option :dry_run, type: :boolean
+        option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
+          validate_machine_plan_request!
 
           # Arguments
           names = normalize_names(argv)
@@ -48,6 +50,8 @@ module Moose
 
           result = build_operation(Moose::Inventory::Operations::AddHosts)
                    .call(names: names, groups: groups, dry_run: options[:dry_run])
+          return if machine_plan_output_rendered?(result, command: 'host add')
+
           render_add_hosts_events(result.events)
           print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
         end
