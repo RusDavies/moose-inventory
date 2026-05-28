@@ -2,13 +2,13 @@
 
 ## Approval status
 
-Status: **Draft — not approved**
+Status: **Approved product-framing baseline**
 
-This brief is a product-framing baseline prepared from the current repository, README, release/security evidence, and approved process tailoring. It is not a product-direction approval, requirements approval, release approval, accepted-risk approval, or public/compliance claim.
+Approval reference: `GOV-PRODUCT-001` in `docs/governance/approval-register.md` approves this document as the product-framing baseline for Moose Inventory.
 
 Approved tailoring reference: `GOV-TAILOR-001` in `docs/governance/approval-register.md` approves Moose Inventory as **Class 4 with target profile Software Library / Package**.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this product brief before it becomes the durable product baseline.
+Scope limit: this approval covers product framing only. It is not detailed requirements approval, CLI UX approval, architecture approval, security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
 
 ## Summary
 

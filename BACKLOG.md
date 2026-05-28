@@ -1,13 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 3 done / 7 open.
+Process conformance status counts: 4 done / 6 open.
 
 ## Open
-
-1. Review and approve, revise, or reject the draft product brief.
-   - Draft is in `docs/product/product-brief.md`.
-   - Pending approval is recorded as `GOV-PRODUCT-001` in `docs/governance/approval-register.md`.
-   - Do not treat the draft as approved product direction until a human approver records a durable decision.
 
 1. Create requirements and acceptance criteria baseline.
    - Cover CLI behavior, DB backends/schema migrations, Ansible integration, import/export, dry-run/plan output, audit log, release/package integrity, compatibility, documentation, and security expectations.
@@ -31,6 +26,11 @@ Process conformance status counts: 3 done / 7 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Review and approve, revise, or reject the draft product brief.
+   - Russ approved `docs/product/product-brief.md` as the product-framing baseline on 2026-05-28.
+   - Recorded approval as `GOV-PRODUCT-001` in `docs/governance/approval-register.md`.
+   - Approval covers product framing only; detailed requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, and future RubyGems publishing still require separate approval.
 
 1. Create a product brief / framing baseline.
    - Added `docs/product/product-brief.md` as a draft product-framing baseline.
