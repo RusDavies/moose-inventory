@@ -1,18 +1,46 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 0 done / 1 open.
+Process conformance status counts: 1 done / 8 open.
 
 ## Open
 
-1. Re-read updated `SOFTWARE_PRODUCT_DEVELOPMENT_PROCESS.md`, perform a repository gap analysis, and propose a conformance plan.
-   - Compare Moose Inventory against the updated process documents, including tailoring/classification, approvals/governance, requirements, architecture, UX/product design if applicable, security/privacy, QA/test evidence, release, operations, documentation, and backlog/evidence practices.
-   - Produce a gap analysis that distinguishes documented/draft artifacts from approved gates; the existence of a document must not be treated as approval.
-   - Propose an ordered remediation plan to bring the repository into conformance with the updated process documents, including blockers, required human approvals, verification evidence, and backlog changes.
-   - Update repository process/conformance docs and backlog after the analysis, without claiming product, launch, release, or governance approval unless explicitly recorded by an approver.
+1. Record and approve or revise the process tailoring decision.
+   - Proposed classification is Class 4 with target profile Software Library / Package.
+   - Record Russ/delegated approver decision in `docs/governance/approval-register.md` with scope, date, limitations, and follow-up.
+   - Do not treat the recommendation in `docs/process/conformance-gap-analysis-2026-05-28.md` as approval.
+
+1. Create a product brief / framing baseline.
+   - Document target users, use cases, goals, non-goals, assumptions, success criteria, and security-sensitive inventory/Ansible implications.
+   - Mark draft until explicitly approved.
+
+1. Create requirements and acceptance criteria baseline.
+   - Cover CLI behavior, DB backends/schema migrations, Ansible integration, import/export, dry-run/plan output, audit log, release/package integrity, compatibility, documentation, and security expectations.
+   - Include approval status and change-control note.
+
+1. Add lightweight CLI UX/workflow notes.
+   - Cover core workflows, destructive operations, dry-run/trust behavior, machine-readable output, error states, accessibility/readability expectations, and UX approval status.
+
+1. Add architecture, trust-boundary, and digital-estate documentation.
+   - Cover CLI layers, operation objects, DB adapters/schema, Ansible plugin/shim, audit/import/export, CI/release pipeline, GitHub repo, RubyGems gem, trusted publishing, release environment, and maintainer ownership.
+
+1. Add maintained security/privacy process docs.
+   - Add threat model or abuse cases, data classification/flows for local DB/config/audit logs/artifacts, secrets/logging model, vulnerability intake/security patch policy, and accepted-risk register.
+   - Track GitHub secret-scanning limitation vs local `gitleaks` compensation.
+
+1. Add QA, documentation QA, and release gate templates.
+   - Map `scripts/check.sh` gates to requirements/release criteria.
+   - Add documentation plan/checklist, release checklist, release security gate, accepted-risk disposition, package yank/deprecation/rollback path, and post-release review template.
+
+1. Add package maintenance runbook and AI-agent operation boundaries.
+   - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
 
-_No completed process-conformance items._
+1. Re-read updated `SOFTWARE_PRODUCT_DEVELOPMENT_PROCESS.md`, perform a repository gap analysis, and propose a conformance plan.
+   - Compared Moose Inventory against updated process/tailoring/governance plus requirements, architecture, security, QA, release, operations, and documentation guidance.
+   - Added `docs/process/conformance-gap-analysis-2026-05-28.md` with current evidence, approval-vs-document distinctions, recommended Class 4 + Software Library / Package tailoring, gaps, and remediation phases.
+   - Added `docs/governance/approval-register.md` seeded with pending tailoring approval and explicit approval rules.
+   - Added follow-up backlog items for tailoring approval, product/requirements/UX/architecture/security/QA/release/maintenance/agent-boundary remediation.
 
 ---
 
