@@ -1,12 +1,13 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 2 done / 7 open.
+Process conformance status counts: 3 done / 7 open.
 
 ## Open
 
-1. Create a product brief / framing baseline.
-   - Document target users, use cases, goals, non-goals, assumptions, success criteria, and security-sensitive inventory/Ansible implications.
-   - Mark draft until explicitly approved.
+1. Review and approve, revise, or reject the draft product brief.
+   - Draft is in `docs/product/product-brief.md`.
+   - Pending approval is recorded as `GOV-PRODUCT-001` in `docs/governance/approval-register.md`.
+   - Do not treat the draft as approved product direction until a human approver records a durable decision.
 
 1. Create requirements and acceptance criteria baseline.
    - Cover CLI behavior, DB backends/schema migrations, Ansible integration, import/export, dry-run/plan output, audit log, release/package integrity, compatibility, documentation, and security expectations.
@@ -30,6 +31,11 @@ Process conformance status counts: 2 done / 7 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Create a product brief / framing baseline.
+   - Added `docs/product/product-brief.md` as a draft product-framing baseline.
+   - Covered target users, user problems, use cases, product goals, non-goals, security-sensitive inventory/Ansible implications, compatibility expectations, assumptions, success criteria, and open product questions.
+   - Recorded pending approval as `GOV-PRODUCT-001`; the brief remains draft until explicitly approved, revised, or rejected.
 
 1. Record and approve or revise the process tailoring decision.
    - Russ approved the target class/profile as Class 4 with target profile Software Library / Package on 2026-05-28.
