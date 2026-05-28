@@ -32,6 +32,7 @@ module Moose
         def host_payload(host)
           {
             'groups' => host.groups_dataset.map(:name).sort,
+            'tags' => host.tags_dataset.map(:name).sort,
             'vars' => variables_hash(host.hostvars_dataset)
           }
         end
@@ -45,6 +46,7 @@ module Moose
         def group_payload(group)
           {
             'children' => group.children_dataset.map(:name).sort,
+            'tags' => group.tags_dataset.map(:name).sort,
             'vars' => variables_hash(group.groupvars_dataset)
           }
         end

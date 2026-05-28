@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 8 done / 3 open.
+Feature value status counts: 9 done / 2 open.
 
 ## Open
-
-1. Add tagging / metadata support for hosts and groups.
-   - Add labels/tags separate from Ansible variables for metadata such as environment, owner, role, lifecycle, location, and criticality.
-   - Support listing and filtering by tags.
-   - Keep tag semantics simple and portable across database adapters.
 
 1. Add query/filter support for inventory listing.
    - Support commands such as `host list --group web --tag prod --var os=fedora --format yaml`.
@@ -25,6 +20,14 @@ Feature value status counts: 8 done / 3 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add tagging / metadata support for hosts and groups.
+   - Added portable `tags`, `hosts_tags`, and `groups_tags` tables and schema version bump to 3.
+   - Added `host addtag`, `host rmtag`, `host listtags`, `group addtag`, `group rmtag`, and `group listtags`.
+   - Tag names are normalized to lowercase and deduplicated per host/group.
+   - Snapshot import/export now includes host/group tags.
+   - Tag add/remove changes are audited.
+   - Filtering by tag remains in the query/filter backlog item.
 
 1. Add audit log / change history.
    - Added append-only `audit_events` table and schema version bump to 2.

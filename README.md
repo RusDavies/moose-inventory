@@ -176,7 +176,7 @@ For automation and review workflows, dry-run events can also be emitted as YAML,
 The actual `events` array includes the full ordered plan for the command.  Each event has a `type` and a `payload`, so scripts can inspect planned host, group, variable, association, automatic `ungrouped`, and child-group cleanup actions without scraping human-readable output.
 
 ###Import and export snapshots
-The full inventory can be exported as a portable snapshot.  The snapshot contains a version number, hosts, host variables, host-to-group memberships, groups, group variables, and child-group relationships.  It is intended for review, backup, migration, and automation workflows.
+The full inventory can be exported as a portable snapshot.  The snapshot contains a version number, hosts, host variables, host-to-group memberships, host/group tags, groups, group variables, and child-group relationships.  It is intended for review, backup, migration, and automation workflows.
 
     $ moose-inventory --format yaml export inventory.yml
     Exported inventory snapshot to inventory.yml.
@@ -189,6 +189,9 @@ The full inventory can be exported as a portable snapshot.  The snapshot contain
           "groups": [
             "web"
           ],
+          "tags": [
+            "prod"
+          ],
           "vars": {
             "env": "prod"
           }
@@ -197,6 +200,9 @@ The full inventory can be exported as a portable snapshot.  The snapshot contain
       "groups": {
         "web": {
           "children": [],
+          "tags": [
+            "frontend"
+          ],
           "vars": {
             "role": "frontend"
           }
@@ -213,7 +219,7 @@ Snapshots can be imported from YAML or JSON.  Import validates the file before w
     Variables changed: 2
     Associations added: 1
 
-Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
+Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations and tags, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
 
 ###Inventory doctor
 The `doctor` command runs read-only inventory health checks and exits with a non-zero status if it finds issues.  This makes it suitable for CI checks, release gates, and pre-change reviews.
@@ -246,6 +252,25 @@ For automation, use `--format yaml`, `--format json`, or `--format pjson` on the
 
 Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
 
+###Metadata tags
+Hosts and groups can carry metadata tags that are separate from Ansible variables.  Use tags for operational labels such as environment, owner, lifecycle, location, role, or criticality when you want metadata without exposing it as inventory variables.
+
+    $ moose-inventory host addtag web01 prod critical owner-platform
+    Added host tag(s) to 'web01': prod, critical, owner-platform.
+
+    $ moose-inventory host listtags web01
+    Host 'web01' tags: critical, owner-platform, prod
+
+    $ moose-inventory host rmtag web01 critical
+    Removed host tag(s) from 'web01': critical.
+
+Groups support the same tag commands:
+
+    $ moose-inventory group addtag web frontend public-edge
+    $ moose-inventory group listtags web --format json
+
+Tag names are normalized to lowercase, deduplicated per host/group, and stored in portable join tables.  Tag add/remove operations are audited when they change state.  Querying/filtering by tags is intentionally left to the next query/filter backlog item so this slice keeps metadata storage and inspection simple.
+
 ###Audit log / change history
 Moose Inventory records append-only audit events for successful mutating CLI commands.  Dry-run commands are intentionally excluded, because planned changes are already available through `--plan-format` and did not actually mutate inventory state.
 
@@ -271,8 +296,8 @@ Moose Inventory records a small schema metadata table and exposes database lifec
 
     $ moose-inventory db status
     Adapter: sqlite3
-    Schema version: 1
-    Expected schema version: 1
+    Schema version: 3
+    Expected schema version: 3
     SQLite file: /home/russ/.moose/db/dev.db
     Tables:
     - hosts: present
@@ -283,7 +308,7 @@ Moose Inventory records a small schema metadata table and exposes database lifec
     Database doctor found no issues.
 
     $ moose-inventory db migrate
-    Database schema is at version 1.
+    Database schema is at version 3.
 
 `db migrate` is currently a lightweight schema bootstrap/metadata command.  It creates any missing known tables and records the current schema version.  Future release migrations should extend this path instead of hiding schema changes inside unrelated commands.
 

@@ -40,6 +40,10 @@ module Moose
         db.models[:group].find_or_create(name: name)
       end
 
+      def find_or_create_tag(name)
+        db.models[:tag].find_or_create(name: name)
+      end
+
       def automatic_group
         find_or_create_group(AUTOMATIC_GROUP)
       end

@@ -7,6 +7,7 @@ module Moose
       # Model for the hosts table
       class Host < Sequel::Model
         many_to_many :groups
+        many_to_many :tags
         one_to_many :hostvars
       end
 
@@ -24,6 +25,7 @@ module Moose
                      class: self
 
         many_to_many :hosts
+        many_to_many :tags
         one_to_many  :groupvars
       end
 
@@ -42,6 +44,13 @@ module Moose
       ##
       # Append-only audit event records.
       class AuditEvent < Sequel::Model
+      end
+
+      ##
+      # Host/group metadata tag record.
+      class Tag < Sequel::Model
+        many_to_many :hosts
+        many_to_many :groups
       end
     end
   end

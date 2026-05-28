@@ -31,11 +31,11 @@ RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot do
     snapshot = {
       'version' => 1,
       'hosts' => {
-        'web01' => { 'groups' => ['web'], 'vars' => { 'env' => 'prod' } }
+        'web01' => { 'groups' => ['web'], 'tags' => [], 'vars' => { 'env' => 'prod' } }
       },
       'groups' => {
-        'web' => { 'children' => ['blue'], 'vars' => { 'role' => 'frontend' } },
-        'blue' => { 'children' => [], 'vars' => {} }
+        'web' => { 'children' => ['blue'], 'tags' => [], 'vars' => { 'role' => 'frontend' } },
+        'blue' => { 'children' => [], 'tags' => [], 'vars' => {} }
       }
     }
 

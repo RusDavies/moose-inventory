@@ -42,7 +42,7 @@ module Moose
 
         def validate_hosts!(snapshot)
           snapshot['hosts'].each do |name, payload|
-            validate_entity_payload!(name, payload, 'host', allowed_keys: %w[groups vars])
+            validate_entity_payload!(name, payload, 'host', allowed_keys: %w[groups tags vars])
             groups = array_value(payload, 'groups', label: "host '#{name}' groups")
             groups.each do |group_name|
               next if snapshot['groups'].key?(group_name)
@@ -54,7 +54,7 @@ module Moose
 
         def validate_groups!(snapshot)
           snapshot['groups'].each do |name, payload|
-            validate_entity_payload!(name, payload, 'group', allowed_keys: %w[children vars])
+            validate_entity_payload!(name, payload, 'group', allowed_keys: %w[children tags vars])
             children = array_value(payload, 'children', label: "group '#{name}' children")
             children.each do |child_name|
               next if snapshot['groups'].key?(child_name)
@@ -75,6 +75,8 @@ module Moose
 
           variables = payload.fetch('vars', {})
           raise_invalid("#{label} '#{name}' vars must be a mapping") unless variables.is_a?(Hash)
+
+          array_value(payload, 'tags', label: "#{label} '#{name}' tags")
         end
 
         def validate_group_cycles!(groups)
@@ -120,6 +122,7 @@ module Moose
           groups.each do |name, payload|
             group = context.find_group(name)
             result.updated_variables += apply_variables(group, :group, payload.fetch('vars', {}))
+            apply_tags(group, array_value(payload, 'tags', label: "group '#{name}' tags"), result)
             array_value(payload, 'children', label: "group '#{name}' children").each do |child_name|
               child = context.find_group(child_name)
               next unless group.children_dataset[name: child_name].nil?
@@ -134,6 +137,7 @@ module Moose
           hosts.each do |name, payload|
             host = context.find_host(name)
             result.updated_variables += apply_variables(host, :host, payload.fetch('vars', {}))
+            apply_tags(host, array_value(payload, 'tags', label: "host '#{name}' tags"), result)
             array_value(payload, 'groups', label: "host '#{name}' groups").each do |group_name|
               group = context.find_group(group_name)
               next unless host.groups_dataset[name: group_name].nil?
@@ -141,6 +145,16 @@ module Moose
               host.add_group(group)
               result.associations += 1
             end
+          end
+        end
+
+        def apply_tags(entity, tags, result)
+          tags.each do |tag_name|
+            tag = context.find_or_create_tag(tag_name)
+            next unless entity.tags_dataset[name: tag_name].nil?
+
+            entity.add_tag(tag)
+            result.associations += 1
           end
         end
 
