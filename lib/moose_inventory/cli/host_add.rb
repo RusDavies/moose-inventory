@@ -24,13 +24,15 @@ module Moose
           group_missing_created: :render_add_host_missing_group_warning,
           association_exists: :render_add_host_association_exists_warning,
           adding_automatic_group: :render_add_host_automatic_group,
-          host_complete: :render_add_host_complete
+          host_complete: :render_add_host_complete,
+          dry_run_summary: :render_dry_run_summary
         }.freeze
 
         #==========================
         desc 'add HOSTNAME_1 [HOSTNAME_2 ...]',
              'Add a hosts HOSTNAME_n to the inventory'
         option :groups
+        option :dry_run, type: :boolean
         def add(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
 
@@ -45,7 +47,7 @@ module Moose
           abort_if_automatic_group(groups)
 
           result = build_operation(Moose::Inventory::Operations::AddHosts)
-                   .call(names: names, groups: groups)
+                   .call(names: names, groups: groups, dry_run: options[:dry_run])
           render_add_hosts_events(result.events)
           print_warning_summary(result, success_message: 'Succeeded', warning_message: 'Succeeded')
         end
@@ -99,6 +101,10 @@ module Moose
 
         def render_add_host_complete(_payload)
           fmt.puts 2, '- All OK'
+        end
+
+        def render_dry_run_summary(_payload)
+          puts 'Dry run complete. No changes applied.'
         end
       end
     end

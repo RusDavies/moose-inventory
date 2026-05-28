@@ -13,9 +13,18 @@ module Moose
           @context = context
         end
 
-        def call(names:)
+        def call(names:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
+
+          if dry_run
+            names.each do |name|
+              warning_count += remove_host(name, events)
+            end
+            emit(events, :dry_run_summary)
+            return operation_result(events: events, warning_count: warning_count)
+          end
 
           context.transaction do
             names.each do |name|
@@ -28,7 +37,7 @@ module Moose
 
         private
 
-        attr_reader :context
+        attr_reader :context, :dry_run
 
         def remove_host(name, events)
           emit(events, :host_started, name: name)
@@ -45,8 +54,10 @@ module Moose
 
           emit(events, :ok, indent: 4)
           emit(events, :destroying_host, name: name)
-          host.remove_all_groups
-          host.destroy
+          unless dry_run
+            host.remove_all_groups
+            host.destroy
+          end
           emit(events, :ok, indent: 4)
           emit(events, :host_complete)
           0

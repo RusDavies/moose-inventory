@@ -43,6 +43,19 @@ RSpec.describe Moose::Inventory::Operations::AddHosts do
       expect(host.groups_dataset[name: 'ungrouped']).not_to be_nil
     end
 
+    it 'returns dry-run events without creating hosts, groups, or associations' do
+      @result = operation.call(
+        names: ['testhost'],
+        groups: ['missinggroup'],
+        dry_run: true
+      )
+
+      expect(@result.events.map(&:type)).to eq(
+        %i[host_started creating_host ok adding_association group_missing_created ok host_complete dry_run_summary]
+      )
+      expect(@db.models[:host].find(name: 'testhost')).to be_nil
+      expect(@db.models[:group].find(name: 'missinggroup')).to be_nil
+    end
     it 'reports existing hosts, missing groups, and duplicate associations as events' do
       host = @db.models[:host].create(name: 'testhost')
       group = @db.models[:group].create(name: 'existinggroup')

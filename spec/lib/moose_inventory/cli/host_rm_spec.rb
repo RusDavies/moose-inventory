@@ -82,6 +82,27 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #---------------
+    it 'HOST --dry-run should show planned removal without deleting the host' do
+      name = 'test1'
+      @db.models[:host].create(name: name)
+
+      actual = runner { @app.start(%W[host rm #{name} --dry-run]) }
+
+      desired = {}
+      desired[:STDOUT] =
+        "Remove host '#{name}':\n  " \
+        "- Retrieve host '#{name}'...\n    " \
+        "- OK\n  " \
+        "- Destroy host '#{name}'...\n    " \
+        "- OK\n  " \
+        "- All OK\n" \
+        "Dry run complete. No changes applied.\n" \
+        "Succeeded.\n"
+
+      expected(actual, desired)
+      expect(@db.models[:host].find(name: name)).not_to be_nil
+    end
+    #---------------
     it 'HOST1 HOST2 ... should remove multiple hosts' do
       names = %w[host1 host2 host3]
       names.each do |name|
