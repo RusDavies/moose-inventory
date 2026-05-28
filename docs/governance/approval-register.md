@@ -4,13 +4,17 @@ This register records durable approvals and explicitly separates prepared eviden
 
 ## Current status
 
-No process-baseline approvals are currently recorded in this file.
+The process tailoring baseline is approved as Class 4 with target profile Software Library / Package.
+
+## Approved decisions
+
+| ID | Decision | Approver | Date | Scope | Conditions / limitations |
+| --- | --- | --- | --- | --- | --- |
+| GOV-TAILOR-001 | Tailor Moose Inventory as Class 4, target profile Software Library / Package | Russ / Rusty Frink Desiato | 2026-05-28 | Process baseline for this repository | Approval covers project class and target profile only. It does not approve product brief, requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, or future RubyGems publishing. Pure software-library target excludes normal hosted-runtime operations unless Moose Inventory later adds an operated runtime component. |
 
 ## Pending approvals
 
-| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| GOV-TAILOR-001 | Tailor Moose Inventory as Class 4, target profile Software Library / Package | Pending | TBD | TBD | Process baseline for this repository | Prepared by process-conformance gap analysis on 2026-05-28; not approved by document existence. |
+_No pending approvals recorded._
 
 ## Approval rules
 

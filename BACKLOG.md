@@ -1,13 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 1 done / 8 open.
+Process conformance status counts: 2 done / 7 open.
 
 ## Open
-
-1. Record and approve or revise the process tailoring decision.
-   - Proposed classification is Class 4 with target profile Software Library / Package.
-   - Record Russ/delegated approver decision in `docs/governance/approval-register.md` with scope, date, limitations, and follow-up.
-   - Do not treat the recommendation in `docs/process/conformance-gap-analysis-2026-05-28.md` as approval.
 
 1. Create a product brief / framing baseline.
    - Document target users, use cases, goals, non-goals, assumptions, success criteria, and security-sensitive inventory/Ansible implications.
@@ -35,6 +30,11 @@ Process conformance status counts: 1 done / 8 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Record and approve or revise the process tailoring decision.
+   - Russ approved the target class/profile as Class 4 with target profile Software Library / Package on 2026-05-28.
+   - Recorded approval in `docs/governance/approval-register.md` as `GOV-TAILOR-001` with explicit scope limits.
+   - Approval covers project class and target profile only; it does not approve product brief, requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, or future RubyGems publishing.
 
 1. Re-read updated `SOFTWARE_PRODUCT_DEVELOPMENT_PROCESS.md`, perform a repository gap analysis, and propose a conformance plan.
    - Compared Moose Inventory against updated process/tailoring/governance plus requirements, architecture, security, QA, release, operations, and documentation guidance.
