@@ -50,6 +50,40 @@ RSpec.describe Moose::Inventory::Operations::AddAssociations do
     expect(host.groups_dataset[name: 'ungrouped']).to be_nil
   end
 
+  it 'dry-runs adding groups to a host without creating groups or changing automatic membership' do
+    host = @db.models[:host].create(name: 'host1')
+    ungrouped = @db.models[:group].find_or_create(name: 'ungrouped')
+    host.add_group(ungrouped)
+
+    result = operation.host_to_groups(
+      host: host,
+      host_name: 'host1',
+      group_names: ['created'],
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(1)
+    expect(result.events.map(&:type)).to include(:group_missing_created, :removing_automatic_group, :dry_run_summary)
+    expect(@db.models[:group].find(name: 'created')).to be_nil
+    expect(host.groups_dataset[name: 'created']).to be_nil
+    expect(host.groups_dataset[name: 'ungrouped']).not_to be_nil
+  end
+
+  it 'dry-runs adding hosts to a group without creating hosts or changing automatic membership' do
+    group = @db.models[:group].create(name: 'group1')
+
+    result = operation.group_to_hosts(
+      group: group,
+      group_name: 'group1',
+      host_names: ['host1'],
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(1)
+    expect(result.events.map(&:type)).to include(:host_missing_created, :dry_run_summary)
+    expect(@db.models[:host].find(name: 'host1')).to be_nil
+    expect(group.hosts_dataset[name: 'host1']).to be_nil
+  end
   it 'adds hosts to an existing group and reports creation/duplicate events' do
     group = @db.models[:group].create(name: 'group1')
     duplicate_host = @db.models[:host].create(name: 'host1')

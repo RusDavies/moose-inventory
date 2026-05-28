@@ -125,6 +125,23 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #------------------------
+    it 'host rmgroup HOST GROUP --dry-run should not remove membership or add ungrouped' do
+      host_name = 'test1'
+      group_name = 'group1'
+      runner { @app.start(%W[host add #{host_name}]) }
+      runner { @app.start(%W[host addgroup #{host_name} #{group_name}]) }
+
+      actual = runner { @app.start(%W[host rmgroup #{host_name} #{group_name} --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      host = @db.models[:host].find(name: host_name)
+      expect(host.groups_dataset[name: group_name]).not_to be_nil
+      expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+    end
+
+    #------------------------
     it 'host rmgroup HOST GROUP ... should warn about non-existing associations' do
       # 1. Should warn that the group doesn't exist.
       # 2. Should complete with success. (desired state == actual state)
