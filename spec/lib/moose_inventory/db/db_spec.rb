@@ -87,6 +87,110 @@ RSpec.describe 'Moose::Inventory::DB' do
     end
   end
 
+  describe 'existing database upgrade behavior' do
+    def with_sqlite_fixture(schema_version: nil, tables: [])
+      Dir.mktmpdir('moose-schema-fixture') do |dir|
+        dbfile = File.join(dir, 'inventory.sqlite3')
+        seed_sqlite_fixture(dbfile, schema_version: schema_version, tables: tables)
+
+        with_db_config(adapter: 'sqlite3', file: dbfile) do
+          yield dbfile
+        end
+      end
+    end
+
+    def seed_sqlite_fixture(dbfile, schema_version:, tables:)
+      fixture = Sequel.sqlite(dbfile)
+      tables.each { |table| create_fixture_table(fixture, table) }
+      unless schema_version.nil?
+        create_fixture_table(fixture, :schema_info)
+        fixture[:schema_info].insert(version: schema_version)
+      end
+    ensure
+      fixture&.disconnect
+    end
+
+    def create_fixture_table(db, table)
+      return if db.table_exists?(table)
+
+      case table
+      when :hosts, :groups, :tags
+        db.create_table(table) do
+          primary_key :id
+          column :name, :text
+        end
+      when :schema_info
+        db.create_table(:schema_info) do
+          primary_key :id
+          column :version, :integer, null: false
+        end
+      else
+        raise "Unsupported fixture table #{table}"
+      end
+    end
+
+    def expect_current_schema_after_init
+      @db.init
+      expect(@db.schema_version).to eq(@db::SCHEMA_VERSION)
+      expect(@db.status[:tables].values).to all(eq(true))
+    end
+
+    it 'upgrades a pre-schema-info sqlite database by creating missing additive tables' do
+      with_sqlite_fixture(tables: %i[hosts groups]) do
+        expect_current_schema_after_init
+      end
+    end
+
+    it 'upgrades a schema version 1 sqlite database to the current schema' do
+      with_sqlite_fixture(schema_version: 1, tables: %i[hosts groups]) do
+        expect_current_schema_after_init
+      end
+    end
+
+    it 'upgrades a schema version 2 sqlite database to the current schema' do
+      with_sqlite_fixture(schema_version: 2, tables: %i[hosts groups schema_info]) do
+        expect_current_schema_after_init
+      end
+    end
+
+    it 'opens a current sqlite database without changing its schema version' do
+      with_sqlite_fixture(schema_version: @db::SCHEMA_VERSION, tables: %i[hosts groups schema_info tags]) do
+        expect_current_schema_after_init
+      end
+    end
+
+    it 'refuses to open a database from a future schema version' do
+      with_sqlite_fixture(schema_version: @db::SCHEMA_VERSION + 1, tables: %i[hosts groups schema_info]) do
+        expect { @db.init }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /newer than supported version #{@db::SCHEMA_VERSION}/
+        )
+      end
+    end
+
+    it 'refuses to migrate a database from a future schema version' do
+      with_sqlite_fixture(schema_version: @db::SCHEMA_VERSION + 1, tables: %i[hosts groups schema_info]) do
+        @db.init_sqlite3
+
+        expect { @db.migrate! }.to raise_error(
+          Moose::Inventory::DB::MooseDBException,
+          /newer than supported version #{@db::SCHEMA_VERSION}/
+        )
+      end
+    end
+
+    it 'reports dirty partial schemas without changing the recorded schema version' do
+      with_sqlite_fixture(schema_version: @db::SCHEMA_VERSION, tables: %i[hosts groups schema_info]) do
+        @db.init
+        @db.db.drop_table(:audit_events)
+
+        status = @db.status
+
+        expect(status[:schema_version]).to eq(@db::SCHEMA_VERSION)
+        expect(status[:tables][:audit_events]).to eq(false)
+      end
+    end
+  end
   describe '.init_exceptions()' do
     it 'is responsive' do
       expect(@db.respond_to?(:init_exceptions)).to eq(true)

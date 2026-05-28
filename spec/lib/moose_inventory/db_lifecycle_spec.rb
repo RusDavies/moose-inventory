@@ -34,6 +34,17 @@ RSpec.describe 'database lifecycle commands' do
     expected(actual, aborted: false, STDOUT: "Database doctor found no issues.\n", STDERR: '')
   end
 
+  it 'reports dirty partial schema state through db doctor' do
+    Moose::Inventory::DB.db.drop_table(:audit_events)
+
+    actual = runner { @app.start(%w[db doctor]) }
+
+    expect(actual[:unexpected]).to eq(false)
+    expect(actual[:aborted]).to eq(true)
+    expect(actual[:STDOUT]).to include('Database doctor found issue(s):')
+    expect(actual[:STDOUT]).to include('- Missing tables: audit_events')
+  end
+
   it 'migrates missing lifecycle metadata' do
     Moose::Inventory::DB.db.drop_table(:schema_info)
 
