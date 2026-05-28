@@ -11,12 +11,11 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 | ID | Decision | Approver | Date | Scope | Conditions / limitations |
 | --- | --- | --- | --- | --- | --- |
 | GOV-TAILOR-001 | Tailor Moose Inventory as Class 4, target profile Software Library / Package | Russ / Rusty Frink Desiato | 2026-05-28 | Process baseline for this repository | Approval covers project class and target profile only. It does not approve product brief, requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, or future RubyGems publishing. Pure software-library target excludes normal hosted-runtime operations unless Moose Inventory later adds an operated runtime component. |
+| GOV-PRODUCT-001 | Approve `docs/product/product-brief.md` as the product-framing baseline | Russ / Rusty Frink Desiato | 2026-05-28 | Product framing for Moose Inventory | Approval covers the product brief as product-framing baseline only. It does not approve detailed requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, or future RubyGems publishing. Open product questions remain unresolved until separately decided. |
 
 ## Pending approvals
 
-| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| GOV-PRODUCT-001 | Approve, revise, or reject `docs/product/product-brief.md` as the product-framing baseline | Pending | TBD | TBD | Product framing for Moose Inventory | Draft prepared after tailoring approval; document existence is not approval. |
+_No pending approvals recorded._
 
 ## Approval rules
 
