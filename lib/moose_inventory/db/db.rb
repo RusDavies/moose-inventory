@@ -105,6 +105,12 @@ module Moose
         end
       }.freeze
 
+      SCHEMA_MIGRATIONS = {
+        1 => %i[hosts hostvars groups groups_groups groupvars groups_hosts schema_info],
+        2 => %i[audit_events],
+        3 => %i[tags hosts_tags groups_tags]
+      }.freeze
+
       MODEL_KEYS = {
         host: :Host,
         hostvar: :Hostvar,
@@ -125,9 +131,7 @@ module Moose
 
         Sequel::Model.plugin :json_serializer
         connect
-        reject_future_schema!
-        create_tables
-        ensure_schema_version!
+        migrate_schema!
         bind_models!
       end
 
@@ -173,8 +177,7 @@ module Moose
         raise('Database connection has not been established') if @db.nil?
 
         purge
-        create_tables
-        ensure_schema_version!
+        migrate_schema!
       end
 
       #===============================
@@ -228,10 +231,12 @@ module Moose
       end
 
       def self.migrate!
-        reject_future_schema!
-        create_tables
-        ensure_schema_version!
+        migrate_schema!
         status
+      end
+
+      def self.migration_versions
+        SCHEMA_MIGRATIONS.keys.sort
       end
 
       def self.backup(path)
@@ -260,6 +265,38 @@ module Moose
           @db[:schema_info].insert(version: SCHEMA_VERSION)
         elsif schema_version != SCHEMA_VERSION
           @db[:schema_info].update(version: SCHEMA_VERSION)
+        end
+      end
+
+      def self.migrate_schema!
+        reject_future_schema!
+        migration_versions.each do |version|
+          next if schema_version.to_i >= version && !schema_migration_tables_missing?(version)
+
+          apply_schema_migration!(version)
+        end
+      end
+
+      def self.schema_migration_tables_missing?(version)
+        SCHEMA_MIGRATIONS.fetch(version).any? { |table_name| !@db.table_exists?(table_name) }
+      end
+
+      def self.apply_schema_migration!(version)
+        tables = SCHEMA_MIGRATIONS.fetch(version)
+        tables.each { |table_name| create_table(table_name) }
+        record_schema_version!(version)
+      end
+
+      def self.record_schema_version!(version)
+        unless @db.table_exists?(:schema_info)
+          raise @exceptions[:moose],
+                'Cannot record schema version before schema_info exists.'
+        end
+
+        if @db[:schema_info].empty?
+          @db[:schema_info].insert(version: version)
+        else
+          @db[:schema_info].update(version: version)
         end
       end
 
@@ -312,10 +349,14 @@ module Moose
       #--------------------
       def self.create_tables
         TABLE_DEFINITIONS.each do |table_name, definition|
-          next if @db.table_exists?(table_name)
-
-          definition.call(@db)
+          create_table(table_name, definition)
         end
+      end
+
+      def self.create_table(table_name, definition = TABLE_DEFINITIONS.fetch(table_name))
+        return if @db.table_exists?(table_name)
+
+        definition.call(@db)
       end
 
       #--------------------
