@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 5 done / 6 open.
+Feature value status counts: 6 done / 5 open.
 
 ## Open
-
-1. Add first-class Ansible inventory plugin mode.
-   - Provide a documented modern Ansible inventory plugin/config path, not only legacy dynamic-inventory CLI usage.
-   - Include example `ansible.cfg` and inventory plugin YAML so adoption is obvious.
-   - Preserve current CLI inventory output for compatibility.
 
 1. Add schema/versioned migrations and database lifecycle commands.
    - Add commands such as `db backup`, `db restore`, `db migrate`, and `db doctor`.
@@ -40,6 +35,11 @@ Feature value status counts: 5 done / 6 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add first-class Ansible inventory plugin mode.
+   - Added `examples/ansible/inventory_plugins/moose_inventory.py` as a modern Ansible inventory plugin that shells out to `moose-inventory` for group and host data.
+   - Added example `examples/ansible/ansible.cfg` and `examples/ansible/inventory/moose_inventory.yml`.
+   - Preserved existing CLI/shim inventory behavior and documented both the plugin path and legacy shim path in README.md.
 
 1. [HIGH] Add inventory doctor/lint checks.
    - Added top-level `doctor` command with human-readable default output and non-zero exit status when findings are present.
