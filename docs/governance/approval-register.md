@@ -16,7 +16,9 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 
 ## Pending approvals
 
-_No pending approvals recorded._
+| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| GOV-UX-001 | Approve, revise, or reject `docs/ux/cli-workflow-notes.md` as the CLI UX/workflow baseline | Pending | TBD | TBD | CLI UX/workflow baseline for Moose Inventory | Draft prepared after requirements approval; document existence is not approval. |
 
 ## Approval rules
 

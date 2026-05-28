@@ -1,11 +1,13 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 6 done / 5 open.
+Process conformance status counts: 7 done / 5 open.
 
 ## Open
 
-1. Add lightweight CLI UX/workflow notes.
-   - Cover core workflows, destructive operations, dry-run/trust behavior, machine-readable output, error states, accessibility/readability expectations, and UX approval status.
+1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
+   - Draft is in `docs/ux/cli-workflow-notes.md`.
+   - Pending approval is recorded as `GOV-UX-001` in `docs/governance/approval-register.md`.
+   - Do not treat the draft as approved UX/workflow evidence until a human approver records a durable decision.
 
 1. Add architecture, trust-boundary, and digital-estate documentation.
    - Cover CLI layers, operation objects, DB adapters/schema, Ansible plugin/shim, audit/import/export, CI/release pipeline, GitHub repo, RubyGems gem, trusted publishing, release environment, and maintainer ownership.
@@ -22,6 +24,11 @@ Process conformance status counts: 6 done / 5 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Add lightweight CLI UX/workflow notes.
+   - Added `docs/ux/cli-workflow-notes.md` as a draft CLI UX/workflow baseline.
+   - Covered user personas, core workflows, destructive/high-risk operations, dry-run/trust behavior, doctor/import/export/audit flows, machine-readable output conventions, error states, accessibility/readability expectations, compatibility conventions, UX acceptance checklist, and open UX questions.
+   - Recorded pending approval as `GOV-UX-001`; the baseline remains draft until explicitly approved, revised, or rejected.
 
 1. Review and approve, revise, or reject the draft requirements and acceptance criteria baseline.
    - Russ approved `docs/product/requirements-baseline.md` as the requirements and acceptance criteria baseline on 2026-05-28.
