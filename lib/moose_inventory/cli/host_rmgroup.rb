@@ -32,6 +32,8 @@ module Moose
           unless machine_plan_output_rendered?(
             result, command: 'host rmgroup'
           )
+            record_audit({ command: 'host rmgroup', action: 'dissociate', entity_type: 'host',
+                           entity_names: name }, result: result, dry_run: options[:dry_run])
             print_warning_summary(result, success_message: 'Succeeded',
                                           warning_message: 'Succeeded')
           end

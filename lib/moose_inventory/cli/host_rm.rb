@@ -21,9 +21,12 @@ module Moose
           abort_if_missing_args(argv, 1, '1 or more')
           validate_machine_plan_request!
 
-          result = remove_hosts_operation.call(names: normalize_names(argv), dry_run: options[:dry_run])
+          names = normalize_names(argv)
+          result = remove_hosts_operation.call(names: names, dry_run: options[:dry_run])
           return if machine_plan_output_rendered?(result, command: 'host rm')
 
+          record_audit({ command: 'host rm', action: 'remove', entity_type: 'host',
+                         entity_names: names }, result: result, dry_run: options[:dry_run])
           render_remove_hosts_events(result.events)
           print_warning_summary(result)
         end

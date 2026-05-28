@@ -1,13 +1,8 @@
 # Moose Inventory Feature Value Backlog
 
-Feature value status counts: 7 done / 4 open.
+Feature value status counts: 8 done / 3 open.
 
 ## Open
-
-1. Add audit log / change history.
-   - Record who/what changed inventory state, when it happened, and which command or operation caused it.
-   - Store enough detail to support debugging, accountability, and future rollback tooling.
-   - Keep the model small and append-only unless a stronger history design is introduced.
 
 1. Add tagging / metadata support for hosts and groups.
    - Add labels/tags separate from Ansible variables for metadata such as environment, owner, role, lifecycle, location, and criticality.
@@ -30,6 +25,13 @@ Feature value status counts: 7 done / 4 open.
    - Include examples that do not require secret-bearing production database access.
 
 ## Done
+
+1. Add audit log / change history.
+   - Added append-only `audit_events` table and schema version bump to 2.
+   - Recorded successful mutating host/group/import commands with actor, command, action, entity type/name, and structured operation details.
+   - Added `audit list` with human-readable and yaml/json/pjson output.
+   - Dry-run commands are intentionally not recorded because they do not mutate inventory state.
+   - Documented audit behavior in README.md.
 
 1. Add schema/versioned migrations and database lifecycle commands.
    - Added schema metadata table with current schema version tracking.

@@ -32,6 +32,8 @@ module Moose
           )
 
           result = remove_groups(names)
+          record_audit({ command: 'group rm', action: 'remove', entity_type: 'group',
+                         entity_names: names }, result: result, dry_run: options[:dry_run])
           print_warning_summary(result) unless machine_plan_output_requested?
         end
 

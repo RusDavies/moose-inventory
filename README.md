@@ -246,6 +246,26 @@ For automation, use `--format yaml`, `--format json`, or `--format pjson` on the
 
 Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
 
+###Audit log / change history
+Moose Inventory records append-only audit events for successful mutating CLI commands.  Dry-run commands are intentionally excluded, because planned changes are already available through `--plan-format` and did not actually mutate inventory state.
+
+Audit events record when the change happened, the local actor from `USER`, the command/action, the entity type/name, and structured operation details.  The audit log is deliberately small: it is for debugging and accountability, not yet a full rollback system.
+
+List recent events in a human-readable form:
+
+    $ moose-inventory audit list
+    12 2026-05-28T17:01:02Z host add host=app01 action=add
+
+Machine-readable output is available for scripts and support bundles:
+
+    $ moose-inventory audit list --format yaml
+    $ moose-inventory audit list --format json
+    $ moose-inventory audit list --format pjson
+
+The default limit is 20 events; use `--limit` to inspect more history:
+
+    $ moose-inventory audit list --limit 100
+
 ###Database lifecycle commands
 Moose Inventory records a small schema metadata table and exposes database lifecycle commands under `db`.  These commands are intentionally conservative: they inspect, create missing schema metadata, and back up SQLite databases, but they do not silently rewrite production databases into a modern art installation.
 

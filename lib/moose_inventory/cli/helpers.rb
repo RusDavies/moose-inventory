@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../inventory_context'
+require_relative 'audit_recording'
 require_relative 'association_rendering'
 require_relative 'child_relation_rendering'
 require_relative 'factory'
@@ -16,6 +17,7 @@ module Moose
       # Shared helpers for Thor command classes.
       module Helpers
         include Moose::Inventory::Cli::AssociationRendering
+        include Moose::Inventory::Cli::AuditRecording
         include Moose::Inventory::Cli::ChildRelationRendering
         include Moose::Inventory::Cli::ListvarsSupport
         include Moose::Inventory::Cli::PlanRendering

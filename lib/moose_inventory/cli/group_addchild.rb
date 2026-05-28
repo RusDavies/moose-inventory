@@ -26,7 +26,11 @@ module Moose
           abort_if_automatic_group([pname] + cnames)
 
           result = add_children_to_group(pname, cnames)
-          print_warning_summary(result) unless machine_plan_output_rendered?(result, command: 'group addchild')
+          return if machine_plan_output_rendered?(result, command: 'group addchild')
+
+          record_audit({ command: 'group addchild', action: 'associate_child', entity_type: 'group',
+                         entity_names: pname }, result: result, dry_run: options[:dry_run])
+          print_warning_summary(result)
         end
 
         private

@@ -30,7 +30,11 @@ module Moose
             operation.call(name: name, vars: vars, dry_run: options[:dry_run])
           end
 
-          print_success_summary unless machine_plan_output_rendered?(result, command: 'host rmvar')
+          return if machine_plan_output_rendered?(result, command: 'host rmvar')
+
+          record_audit({ command: 'host rmvar', action: 'remove_variable', entity_type: 'host',
+                         entity_names: name }, result: result, dry_run: options[:dry_run])
+          print_success_summary
         end
 
         private

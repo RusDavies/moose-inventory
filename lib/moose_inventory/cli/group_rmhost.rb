@@ -26,7 +26,11 @@ module Moose
           abort_if_automatic_group([name])
 
           result = remove_hosts_from_group(name, hosts)
-          print_warning_summary(result) unless machine_plan_output_rendered?(result, command: 'group rmhost')
+          return if machine_plan_output_rendered?(result, command: 'group rmhost')
+
+          record_audit({ command: 'group rmhost', action: 'dissociate', entity_type: 'group',
+                         entity_names: name }, result: result, dry_run: options[:dry_run])
+          print_warning_summary(result)
         end
 
         private
