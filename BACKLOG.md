@@ -259,19 +259,19 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 60 done / 2 open.
+Code quality status counts: 61 done / 1 open.
 
 ## Open
-
-1. Clarify the empty-hosts shape for `group get` output.
-   - `spec/lib/moose_inventory/cli/group_get_spec.rb` still has a TODO asking whether an empty `hosts: []` key should be present for groups with no hosts.
-   - Treat this as an output-contract decision: either lock in omitted-empty-hosts behavior with a clearer spec note or normalize output to include empty lists consistently.
 
 1. Extract a small shared operation event emitter/result helper.
    - Several operation classes still define their own `Event`, `Result`, and `emit(events, type, payload = {})` plumbing.
    - A bounded helper, similar in spirit to the variable-operation support extraction, would reduce duplication without touching CLI output rendering.
 
 ## Done
+
+1. Clarify the empty-hosts shape for `group get` output.
+   - Kept the existing default output contract: `group get` omits empty relationship collections such as `hosts: []` for compact human/data output.
+   - Documented the distinction from Ansible group listing, where `hosts: []` remains explicit for inventory consumers, and added focused query coverage for the omitted-empty-collections shape.
 
 1. Resolve the missing-parent behavior question for `group addchild`.
    - Kept the existing contract: `group addchild PARENT CHILD` requires the parent group to already exist, while missing child groups may be auto-created.
