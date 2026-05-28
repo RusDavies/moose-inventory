@@ -1,14 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 7 done / 5 open.
+Process conformance status counts: 8 done / 4 open.
 
 ## Open
-
-1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
-   - Draft is in `docs/ux/cli-workflow-notes.md`.
-   - Pending approval is recorded as `GOV-UX-001` in `docs/governance/approval-register.md`.
-   - Russ answered the original open UX questions on 2026-05-28; the resulting implementation follow-ups are tracked in the UX implementation backlog below.
-   - Do not treat the draft as approved UX/workflow evidence until a human approver records a durable decision.
 
 1. Add architecture, trust-boundary, and digital-estate documentation.
    - Cover CLI layers, operation objects, DB adapters/schema, Ansible plugin/shim, audit/import/export, CI/release pipeline, GitHub repo, RubyGems gem, trusted publishing, release environment, and maintainer ownership.
@@ -25,6 +19,11 @@ Process conformance status counts: 7 done / 5 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, RubyGems/GitHub estate stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Review and approve, revise, or reject the draft CLI UX/workflow baseline.
+   - Russ approved `docs/ux/cli-workflow-notes.md` as the CLI UX/workflow baseline on 2026-05-28.
+   - Recorded approval as `GOV-UX-001` in `docs/governance/approval-register.md`.
+   - Approval covers command-line workflows and interaction conventions only; architecture, security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, and implementation of UX follow-up backlog items still require separate work/approval where applicable.
 
 1. Add lightweight CLI UX/workflow notes.
    - Added `docs/ux/cli-workflow-notes.md` as a draft CLI UX/workflow baseline.

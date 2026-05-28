@@ -2,9 +2,9 @@
 
 ## Approval status
 
-Status: **Draft - not approved**
+Status: **Approved CLI UX/workflow baseline**
 
-This document captures lightweight CLI UX/workflow expectations for Moose Inventory. It is prepared from the approved product brief, approved requirements baseline, README, specs, and current CLI behavior.
+Approval reference: `GOV-UX-001` in `docs/governance/approval-register.md` approves this document as the CLI UX/workflow baseline for Moose Inventory.
 
 Approved references:
 
@@ -12,9 +12,7 @@ Approved references:
 - `GOV-PRODUCT-001`: `docs/product/product-brief.md` is approved as the product-framing baseline.
 - `GOV-REQ-001`: `docs/product/requirements-baseline.md` is approved as the requirements and acceptance criteria baseline.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this CLI UX/workflow baseline before it becomes approved UX evidence.
-
-Scope limit: this document covers command-line workflows and interaction conventions only. It is not architecture approval, security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
+Scope limit: this approval covers command-line workflows and interaction conventions only. It is not architecture approval, security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, RubyGems publishing approval, or implementation approval for the UX follow-up backlog items.
 
 ## UX posture
 
