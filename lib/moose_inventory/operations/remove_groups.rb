@@ -19,20 +19,23 @@ module Moose
           )
         end
 
-        def call(names:, recursive: false)
+        def call(names:, recursive: false, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
+          cleanup.dry_run = dry_run
 
           names.each do |name|
             warning_count += remove_group(name, events, recursive: recursive)
           end
+          emit(events, :dry_run_summary) if dry_run
 
           operation_result(events: events, warning_count: warning_count)
         end
 
         private
 
-        attr_reader :cleanup, :context
+        attr_reader :cleanup, :context, :dry_run
 
         def remove_group(name, events, recursive:)
           emit(events, :group_started, name: name)
@@ -57,7 +60,7 @@ module Moose
         def remove_parent_associations(group, name, events)
           group.parents_dataset.each do |parent|
             emit(events, :removing_parent_association, group: name, related_group: parent.name)
-            parent.remove_child(group)
+            parent.remove_child(group) unless dry_run
             emit(events, :ok, indent: 4)
           end
         end
@@ -65,9 +68,9 @@ module Moose
         def remove_child_associations(group, name, events, recursive:)
           group.children_dataset.each do |child|
             emit(events, :removing_child_association, group: name, related_group: child.name)
-            group.remove_child(child)
+            group.remove_child(child) unless dry_run
             emit(events, :ok, indent: 4)
-            cleanup.delete_orphaned_group(child, events) if recursive
+            cleanup.delete_orphaned_group(child, events, ignored_parent: group) if recursive
           end
         end
       end

@@ -15,9 +15,18 @@ module Moose
           @context = context
         end
 
-        def call(names:, hosts:)
+        def call(names:, hosts:, dry_run: false)
           events = []
           warning_count = 0
+          @dry_run = dry_run
+
+          if dry_run
+            names.each do |name|
+              warning_count += add_group(name, hosts, events)
+            end
+            emit(events, :dry_run_summary)
+            return operation_result(events: events, warning_count: warning_count)
+          end
 
           context.transaction do
             names.each do |name|
@@ -30,7 +39,7 @@ module Moose
 
         private
 
-        attr_reader :context
+        attr_reader :context, :dry_run
 
         def add_group(name, hosts, events)
           warning_count = 0
@@ -53,7 +62,7 @@ module Moose
           group = context.find_group(name)
 
           if group.nil?
-            group = context.create_group(name)
+            group = context.create_group(name) unless dry_run
             emit(events, :ok, indent: 4)
             [group, nil, true]
           else
@@ -74,7 +83,7 @@ module Moose
             emit(events, :association_exists, group: group_name, host: host_name)
             emit(events, :already_exists_skipping, indent: 4)
             warning_count += 1
-          else
+          elsif !dry_run
             group.add_host(host)
           end
           emit(events, :ok, indent: 4)
@@ -89,17 +98,19 @@ module Moose
 
           emit(events, :host_missing_created, name: name)
           emit(events, :host_creating_now, name: name)
-          host = context.create_host(name)
+          host = context.create_host(name) unless dry_run
           emit(events, :ok, indent: 6)
           [host, :warned_create]
         end
 
         def remove_automatic_group_from_host(host, host_name, events)
+          return if host.nil?
+
           ungrouped = host.groups_dataset[name: AUTOMATIC_GROUP]
           return if ungrouped.nil?
 
           emit(events, :removing_automatic_group, host: host_name)
-          host.remove_group(ungrouped)
+          host.remove_group(ungrouped) unless dry_run
           emit(events, :ok, indent: 4)
         end
 

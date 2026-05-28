@@ -34,6 +34,27 @@ RSpec.describe Moose::Inventory::Operations::RemoveGroups do
     expect(result.events.map(&:type)).to include(:group_missing)
   end
 
+  it 'returns dry-run events without removing groups or recursive children' do
+    parent = @db.models[:group].create(name: 'parent')
+    child = @db.models[:group].create(name: 'child')
+    host = @db.models[:host].create(name: 'child-host')
+    child.add_host(host)
+    parent.add_child(child)
+
+    result = operation.call(names: ['parent'], recursive: true, dry_run: true)
+
+    expect(result.warning_count).to eq(0)
+    expect(result.events.map(&:type)).to include(
+      :removing_child_association,
+      :recursively_delete_orphaned_group,
+      :adding_automatic_group_to_host,
+      :destroying_group,
+      :dry_run_summary
+    )
+    expect(@db.models[:group].find(name: 'parent')).not_to be_nil
+    expect(@db.models[:group].find(name: 'child')).not_to be_nil
+    expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+  end
   it 'removes groups and recursively cleans orphaned children when requested' do
     parent = @db.models[:group].create(name: 'parent')
     child = @db.models[:group].create(name: 'child')
