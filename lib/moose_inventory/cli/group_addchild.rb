@@ -14,6 +14,7 @@ module Moose
         #==========================
         desc 'addchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Associate one or more child-groups CHILDGROUP_n with PARENTGROUP'
+        option :dry_run, type: :boolean
         def addchild(*argv)
           abort_if_missing_args(argv, 2, '2 or more')
 
@@ -38,7 +39,8 @@ module Moose
             result = operation.add_children(
               parent_group: parent_group,
               parent_name: parent_name,
-              child_names: child_names
+              child_names: child_names,
+              dry_run: options[:dry_run]
             )
             render_addchild_events(result.events)
             result

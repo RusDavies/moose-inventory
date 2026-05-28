@@ -46,6 +46,52 @@ RSpec.describe Moose::Inventory::Operations::GroupChildRelations do
     expect(parent.children_dataset[name: 'created']).not_to be_nil
   end
 
+  it 'dry-runs adding child groups without creating children or associations' do
+    parent = @db.models[:group].create(name: 'parent')
+
+    result = operation.add_children(
+      parent_group: parent,
+      parent_name: 'parent',
+      child_names: ['created'],
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(1)
+    expect(result.events.map(&:type)).to include(:child_group_missing, :dry_run_summary)
+    expect(@db.models[:group].find(name: 'created')).to be_nil
+    expect(parent.children_dataset[name: 'created']).to be_nil
+  end
+
+  it 'dry-runs removing child groups without deleting orphaned descendants' do
+    parent = @db.models[:group].create(name: 'parent')
+    child = @db.models[:group].create(name: 'child')
+    grandchild = @db.models[:group].create(name: 'grandchild')
+    host = @db.models[:host].create(name: 'child-host')
+    child.add_host(host)
+    parent.add_child(child)
+    child.add_child(grandchild)
+
+    result = operation.remove_children(
+      parent_group: parent,
+      parent_name: 'parent',
+      child_names: ['child'],
+      delete_orphans: true,
+      dry_run: true
+    )
+
+    expect(result.warning_count).to eq(0)
+    expect(result.events.map(&:type)).to include(
+      :recursively_delete_orphaned_group,
+      :destroying_group,
+      :adding_automatic_group_to_host,
+      :dry_run_summary
+    )
+    expect(parent.children_dataset[name: 'child']).not_to be_nil
+    expect(@db.models[:group].find(name: 'child')).not_to be_nil
+    expect(@db.models[:group].find(name: 'grandchild')).not_to be_nil
+    expect(host.groups_dataset[name: 'ungrouped']).to be_nil
+  end
+
   it 'removes child groups and recursively deletes orphan groups when requested' do
     parent = @db.models[:group].create(name: 'parent')
     child = @db.models[:group].create(name: 'child')

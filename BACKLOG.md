@@ -8,8 +8,8 @@ Feature value status counts: 0 done / 10 open.
    - Add a `--dry-run` flag and/or `plan` command for mutating operations.
    - Show the exact hosts, groups, variables, child relationships, and automatic `ungrouped` changes that would be applied.
    - Keep planned operations transactional and side-effect-free so operators can review inventory surgery before trusting the monkey with the scalpel.
-   - Progress: added CLI/operation dry-run slices for `host add --dry-run`, `host rm --dry-run`, `group add --dry-run`, `group rm --dry-run`, `host addgroup --dry-run`, `host rmgroup --dry-run`, `group addhost --dry-run`, and `group rmhost --dry-run`; dry-run output preserves the existing command progress shape, adds a no-changes-applied summary, and focused specs prove planned host/group rows, recursive cleanup paths, host-group associations, and automatic `ungrouped` maintenance do not create, delete, or reassociate records.
-   - Remaining dry-run expansion TODOs: extend the same safety model across child-group relation commands and host/group variable mutations; then consider a dedicated `plan` command or machine-readable plan output.
+   - Progress: added CLI/operation dry-run slices for `host add --dry-run`, `host rm --dry-run`, `group add --dry-run`, `group rm --dry-run`, `host addgroup --dry-run`, `host rmgroup --dry-run`, `group addhost --dry-run`, `group rmhost --dry-run`, `group addchild --dry-run`, and `group rmchild --dry-run`; dry-run output preserves the existing command progress shape, adds a no-changes-applied summary, and focused specs prove planned host/group rows, recursive cleanup paths, host-group associations, parent-child associations, and automatic `ungrouped` maintenance do not create, delete, or reassociate records.
+   - Remaining dry-run expansion TODOs: extend the same safety model across host/group variable mutations; then consider a dedicated `plan` command or machine-readable plan output.
 
 1. [HIGH] Add bulk import/export with validation.
    - Support importing inventory definitions from YAML/JSON and applying them transactionally.

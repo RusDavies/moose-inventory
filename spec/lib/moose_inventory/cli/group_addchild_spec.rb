@@ -148,6 +148,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
     end
 
     #------------------------
+    it 'GROUP CHILDGROUP --dry-run should not create the child or association' do
+      pname = 'parent_group'
+      cname = 'dry_child'
+
+      runner { @app.start(%W[group add #{pname}]) }
+
+      actual = runner { @app.start(%W[group addchild #{pname} #{cname} --dry-run]) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDOUT]).to include('Dry run complete. No changes applied.')
+      expect(@db.models[:group].find(name: cname)).to be_nil
+      pgroup = @db.models[:group].find(name: pname)
+      expect(pgroup.children_dataset[name: cname]).to be_nil
+    end
+
+    #------------------------
 
     it 'GROUP CHILDGROUP... should warn and skip when the association already exists' do
       pname = 'parent_group'

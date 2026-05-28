@@ -24,6 +24,7 @@ module Moose
 
           return render_addchild_warning(event.type, payload) if addchild_warning?(event.type)
           return render_addchild_existing(payload) if event.type == :already_exists_skipping
+          return render_child_relation_dry_run_summary if event.type == :dry_run_summary
 
           case event.type
           when :adding_child_association
@@ -33,6 +34,10 @@ module Moose
           when :ok
             fmt.puts payload[:indent], '- OK'
           end
+        end
+
+        def render_child_relation_dry_run_summary
+          puts 'Dry run complete. No changes applied.'
         end
 
         def addchild_warning?(type)
@@ -57,6 +62,7 @@ module Moose
           return render_rmchild_warning(payload) if event.type == :child_association_missing
           return render_rmchild_missing(payload) if event.type == :missing_skipping
           return render_rmchild_progress(event.type, payload) if rmchild_progress_event?(event.type)
+          return render_child_relation_dry_run_summary if event.type == :dry_run_summary
 
           render_rmchild_status(event.type, payload)
         end
