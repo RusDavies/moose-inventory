@@ -19,7 +19,7 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 
 | ID | Decision | Proposed status | Approver | Date | Scope | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| GOV-ARCH-001 | Approve, revise, or reject `docs/architecture/architecture-and-digital-estate.md` as the architecture, trust-boundary, and digital-estate baseline | Pending | TBD | TBD | Architecture, trust boundaries, and digital estate for Moose Inventory | Draft prepared after CLI UX approval; document existence is not approval. |
+| GOV-ARCH-001 | Approve, revise, or reject `docs/architecture/architecture-and-trust-boundaries.md` as the architecture and trust-boundary baseline | Pending | TBD | TBD | Architecture and trust boundaries for Moose Inventory | Draft prepared after CLI UX approval; repository/package account-management design is explicitly out of scope for this product; document existence is not approval. |
 
 ## Approval rules
 

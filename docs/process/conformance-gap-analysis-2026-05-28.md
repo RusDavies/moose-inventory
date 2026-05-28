@@ -21,7 +21,7 @@ Rationale:
 - It is intended for real Ansible inventory workflows and can affect infrastructure operations.
 - It handles database configuration, environment-specific inventory state, package publishing, CI, and release automation.
 - It is not a hosted service or operated runtime, so the software-library/package target profile excludes normal service monitoring, alert routing, backup/restore operations, and runtime incident runbooks unless a future hosted/runtime component is added.
-- Library/package concerns remain mandatory: API/CLI compatibility, release integrity, trusted publishing, supply-chain security, vulnerability intake, security patching, maintainer ownership, developer/user documentation, and digital-estate stewardship for repository/package/release credentials.
+- Library/package concerns remain mandatory: API/CLI compatibility, release integrity, trusted publishing, supply-chain security, vulnerability intake, security patching, maintainer ownership, and developer/user documentation.
 
 Approval status: **not approved**. This is a recommendation prepared for Russ or another authorized product owner to approve, revise, or reject.
 
@@ -33,14 +33,13 @@ Approval status: **not approved**. This is a recommendation prepared for Russ or
 | Product framing | README explains purpose/use with Ansible | Not approved as product baseline | Need concise product brief/framing note with goals, users, non-goals, success criteria |
 | Requirements | README, CLI behavior, tests, backlog | Not approved as requirements baseline | Need requirements/acceptance baseline covering CLI, DB, Ansible integration, package/release, security, compatibility |
 | UX/product design | CLI help/README/tests | No UX approval | For CLI package, need lightweight CLI workflow/UX notes rather than wireframes |
-| Architecture | Code and README describe behavior; release docs cover publishing | Not approved | Need architecture overview for CLI/package, DB adapters, schema migrations, Ansible integration, trust boundaries, release pipeline, digital estate |
+| Architecture | Code and README describe behavior; release docs cover publishing | Not approved | Need architecture overview for CLI/package, DB adapters, schema migrations, Ansible integration, trust boundaries, and release pipeline |
 | Security/privacy | Security audit reports, gitleaks/OSV/bundler-audit gates, README secret guidance | Audit evidence exists, not release/security approval | Need maintained threat model, data classification, secrets/logging model, vulnerability-intake/security patch policy, accepted-risk register |
 | Compliance readiness | Not applicable as enterprise product claim today | No compliance claims approved | Need explicit non-goal/claim boundary so no SOC 2/ISO/ISO-style readiness is implied |
 | Documentation planning | README and release docs exist | No documentation QA/sign-off record | Need documentation plan/checklist for user/developer/release/security docs |
 | QA/test evidence | `scripts/check.sh`, RSpec, SimpleCov, RuboCop, permission check, OSV, bundler-audit, gitleaks, package sanity, CI matrix | Test evidence exists per run, not process approval | Need QA plan mapping gates to requirements and release criteria |
 | Release security gate | Release readiness/publishing docs and security audits exist | No formal release approval template/current gate record | Need release-security gate checklist, accepted-risk disposition, release approval fields |
-| Operations/maintenance | Release docs, CI/release workflows, security audits | Partial | Need package-maintenance runbook: owner, RubyGems/GitHub estate, vulnerability intake, update cadence, release/yank/deprecation path, AI-agent maintenance boundaries |
-| Digital estate | RubyGems trusted publisher details and repository references exist | Partial | Need explicit digital estate register for GitHub repo, RubyGems gem, release environment, trusted-publishing config, maintainer ownership |
+| Operations/maintenance | Release docs, CI/release workflows, security audits | Partial | Need package-maintenance runbook: owner, release infrastructure, vulnerability intake, update cadence, release/yank/deprecation path, AI-agent maintenance boundaries |
 | AI-agent operation boundaries | Workspace/git workflow exists outside repo; no repo-local boundary | Not approved | Need repo-local boundaries for agent-assisted maintenance/release prep, especially no publishing/release/accepted-risk decisions without human approval |
 | Backlog/evidence practice | BACKLOG.md is extensive and current | Partial | Need process backlog acceptance criteria/approval notes on process items |
 
@@ -82,7 +81,7 @@ Gaps:
 
 Impact: output compatibility is well tested, but UX decisions are implicit.
 
-### 4. Architecture and digital estate
+### 4. Architecture and trust boundaries
 
 The code has improved architecture, and release docs capture publishing mechanics, but there is no architecture overview matching the updated guidance.
 
@@ -90,7 +89,6 @@ Gaps:
 
 - No architecture overview for CLI layers, operation objects, DB schema/migrations, adapters, Ansible plugin/shim integration, audit log, import/export, and release pipeline.
 - No data model/trust-boundary diagram or written equivalent.
-- No digital estate register covering GitHub repo, RubyGems gem, GitHub Actions release environment, trusted publishing, maintainer accounts, and release credentials/permissions.
 
 Impact: maintainers can infer architecture from code, but future maintainers/agents lack a clear evidence artifact.
 
@@ -142,7 +140,7 @@ Gaps:
 - No maintainer operations runbook for dependency update cadence, vulnerability triage, CI/release failures, RubyGems/GitHub account stewardship, trusted publishing maintenance, and release recovery.
 - No AI-agent operation boundaries for repository maintenance and release preparation.
 
-Impact: routine maintenance remains doable, but not yet process-conformant under the updated digital-estate and AI-agent guidance.
+Impact: routine maintenance remains doable, but not yet process-conformant under the updated package-maintenance and AI-agent guidance.
 
 ## Proposed remediation plan
 
@@ -163,12 +161,11 @@ Exit criteria: Russ or delegated approver explicitly approves or revises the tai
 
 Exit criteria: requirements baseline approved or explicitly left draft with blockers tracked.
 
-### Phase 3 — Architecture, security, and digital estate
+### Phase 3 - Architecture, security, and trust boundaries
 
 1. Add architecture overview and data/trust-boundary notes.
-2. Add digital estate register for GitHub/RubyGems/release environment/trusted publishing.
-3. Add threat model/data classification/secrets-handling notes.
-4. Add vulnerability intake/security patch policy and accepted-risk register.
+2. Add threat model/data classification/secrets-handling notes.
+3. Add vulnerability intake/security patch policy and accepted-risk register.
 
 Exit criteria: architecture/security baseline reviewed; unresolved risks tracked.
 

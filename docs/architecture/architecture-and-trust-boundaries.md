@@ -1,10 +1,10 @@
-# Moose Inventory Architecture, Trust Boundary, and Digital Estate Baseline
+# Moose Inventory Architecture and Trust Boundary Baseline
 
 ## Approval status
 
 Status: **Draft - not approved**
 
-This document captures the current architecture, trust boundaries, data flows, and digital estate for Moose Inventory. It is prepared from the approved product brief, requirements baseline, CLI UX/workflow baseline, README, release docs, GitHub workflows, gemspec, and current source layout.
+This document captures the current architecture, trust boundaries, and data flows for Moose Inventory. It is prepared from the approved product brief, requirements baseline, CLI UX/workflow baseline, README, release docs, GitHub workflows, gemspec, and current source layout.
 
 Approved references:
 
@@ -13,9 +13,9 @@ Approved references:
 - `GOV-REQ-001`: `docs/product/requirements-baseline.md` is approved as the requirements and acceptance criteria baseline.
 - `GOV-UX-001`: `docs/ux/cli-workflow-notes.md` is approved as the CLI UX/workflow baseline.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this architecture and digital-estate baseline before it becomes approved architecture evidence.
+Pending approval: Russ or a delegated product owner must approve, revise, or reject this architecture and trust-boundary baseline before it becomes approved architecture evidence.
 
-Scope limit: this document covers architecture, trust boundaries, and digital estate only. It is not security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
+Scope limit: this document covers architecture and trust boundaries only. It is not security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
 
 ## System summary
 
@@ -395,23 +395,6 @@ Properties:
 - publishing uses RubyGems trusted publishing
 - release approval is a human-owned decision
 
-## Digital estate register
-
-| Asset | Location / identifier | Owner / steward | Purpose | Current controls | Notes |
-| --- | --- | --- | --- | --- | --- |
-| Source repository | `https://github.com/RusDavies/moose-inventory` | Russ / repository maintainers | Source, issues, CI, releases | GitHub auth, branch history, CI workflow | Current local `master` may be ahead of origin during active work. |
-| RubyGem | `moose-inventory` on RubyGems.org | RubyGems gem owners | Public package distribution | RubyGems MFA metadata, trusted publishing | Publishing requires explicit human release approval. |
-| GitHub Actions CI | `.github/workflows/ci.yml` | Repository maintainers | Test matrix and check gate | Read-only contents permission, Ruby matrix, security tools | Runs on master pushes, pull requests, and manual dispatch. |
-| GitHub Actions release | `.github/workflows/release.yml` | Repository maintainers | Trusted publishing to RubyGems | `contents: write`, `id-token: write`, release environment, tag/version check | Runs on `v*` tags. |
-| GitHub environment | `release` | Repository maintainers | OIDC trusted publishing environment | Environment protection if configured | Required by RubyGems trusted publisher. |
-| RubyGems trusted publisher | Owner `RusDavies`, repo `moose-inventory`, workflow `release.yml`, environment `release` | RubyGems gem owners | Short-lived publishing token | OIDC trusted publishing | No RubyGems API key should be stored in GitHub secrets for normal releases. |
-| Local developer workstations | Maintainer machines | Individual maintainers | Development, manual fallback release if approved | Local git, Bundler, RubyGems credentials if fallback used | Manual publishing is fallback only and should use scoped credentials. |
-| Local/CI test artifacts | `spec/reports/coverage`, `tmp/pkg`, `tmp/package-sanity` | Maintainers/CI | Verification output | Ignored/generated cleanup expectations | Do not commit generated runtime artifacts unless intentional. |
-| User inventory databases | User-managed SQLite/MySQL/PostgreSQL | End users/operators | Inventory state | User DB permissions/backups | Outside project operation; docs should treat as sensitive. |
-| User config files | User-managed YAML config | End users/operators | DB/environment config | `password_env` recommendation | Plaintext passwords are compatibility only, not preferred. |
-| Exported snapshots | User-selected paths | End users/operators | Backup/review/migration | User file permissions | Potentially sensitive operational data. |
-| Audit records | User DB | End users/operators | Change evidence | Append-only application behavior | Evidence only, not rollback mechanism. |
-
 ## Maintainer ownership boundaries
 
 Human-owned decisions:
@@ -448,10 +431,9 @@ Current notable architecture decisions:
 6. Use RubyGems trusted publishing/OIDC as the preferred publishing path.
 7. Preserve CLI output compatibility unless breaking changes are explicitly approved.
 
-## Open architecture and estate questions
+## Open architecture questions
 
 1. Should architecture baseline approval require a lightweight text diagram review only, or should future major architecture changes add richer diagrams?
-2. Should the digital estate register track specific GitHub/RubyGems human account names, or keep ownership role-based to avoid stale personal-data records?
-3. Should release environment protection rules be documented in more detail after maintainers confirm the current GitHub environment settings?
-4. Should package provenance beyond RubyGems trusted publishing, such as signed provenance artifacts, become an architectural requirement?
-5. Should user database backup/restore guidance be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL?
+2. Should release environment protection rules be documented in more detail after maintainers confirm the current GitHub environment settings?
+3. Should package provenance beyond RubyGems trusted publishing, such as signed provenance artifacts, become an architectural requirement?
+4. Should user database backup/restore guidance be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL?
