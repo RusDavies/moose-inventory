@@ -15,6 +15,18 @@ module Moose
       ##
       # Class implementing the "host" methods of the CLI
       class Host
+        ADD_HOST_EVENT_RENDERERS = {
+          host_started: :render_add_host_started,
+          creating_host: :render_add_host_creation,
+          host_exists: :render_add_host_exists_warning,
+          ok: :render_add_host_ok,
+          adding_association: :render_add_host_association,
+          group_missing_created: :render_add_host_missing_group_warning,
+          association_exists: :render_add_host_association_exists_warning,
+          adding_automatic_group: :render_add_host_automatic_group,
+          host_complete: :render_add_host_complete
+        }.freeze
+
         #==========================
         desc 'add HOSTNAME_1 [HOSTNAME_2 ...]',
              'Add a hosts HOSTNAME_n to the inventory'
@@ -45,31 +57,48 @@ module Moose
           events.each { |event| render_add_hosts_event(event) }
         end
 
-        def render_add_hosts_event(event) # rubocop:disable Metrics/CyclomaticComplexity
-          payload = event.payload
-          case event.type
-          when :host_started
-            puts "Add host '#{payload[:name]}':"
-          when :creating_host
-            fmt.puts 2, "- Creating host '#{payload[:name]}'..."
-          when :host_exists
-            fmt.warn "The host '#{payload[:name]}' already exists, skipping creation.\n"
-          when :ok
-            fmt.puts payload[:indent], '- OK'
-          when :adding_association
-            fmt.puts 2, "- Adding association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
-          when :group_missing_created
-            fmt.warn "The group '#{payload[:name]}' doesn't exist, but will be created.\n"
-          when :association_exists
-            fmt.warn(
-              "Association {host:#{payload[:host]} <-> group:#{payload[:group]}} " \
-              "already exists, skipping creation.\n"
-            )
-          when :adding_automatic_group
-            fmt.puts 2, "- Adding automatic association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
-          when :host_complete
-            fmt.puts 2, '- All OK'
-          end
+        def render_add_hosts_event(event)
+          renderer = ADD_HOST_EVENT_RENDERERS[event.type]
+          send(renderer, event.payload) unless renderer.nil?
+        end
+
+        def render_add_host_started(payload)
+          puts "Add host '#{payload[:name]}':"
+        end
+
+        def render_add_host_creation(payload)
+          fmt.puts 2, "- Creating host '#{payload[:name]}'..."
+        end
+
+        def render_add_host_exists_warning(payload)
+          fmt.warn "The host '#{payload[:name]}' already exists, skipping creation.\n"
+        end
+
+        def render_add_host_ok(payload)
+          fmt.puts payload[:indent], '- OK'
+        end
+
+        def render_add_host_association(payload)
+          fmt.puts 2, "- Adding association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
+        end
+
+        def render_add_host_missing_group_warning(payload)
+          fmt.warn "The group '#{payload[:name]}' doesn't exist, but will be created.\n"
+        end
+
+        def render_add_host_association_exists_warning(payload)
+          fmt.warn(
+            "Association {host:#{payload[:host]} <-> group:#{payload[:group]}} " \
+            "already exists, skipping creation.\n"
+          )
+        end
+
+        def render_add_host_automatic_group(payload)
+          fmt.puts 2, "- Adding automatic association {host:#{payload[:host]} <-> group:#{payload[:group]}}..."
+        end
+
+        def render_add_host_complete(_payload)
+          fmt.puts 2, '- All OK'
         end
       end
     end
