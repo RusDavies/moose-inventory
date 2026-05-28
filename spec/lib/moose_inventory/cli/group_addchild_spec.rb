@@ -94,8 +94,9 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
     #------------------------
     it 'GROUP CHILDGROUP  ... should abort if GROUP does not exist' do
-      # TODO: Why don't we just create GROUP?  Likewise for all similar functions?
-
+      # Contract: addchild attaches children to an existing parent. Missing child
+      # groups may be created, but the parent must already exist so typos do not
+      # silently create a new tree root.
       pname = 'parent_group'
       cname = 'child group'
 
@@ -113,6 +114,8 @@ RSpec.describe Moose::Inventory::Cli::Group do
         "ERROR: The group '#{pname}' does not exist.\n" \
         "An error occurred during a transaction, any changes have been rolled back.\n"
       expected(actual, desired)
+      expect(@db.models[:group].find(name: pname)).to be_nil
+      expect(@db.models[:group].find(name: cname)).to be_nil
     end
 
     #------------------------
