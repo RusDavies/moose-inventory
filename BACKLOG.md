@@ -99,7 +99,7 @@ _No open process conformance items._
 
 # Moose Inventory Architecture Follow-up Backlog
 
-Architecture follow-up status counts: 2 done / 3 open.
+Architecture follow-up status counts: 3 done / 2 open.
 
 ## Open
 
@@ -108,17 +108,18 @@ Architecture follow-up status counts: 2 done / 3 open.
    - On the next intentional `v*` tag release, verify that the release job can deploy to the `release` environment after required approval.
    - If GitHub treats the policy as branch-only and blocks tag deployments, adjust the environment policy or document the limitation and rely on the workflow trigger plus tag/version check for tag control.
 
-1. Evaluate signed package provenance as future hardening.
-   - Trusted publishing remains the current architectural baseline.
-   - Evaluate signed provenance artifacts, GitHub artifact attestations, checksums, or equivalent later if security-sensitive consumers or release requirements justify the complexity.
-   - Do not make additional provenance a current release blocker unless separately approved.
-
 1. Expand user database backup/restore guidance beyond SQLite.
    - Add guidance boundaries for MySQL/MariaDB and PostgreSQL backups/restores.
    - Clarify what Moose Inventory can and cannot safely do itself.
    - Avoid introducing destructive restore behavior without separate requirements, UX, recovery, and approval records.
 
 ## Done
+
+1. Evaluate signed package provenance as future hardening.
+   - Added `docs/release/package-provenance-hardening.md` evaluating checksums, GitHub artifact attestations, Sigstore/cosign-style signatures, RubyGems certificate signing, and SBOM publication.
+   - Kept RubyGems trusted publishing/OIDC as the current architectural baseline and release requirement.
+   - Documented that additional provenance is not a current release blocker and should be revisited only if consumers, release policy, or supply-chain requirements justify it.
+   - Preferred future first step, if needed: GitHub artifact attestation plus a published SHA-256 checksum for the exact built `.gem`.
 
 1. Configure GitHub `release` environment protection rules.
    - Configured required deployment reviewer `RusDavies` for the `release` environment.
