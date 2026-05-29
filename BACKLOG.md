@@ -122,7 +122,7 @@ Architecture follow-up status counts: 2 done / 3 open.
 
 1. Configure GitHub `release` environment protection rules.
    - Configured required deployment reviewer `RusDavies` for the `release` environment.
-   - Enabled self-review prevention for the required-reviewer rule.
+   - Disabled self-review prevention because OpenClaw/automation pushes use Russ's GitHub account, and `RusDavies` is currently the only required reviewer.
    - Disabled admin bypass for the `release` environment.
    - Enabled custom deployment policies and added policy name `v*`.
    - Updated release, architecture, accepted-risk, and backlog evidence to reflect configured protections and residual next-release verification.
