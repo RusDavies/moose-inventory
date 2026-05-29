@@ -158,3 +158,69 @@ RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot do
   end
 end
 # rubocop:enable Metrics/BlockLength
+
+# rubocop:disable Metrics/BlockLength
+
+RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot, '#preview' do
+  before(:all) do
+    @mockargs = [
+      '--config', File.join(spec_root, 'config/config.yml'),
+      '--format', 'yaml',
+      '--env', 'test'
+    ]
+
+    Moose::Inventory::Config.init(@mockargs)
+    @db = Moose::Inventory::DB
+    @db.init if @db.db.nil?
+  end
+
+  before(:each) do
+    @db.reset
+  end
+
+  def operation
+    described_class.new(context: Moose::Inventory::InventoryContext.new(db: @db))
+  end
+
+  it 'returns a non-mutating snapshot import diff' do
+    runner = operation
+    @db.models[:host].create(name: 'existing')
+    group = @db.models[:group].create(name: 'web')
+    var = @db.models[:groupvar].create(name: 'role', value: 'old')
+    group.add_groupvar(var)
+
+    snapshot = {
+      version: 1,
+      hosts: {
+        web01: { groups: ['web'], tags: ['Prod'], vars: { env: 'prod' } }
+      },
+      groups: {
+        web: { children: ['blue'], tags: ['Frontend'], vars: { role: 'frontend' } },
+        blue: { children: [], tags: [], vars: {} }
+      }
+    }
+
+    preview = runner.preview(snapshot: snapshot)
+
+    expect(preview['schema_version']).to eq('snapshot-import-preview-v1')
+    expect(preview['changes_applied']).to eq(false)
+    expect(preview['summary']).to include(
+      'hosts_created' => 1,
+      'groups_created' => 1,
+      'variables_changed' => 2,
+      'associations_added' => 4,
+      'ignored_existing_hosts' => 1,
+      'destructive_changes' => 0
+    )
+    expect(preview.dig('creates', 'hosts')).to eq(['web01'])
+    expect(preview.dig('creates', 'groups')).to eq(['blue'])
+    expect(preview.dig('updates', 'group_vars')).to include(
+      'entity' => 'web', 'name' => 'role', 'from' => 'old', 'to' => 'frontend'
+    )
+    expect(preview.dig('ignored', 'existing_hosts_not_in_snapshot')).to eq(['existing'])
+    expect(@db.models[:host].where(name: 'web01').count).to eq(0)
+    expect(@db.models[:group].where(name: 'blue').count).to eq(0)
+    expect(group.groupvars_dataset[name: 'role'][:value]).to eq('old')
+  end
+end
+# rubocop:enable Metrics/BlockLength

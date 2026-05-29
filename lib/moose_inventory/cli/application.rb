@@ -22,6 +22,7 @@ module Moose
     module Cli
       ##
       # Top-level Thor application for moose-inventory.
+      # rubocop:disable Metrics/ClassLength
       class Application < Thor
         include Moose::Inventory::Cli::Helpers
 
@@ -52,9 +53,16 @@ module Moose
         end
 
         desc 'import FILE', 'Import and validate an inventory snapshot'
+        option :preview, type: :boolean, desc: 'Preview snapshot import changes without writing'
+        option :preview_format, type: :string, desc: 'Emit preview as yaml|json|pjson'
         def import(file)
           snapshot = YAML.safe_load_file(file, aliases: false)
-          result = build_operation(Moose::Inventory::Operations::ImportInventorySnapshot).call(snapshot: snapshot)
+          operation = build_operation(Moose::Inventory::Operations::ImportInventorySnapshot)
+          return render_import_preview(operation.preview(snapshot: snapshot)) if options[:preview]
+
+          abort('ERROR: --preview-format requires --preview.') if options[:preview_format]
+
+          result = operation.call(snapshot: snapshot)
           record_audit({ command: 'import', action: 'import', entity_type: 'inventory',
                          entity_names: file }, result: result)
           puts "Imported inventory snapshot from #{file}."
@@ -112,6 +120,21 @@ module Moose
           end
         end
 
+        def render_import_preview(preview)
+          if options[:preview_format]
+            puts serialize_data(preview, options[:preview_format].downcase)
+          else
+            render_human_import_preview(preview)
+          end
+        end
+
+        def render_human_import_preview(preview)
+          puts 'Snapshot import preview. No changes applied.'
+          preview.fetch('summary').each do |key, value|
+            puts "#{key.tr('_', ' ').capitalize}: #{value}"
+          end
+        end
+
         def serialize_snapshot(snapshot)
           serialize_data(snapshot, output_format)
         end
@@ -129,6 +152,7 @@ module Moose
           end
         end
       end
+      # rubocop:enable Metrics/ClassLength
     end
   end
 end
