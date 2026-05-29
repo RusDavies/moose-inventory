@@ -37,7 +37,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'does-not-exist'
       var_name = 'foo=bar'
       actual = runner do
-        @app.start(%W[group rmvar #{group_name} #{var_name}])
+        @app.start(%W[group rmvar #{group_name} #{var_name} --yes])
       end
 
       # Check output
@@ -67,7 +67,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       cases.each do |args|
         actual = runner do
-          @app.start(%W[group rmvar #{group_name} #{args}])
+          @app.start(%W[group rmvar #{group_name} #{args} --yes])
         end
         # @console.out(actual,'p')
 
@@ -121,7 +121,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
         # Try to remove the groupvar using the case example valid args
         actual = runner do
-          @app.start(%W[group rmvar #{group_name} #{example}])
+          @app.start(%W[group rmvar #{group_name} #{example} --yes])
         end
         # @console.out(actual,'p')
 
@@ -167,7 +167,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       end
 
       actual = runner do
-        @app.start(%W[group rmvar #{group_name}] + vars)
+        @app.start(%W[group rmvar #{group_name} --yes] + vars)
       end
       # @console.out(actual,'y')
 

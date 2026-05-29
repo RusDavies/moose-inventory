@@ -12,8 +12,10 @@ module Moose
         end
 
         desc 'rmtag GROUP TAG_1 [TAG_2 ...]', 'Remove metadata tags from a group'
+        option :yes, type: :boolean, desc: 'Confirm destructive tag removal without prompting'
         def rmtag(*args)
           abort_if_missing_args(args, 2, '2 or more')
+          confirm_destructive_action!("group rmtag #{args[0].downcase} #{args.slice(1, args.length - 1).join(',')}")
 
           remove_tags('group', args[0].downcase, args.slice(1, args.length - 1))
         end

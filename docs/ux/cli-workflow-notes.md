@@ -113,13 +113,15 @@ Workflow:
 1. User chooses a mutating command: add/remove hosts/groups, variables, tags, associations, or child relationships.
 2. User optionally previews with `--dry-run` or `--dry-run --plan-format`.
 3. CLI validates inputs/options before writes.
-4. CLI applies changes transactionally when not dry-run.
+4. Destructive removal commands require `--yes` before writing unless the user selected `--dry-run`.
+5. CLI applies changes transactionally when not dry-run.
 5. CLI reports progress, warnings, success/failure, and audit evidence where applicable.
 
 UX expectations:
 
 - Mutating commands must be visually distinguishable from read-only workflows through command naming, progress output, and documentation.
 - Invalid option combinations, such as `--plan-format` without `--dry-run`, fail before mutation.
+- Removal commands should fail closed without `--yes`, while still allowing dry-run preview without confirmation.
 - Dry-run output must not imply changes were applied.
 - Real mutation output should preserve existing output contracts unless a breaking change is approved.
 

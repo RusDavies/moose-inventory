@@ -56,7 +56,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       # no items in the db
       group_name = 'fake'
-      actual = runner { @app.start(%W[group rm #{group_name}]) }
+      actual = runner { @app.start(%W[group rm #{group_name} --yes]) }
 
       # @console.out(actual,'y')
       desired = {}
@@ -78,7 +78,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'test1'
       @db.models[:group].create(name: group_name)
 
-      actual = runner { @app.start(%W[group rm #{group_name}]) }
+      actual = runner { @app.start(%W[group rm #{group_name} --yes]) }
 
       # Check output
       desired = {}
@@ -95,6 +95,23 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # Check db
       group = @db.models[:group].find(name: group_name)
       expect(group).to be_nil
+    end
+
+    #---------------
+    it 'GROUP without --yes or --dry-run should abort before deleting' do
+      group_name = 'group1'
+      @db.models[:group].create(name: group_name)
+
+      actual = runner { @app.start(%W[group rm #{group_name}]) }
+
+      desired = {
+        aborted: true,
+        STDOUT: '',
+        STDERR: "ERROR: group rm #{group_name} is destructive. Re-run with --yes to confirm, " \
+                "or use --dry-run to preview.\n"
+      }
+      expected(actual, desired)
+      expect(@db.models[:group].find(name: group_name)).not_to be_nil
     end
 
     #---------------
@@ -150,7 +167,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       expect(groups_ds[name: 'ungrouped']).to be_nil # Shouldn't be ungrouped
 
       # Now do the rm
-      actual = runner { @app.start(%W[group rm #{group_name}]) }
+      actual = runner { @app.start(%W[group rm #{group_name} --yes]) }
 
       # @console.out(actual)
 
@@ -186,7 +203,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
         @db.models[:group].create(name: name)
       end
 
-      actual = runner { @app.start(%w[group rm] + names) }
+      actual = runner { @app.start(%w[group rm --yes] + names) }
 
       # Check output
       desired = { STDOUT: '' }
@@ -213,7 +230,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       @db.models[:group].create(name: 'parent')
       runner { @app.start(%w[group addchild parent child]) }
 
-      actual = runner { @app.start(%w[group rm child]) }
+      actual = runner { @app.start(%w[group rm child --yes]) }
 
       # Check output
       desired = { STDOUT: '' }
@@ -241,7 +258,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       @db.models[:group].create(name: 'parent')
       runner { @app.start(%w[group addchild parent child]) }
 
-      actual = runner { @app.start(%w[group rm parent]) }
+      actual = runner { @app.start(%w[group rm parent --yes]) }
 
       # Check output
       desired = { STDOUT: '' }
@@ -272,7 +289,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%w[group addchild parent child]) }
       runner { @app.start(%w[group addchild child grandchild]) }
 
-      actual = runner { @app.start(%w[group rm --recursive parent]) }
+      actual = runner { @app.start(%w[group rm --recursive parent --yes]) }
 
       expect(actual[:unexpected]).to eq(false)
       expect(actual[:aborted]).to eq(false)
@@ -293,7 +310,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%w[group addchild parent child]) }
       runner { @app.start(%w[group addchild other-parent child]) }
 
-      actual = runner { @app.start(%w[group rm --recursive parent]) }
+      actual = runner { @app.start(%w[group rm --recursive parent --yes]) }
 
       expect(actual[:unexpected]).to eq(false)
       expect(actual[:aborted]).to eq(false)

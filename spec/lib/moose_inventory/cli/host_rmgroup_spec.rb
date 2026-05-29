@@ -41,7 +41,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'not-a-host'
       group_name = 'example'
       actual = runner do
-        @app.start(%W[host rmgroup #{host_name} #{group_name}])
+        @app.start(%W[host rmgroup #{host_name} #{group_name} --yes])
       end
 
       # Check output
@@ -73,7 +73,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       # 2. expect that no association with ungrouped is made.
 
       actual = runner do
-        @app.start(%W[host rmgroup #{host_name} #{group_names[0]}])
+        @app.start(%W[host rmgroup #{host_name} #{group_names[0]} --yes])
       end
       # @console.dump(actual, 'y')
 
@@ -100,7 +100,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       # 1. expect that the group association is removed
       # 2. expect that an association will be made with 'ungrouped'.
       actual = runner do
-        @app.start(%W[host rmgroup #{host_name} #{group_names[1]}])
+        @app.start(%W[host rmgroup #{host_name} #{group_names[1]} --yes])
       end
 
       desired = { aborted: false }
@@ -151,7 +151,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       runner { @app.start(%W[host add #{host_name}]) }
 
       actual = runner do
-        @app.start(%W[host rmgroup #{host_name} #{group_name}])
+        @app.start(%W[host rmgroup #{host_name} #{group_name} --yes])
       end
 
       desired = { aborted: false }
@@ -176,7 +176,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       runner { @app.start(%W[host add #{name}]) }
 
-      actual = runner { @app.start(%W[host rmgroup #{name} #{groupname}]) }
+      actual = runner { @app.start(%W[host rmgroup #{name} #{groupname} --yes]) }
 
       desired = { aborted: true }
       desired[:STDERR] =
@@ -200,7 +200,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       end
 
       actual = runner do
-        @app.start(%W[host rmgroup #{host_name}] + group_names)
+        @app.start(%W[host rmgroup #{host_name} --yes] + group_names)
       end
       desired = { aborted: false }
       desired[:STDOUT] =

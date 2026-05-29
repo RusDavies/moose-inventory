@@ -41,7 +41,7 @@ RSpec.describe 'host and group metadata tags' do
     runner { @app.start(%w[host add app01]) }
     runner { @app.start(%w[host addtag app01 prod critical]) }
 
-    remove = runner { @app.start(%w[host rmtag app01 PROD]) }
+    remove = runner { @app.start(%w[host rmtag app01 PROD --yes]) }
     list = runner { @app.start(%w[host listtags app01]) }
 
     expect(remove[:unexpected]).to eq(false)

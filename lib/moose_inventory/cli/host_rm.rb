@@ -16,12 +16,14 @@ module Moose
         desc 'rm HOSTNAME_1 [HOSTNAME_2 ...]',
              'Remove hosts HOSTNAME_n from the inventory'
         option :dry_run, type: :boolean
+        option :yes, type: :boolean, desc: 'Confirm destructive removal without prompting'
         option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def rm(*argv)
           abort_if_missing_args(argv, 1, '1 or more')
           validate_machine_plan_request!
 
           names = normalize_names(argv)
+          confirm_destructive_action!("host rm #{names.join(',')}")
           result = remove_hosts_operation.call(names: names, dry_run: options[:dry_run])
           return if machine_plan_output_rendered?(result, command: 'host rm')
 

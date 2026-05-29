@@ -40,7 +40,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       # no items in the db
       name = 'fake'
-      actual = runner { @app.start(%W[host rm #{name}]) }
+      actual = runner { @app.start(%W[host rm #{name} --yes]) }
 
       desired = {}
       desired[:STDOUT] =
@@ -57,11 +57,28 @@ RSpec.describe Moose::Inventory::Cli::Host do
     end
 
     #---------------
-    it 'HOST ... should remove a host' do
+    it 'HOST without --yes or --dry-run should abort before deleting' do
       name = 'test1'
       @db.models[:host].create(name: name)
 
       actual = runner { @app.start(%W[host rm #{name}]) }
+
+      desired = {
+        aborted: true,
+        STDOUT: '',
+        STDERR: "ERROR: host rm #{name} is destructive. Re-run with --yes to confirm, " \
+                "or use --dry-run to preview.\n"
+      }
+      expected(actual, desired)
+      expect(@db.models[:host].find(name: name)).not_to be_nil
+    end
+
+    #---------------
+    it 'HOST ... should remove a host' do
+      name = 'test1'
+      @db.models[:host].create(name: name)
+
+      actual = runner { @app.start(%W[host rm #{name} --yes]) }
 
       # Check output
       desired = {}
@@ -109,7 +126,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
         @db.models[:host].create(name: name)
       end
 
-      actual = runner { @app.start(%w[host rm] + names) }
+      actual = runner { @app.start(%w[host rm --yes] + names) }
 
       # Check output
       desired = { aborted: false, STDERR: '', STDOUT: '' }

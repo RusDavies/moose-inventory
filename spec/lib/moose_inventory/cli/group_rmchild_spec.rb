@@ -81,7 +81,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       child_name = 'ungrouped'
 
       actual = runner do
-        @app.start(%W[group rmchild #{parent_name} #{child_name}])
+        @app.start(%W[group rmchild #{parent_name} #{child_name} --yes])
       end
 
       # @console.out(actual, 'y')
@@ -98,7 +98,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       cname = 'child group'
 
       actual = runner do
-        @app.start(%W[group rmchild #{pname} #{cname}])
+        @app.start(%W[group rmchild #{pname} #{cname} --yes])
       end
 
       # @console.out(actual, 'y')
@@ -121,7 +121,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%W[group add #{pname} #{cname}]) }
 
       actual = runner do
-        @app.start(%W[group rmchild #{pname} #{cname}])
+        @app.start(%W[group rmchild #{pname} #{cname} --yes])
       end
 
       # @console.out(actual, 'y')
@@ -153,7 +153,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%W[group addchild #{pname} #{cname}]) }
 
       actual = runner do
-        @app.start(%W[group rmchild #{pname} #{cname}])
+        @app.start(%W[group rmchild #{pname} #{cname} --yes])
       end
 
       # @console.out(actual, 'y')
@@ -203,7 +203,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%w[group addchild child grandchild]) }
 
       actual = runner do
-        @app.start(%w[group rmchild --delete-orphans parent child])
+        @app.start(%w[group rmchild --delete-orphans parent child --yes])
       end
 
       expect(actual[:unexpected]).to eq(false)
@@ -227,7 +227,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%w[group addchild other-parent child]) }
 
       actual = runner do
-        @app.start(%w[group rmchild --delete-orphans parent child])
+        @app.start(%w[group rmchild --delete-orphans parent child --yes])
       end
 
       expect(actual[:unexpected]).to eq(false)

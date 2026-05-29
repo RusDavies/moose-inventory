@@ -140,14 +140,9 @@ Architecture follow-up status counts: 4 done / 1 open.
 
 # Moose Inventory UX Implementation Backlog
 
-UX implementation status counts: 1 done / 3 open.
+UX implementation status counts: 2 done / 2 open.
 
 ## Open
-
-1. Add explicit confirmation for destructive commands.
-   - Destructive commands should eventually require explicit confirmation unless `--yes` or an equivalent non-interactive acknowledgement is provided.
-   - Preserve dry-run behavior and ensure invalid inputs/options fail before prompting or writing.
-   - Document confirmation behavior in README when implemented.
 
 1. Define and document output compatibility versioning.
    - Human-readable output compatibility should be formally versioned alongside machine-readable output compatibility.
@@ -159,6 +154,11 @@ UX implementation status counts: 1 done / 3 open.
    - This is future work and does not block approval of the current CLI UX baseline.
 
 ## Done
+
+1. Add explicit confirmation for destructive commands.
+   - Added `--yes` acknowledgement gates for destructive removal commands while preserving `--dry-run` preview without confirmation.
+   - Covered host/group deletion, variable removal, host/group association removal, child-group dissociation, and host/group tag removal paths.
+   - Kept validation/error paths ahead of writes and documented confirmation behavior in README and UX workflow notes.
 
 1. Prioritize read-only console quoted-name parsing and richer validation.
    - Replaced whitespace splitting with `Shellwords.split` so quoted host/group names work in the read-only console.

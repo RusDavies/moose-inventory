@@ -37,7 +37,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       host_name = 'not-a-host'
       var_name = 'foo=bar'
       actual = runner do
-        @app.start(%W[host rmvar #{host_name} #{var_name}])
+        @app.start(%W[host rmvar #{host_name} #{var_name} --yes])
       end
 
       # Check output
@@ -67,7 +67,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
       cases.each do |args|
         actual = runner do
-          @app.start(%W[host rmvar #{host_name} #{args}])
+          @app.start(%W[host rmvar #{host_name} #{args} --yes])
         end
         # @console.out(actual,'p')
 
@@ -124,7 +124,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
 
         # Try to remove the hostvar using the case example valid args
         actual = runner do
-          @app.start(%W[host rmvar #{host_name} #{example}])
+          @app.start(%W[host rmvar #{host_name} #{example} --yes])
         end
         # @console.out(actual,'p')
 
@@ -170,7 +170,7 @@ RSpec.describe Moose::Inventory::Cli::Host do
       end
 
       actual = runner do
-        @app.start(%W[host rmvar #{host_name}] + vars)
+        @app.start(%W[host rmvar #{host_name} --yes] + vars)
       end
       # @console.out(actual,'p')
 

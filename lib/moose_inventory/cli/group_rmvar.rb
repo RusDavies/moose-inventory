@@ -14,6 +14,7 @@ module Moose
         desc 'rmvar NAME VARNAME',
              'Remove a variable VARNAME from the group NAME'
         option :dry_run, type: :boolean
+        option :yes, type: :boolean, desc: 'Confirm destructive removal without prompting'
         option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def rmvar(*args)
           abort_if_missing_args(args, 2, '2 or more')
@@ -21,6 +22,7 @@ module Moose
 
           name = args[0].downcase
           vars = args.slice(1, args.length - 1).uniq
+          confirm_destructive_action!("group rmvar #{name} #{vars.join(',')}")
           operation = build_operation(Moose::Inventory::Operations::RemoveVariables,
                                       entity_type: :group,
                                       emitter: machine_plan_emitter(group_rmvar_emitter(name, vars)))

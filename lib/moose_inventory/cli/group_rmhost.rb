@@ -15,6 +15,7 @@ module Moose
         desc 'rmhost GROUPNAME HOSTNAME_1 [HOSTNAME_2 ...]',
              'Dissociate the hosts HOSTNAME_n from the group NAME'
         option :dry_run, type: :boolean
+        option :yes, type: :boolean, desc: 'Confirm destructive dissociation without prompting'
         option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def rmhost(*args)
           abort_if_missing_args(args, 2, '2 or more')
@@ -24,6 +25,7 @@ module Moose
           hosts = normalize_names(args.slice(1, args.length - 1))
 
           abort_if_automatic_group([name])
+          confirm_destructive_action!("group rmhost #{name} #{hosts.join(',')}")
 
           result = remove_hosts_from_group(name, hosts)
           return if machine_plan_output_rendered?(result, command: 'group rmhost')

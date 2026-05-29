@@ -86,6 +86,12 @@ module Moose
           abort(message || "ERROR: Cannot manually manipulate the automatic group '#{AUTOMATIC_GROUP}'.")
         end
 
+        def confirm_destructive_action!(description)
+          return if options[:dry_run] || options[:yes]
+
+          abort("ERROR: #{description} is destructive. Re-run with --yes to confirm, or use --dry-run to preview.")
+        end
+
         def association_exists?(dataset, name)
           !dataset.nil? && !dataset[name: name].nil?
         end
