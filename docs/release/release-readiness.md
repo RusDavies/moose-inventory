@@ -50,6 +50,8 @@ The release workflow runs when a `v*` tag is pushed. It:
 
 RubyGems has a trusted publisher configured for repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`, so the workflow can request a short-lived publish token when a real release tag is pushed.
 
+Current GitHub `release` environment protection evidence is recorded in `docs/release/release-environment-protection.md`. As of 2026-05-29, the environment has no required reviewers, wait timer, or deployment branch/tag policy configured.
+
 This path was verified with release `v2.0` / gem `2.0`: RubyGems trusted publishing succeeded and the published gem was installable afterward. The release workflow now disables `rubygems/release-gem`'s post-publish await step (`await-release: false`) because RubyGems full-index propagation lag produced false-negative workflow failures even after successful publishes.
 
 ## Package sanity expectations

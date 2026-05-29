@@ -18,7 +18,9 @@ RubyGems has a trusted publisher configured for the existing `moose-inventory` g
 - Environment: `release`
 - Workflow repository owner/name: blank, because the workflow lives in this repository
 
-The release workflow requires the GitHub environment name `release`. If that environment has protection rules, approve the deployment when releasing.
+The release workflow requires the GitHub environment name `release`. Current environment protection evidence is documented in `docs/release/release-environment-protection.md`.
+
+As of 2026-05-29, the GitHub `release` environment exists but has no configured protection rules: no required deployment reviewers, no wait timer, and no deployment branch/tag policy. The workflow itself still runs only for pushed `v*` tags and verifies tag/version alignment before publishing.
 
 ## Trusted publishing release checklist
 
