@@ -406,21 +406,23 @@ Acceptance criteria:
 
 #### COMPAT-002: Machine-readable compatibility
 
-Machine-readable formats should be treated as automation-facing interfaces.
+Machine-readable formats are automation-facing interfaces governed by `CLI-OUTPUT-v1` in `docs/compatibility/cli-output-compatibility.md`.
 
 Acceptance criteria:
 
 - Changes to JSON/YAML/pjson structures are reviewed for compatibility impact.
-- Breaking format changes require approval and migration notes.
+- Breaking format changes require approval, migration notes, and a release-note declaration of any successor compatibility baseline.
+- Existing machine-readable shapes are not retrofitted with version fields unless the compatibility impact is approved.
 
 #### COMPAT-003: Human-readable compatibility
 
-Human-readable output should remain stable where tests or downstream examples rely on it.
+Human-readable output is also governed by `CLI-OUTPUT-v1` when tests, README examples, or downstream scripts rely on exact wording.
 
 Acceptance criteria:
 
 - Refactors preserve existing wording/newline behavior where tests lock it.
-- Intentional wording changes include test updates and release notes.
+- Intentional wording changes include test updates and release notes or backlog evidence.
+- Human-readable output remains discouraged as an automation interface when machine-readable output is available.
 
 ### Documentation
 
@@ -457,9 +459,8 @@ A release candidate is not requirements-conformant until:
 
 ## Open requirements questions
 
-1. Should the project formally freeze compatibility expectations for human-readable output, or only for machine-readable formats?
-2. Should snapshot import gain an explicitly destructive sync/restore mode, and what confirmation/recovery controls would be required?
-3. Should audit history become a rollback/change-set system or remain accountability/debug evidence?
-4. What exact Ruby/database support window should apply after each release?
-5. Should package signing/provenance beyond RubyGems trusted publishing become a requirement?
-6. Should tag normalization be fully case-insensitive across all import/export/CLI paths?
+1. Should snapshot import gain an explicitly destructive sync/restore mode, and what confirmation/recovery controls would be required?
+2. Should audit history become a rollback/change-set system or remain accountability/debug evidence?
+3. What exact Ruby/database support window should apply after each release?
+4. Should package signing/provenance beyond RubyGems trusted publishing become a requirement?
+5. Should tag normalization be fully case-insensitive across all import/export/CLI paths?

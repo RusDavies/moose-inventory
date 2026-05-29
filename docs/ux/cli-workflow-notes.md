@@ -233,7 +233,7 @@ For a CLI, accessibility/readability means:
 
 ## Machine-readable output conventions
 
-Machine-readable output is automation-facing UX.
+Machine-readable output is automation-facing UX and is governed by `CLI-OUTPUT-v1` in `docs/compatibility/cli-output-compatibility.md`.
 
 Expectations:
 
@@ -245,13 +245,14 @@ Expectations:
 
 ## Compatibility conventions
 
-Human-readable output is also a compatibility surface when tests, docs, or scripts rely on exact wording.
+Human-readable output is also a versioned compatibility surface under `CLI-OUTPUT-v1` when tests, docs, or scripts rely on exact wording.
 
 Expectations:
 
 - Preserve existing wording/newline behavior during refactors unless an intentional change is approved.
 - Tests should cover known legacy output contracts, especially around warnings and cleanup behavior.
 - README examples should not promise output that the CLI no longer emits.
+- Breaking human-readable output changes need backlog/approval evidence and release notes just like machine-readable breaking changes.
 
 ## UX acceptance checklist
 
@@ -273,7 +274,7 @@ A new or changed CLI workflow is UX-ready when:
 These decisions were provided by Russ during review on 2026-05-28. They are captured here as product/UX direction for future implementation, but this draft UX baseline still requires explicit approval through `GOV-UX-001` before it becomes approved UX evidence.
 
 1. Destructive commands should eventually require explicit confirmation unless `--yes` or an equivalent non-interactive acknowledgement is provided.
-2. Human-readable output compatibility should be formally versioned, not only machine-readable output compatibility.
+2. Human-readable output compatibility is formally versioned through `CLI-OUTPUT-v1`, alongside machine-readable output compatibility.
 3. Read-only console support for quoted names and richer validation through `Shellwords.split` should be prioritized before adding more CLI features.
 4. Audit history should remain evidence only; future rollback/change-set UX should not be introduced through audit history.
 5. Snapshot import should eventually offer a formal preview/diff mode distinct from command-level dry-run planning, but this is future work and does not block the current UX baseline.
