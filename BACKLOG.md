@@ -1,17 +1,19 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 13 done / 2 open.
+Process conformance status counts: 14 done / 1 open.
 
 ## Open
-
-1. Add QA, documentation QA, and release gate templates.
-   - Map `scripts/check.sh` gates to requirements/release criteria.
-   - Add documentation plan/checklist, release checklist, release security gate, accepted-risk disposition, package yank/deprecation/rollback path, and post-release review template.
 
 1. Add package maintenance runbook and AI-agent operation boundaries.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Add QA, documentation QA, and release gate templates.
+   - Added `docs/qa/qa-documentation-and-release-gates.md` with reusable QA, documentation-QA, release-readiness, release-security, accepted-risk disposition, yank/deprecation/rollback, and post-release review templates.
+   - Mapped `scripts/check.sh` gate steps to requirement/release criteria and release interpretation.
+   - Updated `docs/release/release-readiness.md` to include the full current gate including RuboCop, secret scan, and required-security-tools release invocation.
+   - Updated `docs/release/publishing.md` to require the security-tools gate and QA/release templates during trusted-publishing releases.
 
 1. Approve the accepted-risk register baseline.
    - Russ approved `docs/security/accepted-risk-register.md` as the maintained accepted-risk register baseline on 2026-05-29.
@@ -687,7 +689,7 @@ _No open code-quality items._
 
 1. Clean CLI loader and gemspec hygiene.
    - Normalized small CLI loader files for frozen string literals and idiomatic `require_relative` paths.
-   - Updated gemspec metadata to require RubyGems MFA, removed deprecated `test_files`, and corrected dependency/API/style issues while preserving the project’s Gemfile-through-gemspec setup.
+   - Updated gemspec metadata to require RubyGems MFA, removed deprecated `test_files`, and corrected dependency/API/style issues while preserving the project's Gemfile-through-gemspec setup.
    - Added the cleaned CLI loader files and gemspec to the targeted RuboCop gate.
 
 1. Replace randomized SQLite busy retry sleeps with deterministic capped backoff.
