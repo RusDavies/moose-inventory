@@ -99,14 +99,14 @@ _No open process conformance items._
 
 # Moose Inventory Architecture Follow-up Backlog
 
-Architecture follow-up status counts: 1 done / 3 open.
+Architecture follow-up status counts: 2 done / 3 open.
 
 ## Open
 
-1. Decide whether to add GitHub `release` environment protection rules.
-   - Current evidence shows no required deployment reviewers, wait timer, or deployment branch/tag policy configured as of 2026-05-29.
-   - Decide whether to add required reviewers, approval-role limits, tag/branch deployment restrictions, wait timers, or admin-bypass changes before treating environment protection as a release control.
-   - This is GitHub release-infrastructure administration and requires explicit human approval before changing settings.
+1. Verify GitHub `release` environment custom `v*` policy behavior on the next real release.
+   - GitHub accepted a custom deployment policy named `v*`, but the API reports the policy object as `type: branch`.
+   - On the next intentional `v*` tag release, verify that the release job can deploy to the `release` environment after required approval.
+   - If GitHub treats the policy as branch-only and blocks tag deployments, adjust the environment policy or document the limitation and rely on the workflow trigger plus tag/version check for tag control.
 
 1. Evaluate signed package provenance as future hardening.
    - Trusted publishing remains the current architectural baseline.
@@ -119,6 +119,13 @@ Architecture follow-up status counts: 1 done / 3 open.
    - Avoid introducing destructive restore behavior without separate requirements, UX, recovery, and approval records.
 
 ## Done
+
+1. Configure GitHub `release` environment protection rules.
+   - Configured required deployment reviewer `RusDavies` for the `release` environment.
+   - Enabled self-review prevention for the required-reviewer rule.
+   - Disabled admin bypass for the `release` environment.
+   - Enabled custom deployment policies and added policy name `v*`.
+   - Updated release, architecture, accepted-risk, and backlog evidence to reflect configured protections and residual next-release verification.
 
 1. Document confirmed GitHub release environment protection rules.
    - Confirmed via `gh api repos/RusDavies/moose-inventory/environments/release --jq '.'` on 2026-05-29.
