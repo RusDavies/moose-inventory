@@ -2,7 +2,9 @@
 
 ## Approval status
 
-Status: **Draft - maintained operations runbook**
+Status: **Approved package maintenance and AI-agent operation-boundary baseline**
+
+Russ / Rusty Frink Desiato approved this document as the package maintenance and AI-agent operation-boundary baseline for Moose Inventory on 2026-05-29. Approval reference: `GOV-MAINT-001`.
 
 This document defines the routine package-maintenance runbook and AI-agent operation boundaries for Moose Inventory.
 
@@ -15,6 +17,7 @@ Approved references:
 - `GOV-ARCH-001`: `docs/architecture/architecture-and-trust-boundaries.md` is approved as the architecture and trust-boundary baseline.
 - `GOV-SEC-001`: `docs/security/security-privacy-process.md` is approved as the security and privacy process baseline.
 - `GOV-RISK-REG-001`: `docs/security/accepted-risk-register.md` is approved as the maintained accepted-risk register baseline.
+- `GOV-MAINT-001`: this document is approved as the package maintenance and AI-agent operation-boundary baseline.
 
 Related templates:
 
