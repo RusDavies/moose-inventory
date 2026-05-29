@@ -41,11 +41,19 @@ module Moose
       end
 
       def find_tag(name)
-        db.models[:tag].find(name: name)
+        db.models[:tag].find(name: normalize_tag_name(name))
       end
 
       def find_or_create_tag(name)
-        db.models[:tag].find_or_create(name: name)
+        db.models[:tag].find_or_create(name: normalize_tag_name(name))
+      end
+
+      def normalize_tag_name(name)
+        name.to_s.downcase.strip
+      end
+
+      def normalize_tag_names(names)
+        names.map { |name| normalize_tag_name(name) }.reject(&:empty?).uniq
       end
 
       def hosts_dataset

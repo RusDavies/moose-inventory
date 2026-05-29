@@ -291,8 +291,8 @@ Hosts and groups must support metadata tags separate from Ansible variables.
 Acceptance criteria:
 
 - Tag add/list/remove commands work for hosts and groups.
-- Tags are deduplicated per host/group.
-- Tag normalization rules are documented and consistently applied after the relevant backlog item is completed.
+- Tags are normalized to lowercase, stripped of surrounding whitespace, and deduplicated per host/group.
+- CLI tag commands and snapshot import apply the same tag normalization rule.
 
 ### Ansible integration
 

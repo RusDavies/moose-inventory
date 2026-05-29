@@ -69,7 +69,7 @@ module Moose
             raise_invalid("#{label} '#{name}' variable name cannot be empty") if blank_string?(variable_name)
           end
 
-          array_value(payload, 'tags', label: "#{label} '#{name}' tags")
+          payload['tags'] = context.normalize_tag_names(array_value(payload, 'tags', label: "#{label} '#{name}' tags"))
         end
 
         def validate_group_cycles!(groups)

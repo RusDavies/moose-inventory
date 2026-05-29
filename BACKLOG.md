@@ -170,20 +170,22 @@ UX implementation status counts: 1 done / 3 open.
 
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 8 done / 2 open.
+Code improvement analysis status counts: 9 done / 1 open.
 
 ## Open
-
-1. Normalize tag casing consistently across snapshot import and CLI tag commands.
-   - CLI tag commands normalize tags to lowercase, but snapshot import currently uses tag strings as supplied.
-   - Decide whether tags are case-insensitive metadata; if yes, normalize imported tags the same way and document the rule.
-   - Add import/export regression coverage for mixed-case tags.
 
 1. Keep generated coverage reports out of source-oriented scans and commits.
    - `spec/reports/coverage` is generated output and should remain ignored unless intentionally published.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Normalize tag casing consistently across snapshot import and CLI tag commands.
+   - Confirmed tags are case-insensitive operational metadata.
+   - Centralized tag normalization through `InventoryContext`: lowercase, strip surrounding whitespace, reject empty values, and deduplicate.
+   - Applied the same rule to CLI tag commands and snapshot import validation/application.
+   - Documented the normalization rule in README and product requirements.
+   - Added regression coverage for mixed-case CLI tags and mixed-case snapshot-import tags.
 
 1. Improve read-only console parsing and validation.
    - Replaced blunt whitespace splitting with `Shellwords.split` for shell-style quoted names.

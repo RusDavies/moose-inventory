@@ -269,7 +269,7 @@ Groups support the same tag commands:
     $ moose-inventory group addtag web frontend public-edge
     $ moose-inventory group listtags web --format json
 
-Tag names are normalized to lowercase, deduplicated per host/group, and stored in portable join tables.  Tag add/remove operations are audited when they change state.  Querying/filtering by tags is intentionally left to the next query/filter backlog item so this slice keeps metadata storage and inspection simple.
+Tag names are case-insensitive operational metadata: CLI tag commands and snapshot imports normalize them to lowercase, strip surrounding whitespace, deduplicate repeated values, and store them in portable join tables.  Tag add/remove operations are audited when they change state.
 
 ###Audit log / change history
 Moose Inventory records append-only audit events for successful mutating CLI commands.  Dry-run commands are intentionally excluded, because planned changes are already available through `--plan-format` and did not actually mutate inventory state.
