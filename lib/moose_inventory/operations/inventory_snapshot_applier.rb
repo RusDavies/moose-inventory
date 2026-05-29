@@ -60,7 +60,7 @@ module Moose
         end
 
         def apply_tags(entity, tags, result)
-          tags.each do |tag_name|
+          context.normalize_tag_names(tags).each do |tag_name|
             tag = context.find_or_create_tag(tag_name)
             next unless entity.tags_dataset[name: tag_name].nil?
 

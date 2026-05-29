@@ -53,6 +53,34 @@ RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot do
     expect(group.groupvars_dataset[name: 'role'][:value]).to eq('frontend')
   end
 
+  it 'normalizes imported tag casing and deduplicates tags before applying' do
+    snapshot = {
+      version: 1,
+      hosts: {
+        web01: { groups: ['web'], tags: ['Prod', 'prod', ' OWNER-Platform ', ''], vars: {} }
+      },
+      groups: {
+        web: { children: [], tags: %w[Frontend frontend], vars: {} }
+      }
+    }
+
+    result = operation.call(snapshot: snapshot)
+
+    host = @db.models[:host].find(name: 'web01')
+    group = @db.models[:group].find(name: 'web')
+    expect(result.associations).to eq(4)
+    expect(host.tags_dataset.order(:name).map(:name)).to eq(%w[owner-platform prod])
+    expect(group.tags_dataset.order(:name).map(:name)).to eq(%w[frontend])
+    expect(@db.models[:tag].order(:name).map(:name)).to eq(%w[frontend owner-platform prod])
+    expect(@db.models[:tag].where(name: 'Prod').count).to eq(0)
+
+    exported = Moose::Inventory::Operations::InventorySnapshot.new(
+      context: Moose::Inventory::InventoryContext.new(db: @db)
+    ).export
+    expect(exported.dig('hosts', 'web01', 'tags')).to eq(%w[owner-platform prod])
+    expect(exported.dig('groups', 'web', 'tags')).to eq(%w[frontend])
+  end
+
   it 'rejects unknown group references before writing anything' do
     snapshot = {
       version: 1,

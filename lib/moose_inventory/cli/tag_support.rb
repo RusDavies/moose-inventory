@@ -14,7 +14,7 @@ module Moose
 
           db.transaction do
             normalized.each do |tag_name|
-              tag = db.models[:tag].find_or_create(name: tag_name)
+              tag = inventory_context.find_or_create_tag(tag_name)
               next unless entity.tags_dataset[name: tag_name].nil?
 
               entity.add_tag(tag)
@@ -70,7 +70,7 @@ module Moose
         end
 
         def normalize_tags(values)
-          values.map { |value| value.to_s.downcase.strip }.reject(&:empty?).uniq
+          inventory_context.normalize_tag_names(values)
         end
 
         def tag_result(events:)
