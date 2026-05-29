@@ -99,14 +99,14 @@ _No open process conformance items._
 
 # Moose Inventory Architecture Follow-up Backlog
 
-Architecture follow-up status counts: 0 done / 3 open.
+Architecture follow-up status counts: 1 done / 3 open.
 
 ## Open
 
-1. Document confirmed GitHub release environment protection rules.
-   - Confirm the current GitHub `release` environment settings with maintainers.
-   - Document whether deployment approval, branch/tag restrictions, wait timers, or approval-role limits apply to RubyGems trusted publishing.
-   - Keep this as release-process evidence, not digital estate management.
+1. Decide whether to add GitHub `release` environment protection rules.
+   - Current evidence shows no required deployment reviewers, wait timer, or deployment branch/tag policy configured as of 2026-05-29.
+   - Decide whether to add required reviewers, approval-role limits, tag/branch deployment restrictions, wait timers, or admin-bypass changes before treating environment protection as a release control.
+   - This is GitHub release-infrastructure administration and requires explicit human approval before changing settings.
 
 1. Evaluate signed package provenance as future hardening.
    - Trusted publishing remains the current architectural baseline.
@@ -120,7 +120,12 @@ Architecture follow-up status counts: 0 done / 3 open.
 
 ## Done
 
-_No completed architecture follow-up items._
+1. Document confirmed GitHub release environment protection rules.
+   - Confirmed via `gh api repos/RusDavies/moose-inventory/environments/release --jq '.'` on 2026-05-29.
+   - Added `docs/release/release-environment-protection.md` documenting current `release` environment settings.
+   - Current GitHub `release` environment has no required deployment reviewers, no wait timer, and no deployment branch/tag policy; admin bypass is enabled.
+   - Updated publishing, release-readiness, architecture, and accepted-risk evidence to reflect the confirmed state.
+   - Added follow-up backlog item to decide whether to add release environment protection rules before relying on environment protection as a release control.
 
 ---
 
