@@ -20,9 +20,10 @@ The gate currently runs:
 2. `scripts/ci/check_rubocop.sh` for targeted Ruby style/lint checks.
 3. `git diff --check` for whitespace/conflict-marker issues in the working tree.
 4. `scripts/ci/check_permissions.sh` to ensure only intentional tracked repository entrypoints are executable.
-5. `scripts/ci/check_security.sh` to query OSV, run `bundler-audit`, and run `osv-scanner` when available or required.
-6. `scripts/ci/check_secrets.sh` to run the dedicated `gitleaks` secret scan when available or required.
-7. `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, and smoke-test the CLI version command.
+5. `scripts/ci/check_generated_artifacts.sh` to ensure generated/local artifact paths remain ignored and untracked.
+6. `scripts/ci/check_security.sh` to query OSV, run `bundler-audit`, and run `osv-scanner` when available or required.
+7. `scripts/ci/check_secrets.sh` to run the dedicated `gitleaks` secret scan when available or required.
+8. `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, and smoke-test the CLI version command.
 
 For release evidence, prefer:
 

@@ -13,7 +13,6 @@
 mkmf.log
 .buildpath
 .project
-/coverage/
 *.gem
 /gems/
 moose-inventory.spec

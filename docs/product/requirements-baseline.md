@@ -338,7 +338,7 @@ Release candidates must pass the full project verification gate or record explic
 Acceptance criteria:
 
 - `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh` passes for release-candidate code unless an exception is explicitly accepted.
-- Gate includes tests, coverage, RuboCop, whitespace/permission checks, dependency security checks, secret scanning, and package sanity.
+- Gate includes tests, coverage, RuboCop, whitespace/permission checks, generated-artifact guards, dependency security checks, secret scanning, and package sanity.
 - Release evidence records the exact command and result.
 
 #### PKG-002: Trusted publishing

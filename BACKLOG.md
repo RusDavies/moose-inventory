@@ -170,15 +170,19 @@ UX implementation status counts: 1 done / 3 open.
 
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 9 done / 1 open.
+Code improvement analysis status counts: 10 done / 0 open.
 
 ## Open
 
-1. Keep generated coverage reports out of source-oriented scans and commits.
-   - `spec/reports/coverage` is generated output and should remain ignored unless intentionally published.
-   - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
+_No open code-improvement-analysis items._
 
 ## Done
+
+1. Keep generated coverage reports out of source-oriented scans and commits.
+   - Added `scripts/ci/check_generated_artifacts.sh` to fail if generated/local paths are tracked or no longer ignored.
+   - Wired the guard into `./scripts/check.sh` after tests create coverage output and before source/security/package checks.
+   - Kept `spec/reports`, `coverage`, `tmp`, `pkg`, and `.openclaw-security-audit` out of source/package review by ignore and tracking checks.
+   - Documented the new gate in README, release-readiness, QA, and requirements docs.
 
 1. Normalize tag casing consistently across snapshot import and CLI tag commands.
    - Confirmed tags are case-insensitive operational metadata.

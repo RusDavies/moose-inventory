@@ -650,7 +650,7 @@ Run the local verification gate before committing changes:
 ./scripts/check.sh
 ```
 
-The check script runs the RSpec suite, enforces the SimpleCov coverage minimum, checks file permissions, queries OSV for locked RubyGems advisories, runs `bundler-audit`, runs `gitleaks` when available, and builds/smoke-tests the packaged gem.
+The check script runs the RSpec suite, enforces the SimpleCov coverage minimum, checks file permissions, verifies generated/local artifact paths remain ignored and untracked, queries OSV for locked RubyGems advisories, runs `bundler-audit`, runs `gitleaks` when available, and builds/smoke-tests the packaged gem.
 
 Optional Go-based security tools used by CI can be installed locally with:
 
