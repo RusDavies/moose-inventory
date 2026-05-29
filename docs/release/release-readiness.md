@@ -2,6 +2,8 @@
 
 This project now has a small release-readiness gate intended to catch the regressions found during the modernization and security-audit passes.
 
+Reusable QA, documentation-QA, release, security, accepted-risk, rollback, and post-release templates live in `docs/qa/qa-documentation-and-release-gates.md`.
+
 ## Local gate
 
 Run:
@@ -13,10 +15,18 @@ Run:
 The gate currently runs:
 
 1. RSpec with coverage via the existing spec helper.
-2. `git diff --check` for whitespace/conflict-marker issues in the working tree.
-3. `scripts/ci/check_permissions.sh` to ensure only intentional tracked repository entrypoints are executable.
-4. `scripts/ci/check_security.sh` to query OSV for locked RubyGems dependency advisories.
-5. `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, and smoke-test the CLI version command.
+2. `scripts/ci/check_rubocop.sh` for targeted Ruby style/lint checks.
+3. `git diff --check` for whitespace/conflict-marker issues in the working tree.
+4. `scripts/ci/check_permissions.sh` to ensure only intentional tracked repository entrypoints are executable.
+5. `scripts/ci/check_security.sh` to query OSV, run `bundler-audit`, and run `osv-scanner` when available or required.
+6. `scripts/ci/check_secrets.sh` to run the dedicated `gitleaks` secret scan when available or required.
+7. `scripts/ci/package_sanity.sh` to build the gem, inspect the packaged payload, and smoke-test the CLI version command.
+
+For release evidence, prefer:
+
+```bash
+MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh
+```
 
 ## CI gate
 

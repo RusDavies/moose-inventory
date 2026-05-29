@@ -37,10 +37,10 @@ The release workflow requires the GitHub environment name `release`. If that env
 
    If the repository version is not higher than the latest RubyGems version, bump `lib/moose_inventory/version.rb` first and commit that change before releasing.
 
-3. Run the local release gate.
+3. Run the local release gate with security tools required, and complete the QA/release templates in `docs/qa/qa-documentation-and-release-gates.md`.
 
    ```bash
-   ./scripts/check.sh
+   MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh
    ```
 
 4. Push the release commit and wait for CI to pass.
