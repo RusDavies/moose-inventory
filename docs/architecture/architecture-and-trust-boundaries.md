@@ -431,9 +431,15 @@ Current notable architecture decisions:
 6. Use RubyGems trusted publishing/OIDC as the preferred publishing path.
 7. Preserve CLI output compatibility unless breaking changes are explicitly approved.
 
+## Architecture decisions recorded from review
+
+These decisions were provided by Russ during review on 2026-05-28. They are captured here as architecture direction for future implementation, but this draft architecture baseline still requires explicit approval through `GOV-ARCH-001` before it becomes approved architecture evidence.
+
+1. Architecture baseline approval requires lightweight text diagram review only; richer diagrams are not required by default.
+2. Release environment protection rules should be documented in more detail after maintainers confirm the current GitHub `release` environment settings.
+3. Additional package provenance beyond RubyGems trusted publishing is not a current architectural requirement. Trusted publishing remains the baseline; signed provenance/artifact attestations can be evaluated later as future hardening.
+4. User database backup/restore guidance should be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL.
+
 ## Open architecture questions
 
-1. Should architecture baseline approval require a lightweight text diagram review only, or should future major architecture changes add richer diagrams?
-2. Should release environment protection rules be documented in more detail after maintainers confirm the current GitHub environment settings?
-3. Should package provenance beyond RubyGems trusted publishing, such as signed provenance artifacts, become an architectural requirement?
-4. Should user database backup/restore guidance be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL?
+No open architecture questions remain in this draft. Future questions should be added here only when they are not already represented as a decision, backlog item, or accepted scope limit.

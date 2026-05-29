@@ -7,6 +7,7 @@ Process conformance status counts: 9 done / 4 open.
 1. Review and approve, revise, or reject the draft architecture and trust-boundary baseline.
    - Draft is in `docs/architecture/architecture-and-trust-boundaries.md`.
    - Pending approval is recorded as `GOV-ARCH-001` in `docs/governance/approval-register.md`.
+   - Russ answered the original open architecture questions on 2026-05-28; the resulting follow-ups are tracked in the architecture follow-up backlog below.
    - Do not treat the draft as approved architecture evidence until a human approver records a durable decision.
 
 1. Add maintained security/privacy process docs.
@@ -67,6 +68,33 @@ Process conformance status counts: 9 done / 4 open.
    - Added `docs/process/conformance-gap-analysis-2026-05-28.md` with current evidence, approval-vs-document distinctions, recommended Class 4 + Software Library / Package tailoring, gaps, and remediation phases.
    - Added `docs/governance/approval-register.md` seeded with pending tailoring approval and explicit approval rules.
    - Added follow-up backlog items for tailoring approval, product/requirements/UX/architecture/security/QA/release/maintenance/agent-boundary remediation.
+
+---
+
+# Moose Inventory Architecture Follow-up Backlog
+
+Architecture follow-up status counts: 0 done / 3 open.
+
+## Open
+
+1. Document confirmed GitHub release environment protection rules.
+   - Confirm the current GitHub `release` environment settings with maintainers.
+   - Document whether deployment approval, branch/tag restrictions, wait timers, or approval-role limits apply to RubyGems trusted publishing.
+   - Keep this as release-process evidence, not digital estate management.
+
+1. Evaluate signed package provenance as future hardening.
+   - Trusted publishing remains the current architectural baseline.
+   - Evaluate signed provenance artifacts, GitHub artifact attestations, checksums, or equivalent later if security-sensitive consumers or release requirements justify the complexity.
+   - Do not make additional provenance a current release blocker unless separately approved.
+
+1. Expand user database backup/restore guidance beyond SQLite.
+   - Add guidance boundaries for MySQL/MariaDB and PostgreSQL backups/restores.
+   - Clarify what Moose Inventory can and cannot safely do itself.
+   - Avoid introducing destructive restore behavior without separate requirements, UX, recovery, and approval records.
+
+## Done
+
+_No completed architecture follow-up items._
 
 ---
 
