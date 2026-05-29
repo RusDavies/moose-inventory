@@ -140,13 +140,9 @@ Architecture follow-up status counts: 4 done / 1 open.
 
 # Moose Inventory UX Implementation Backlog
 
-UX implementation status counts: 2 done / 2 open.
+UX implementation status counts: 3 done / 1 open.
 
 ## Open
-
-1. Define and document output compatibility versioning.
-   - Human-readable output compatibility should be formally versioned alongside machine-readable output compatibility.
-   - Decide where version identifiers live and how breaking output changes are approved, tested, and communicated.
 
 1. Add snapshot import preview/diff mode.
    - Future snapshot import should offer a formal preview/diff mode distinct from command-level dry-run planning.
@@ -154,6 +150,11 @@ UX implementation status counts: 2 done / 2 open.
    - This is future work and does not block approval of the current CLI UX baseline.
 
 ## Done
+
+1. Define and document output compatibility versioning.
+   - Added `docs/compatibility/cli-output-compatibility.md` defining the `CLI-OUTPUT-v1` baseline for Moose Inventory 2.x.
+   - Documented that compatibility version identifiers live in the policy document, release notes/release evidence, and backlog/approval evidence for breaking changes rather than retrofitting existing JSON/YAML shapes.
+   - Updated requirements, UX notes, and README so machine-readable and protected human-readable output changes require compatibility review, tests, docs, and release notes when breaking.
 
 1. Add explicit confirmation for destructive commands.
    - Added `--yes` acknowledgement gates for destructive removal commands while preserving `--dry-run` preview without confirmation.

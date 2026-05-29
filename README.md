@@ -181,6 +181,8 @@ Destructive removal commands require an explicit acknowledgement before they wri
 
 The actual `events` array includes the full ordered plan for the command.  Each event has a `type` and a `payload`, so scripts can inspect planned host, group, variable, association, automatic `ungrouped`, and child-group cleanup actions without scraping human-readable output.
 
+CLI output compatibility is governed by `CLI-OUTPUT-v1` in `docs/compatibility/cli-output-compatibility.md`. Machine-readable JSON/YAML/pjson structures are the supported automation interface. Documented human-readable output is also compatibility-protected when tests, README examples, or release notes rely on it, but scripts should prefer machine-readable formats.
+
 ###Import and export snapshots
 The full inventory can be exported as a portable snapshot.  The snapshot contains a version number, hosts, host variables, host-to-group memberships, host/group tags, groups, group variables, and child-group relationships.  It is intended for review, backup, migration, and automation workflows.
 
