@@ -215,7 +215,7 @@ Expected error behavior:
 
 Known UX improvement area:
 
-- Read-only console parsing currently has blunt whitespace splitting and validation limitations. This remains tracked in the code-improvement backlog and should be improved without turning the console into a mutating interface.
+- Read-only console parsing now uses shell-style quoting and command-specific validation for the current browsing commands. Future console changes should preserve the read-only boundary unless mutation flows add confirmation, dry-run, and audit behavior.
 
 ## Accessibility and readability expectations
 

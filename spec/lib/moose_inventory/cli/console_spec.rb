@@ -54,5 +54,45 @@ RSpec.describe Moose::Inventory::Cli::Console do
     expect(actual[:STDOUT]).to include('Unknown command: nonsense')
     expect(actual[:STDOUT]).to include("Host 'missing' not found.")
   end
+
+  it 'supports quoted read-only entity names' do
+    group = @db.models[:group].create(name: 'prod group')
+    host = @db.models[:host].create(name: 'web 01')
+    tag = @db.models[:tag].create(name: 'critical host')
+    host.add_group(group)
+    host.add_tag(tag)
+    before_audit_count = @db.models[:audit_event].count
+
+    actual = run_console("host \"web 01\"\ntags host \"web 01\"\ngroup 'prod group'\nquit\n")
+
+    expect(actual[:unexpected]).to eq(false)
+    expect(actual[:STDOUT]).to include('Host: web 01')
+    expect(actual[:STDOUT]).to include('Groups: prod group')
+    expect(actual[:STDOUT]).to include('critical host')
+    expect(actual[:STDOUT]).to include('Group: prod group')
+    expect(actual[:STDOUT]).to include('Hosts: web 01')
+    expect(@db.models[:audit_event].count).to eq(before_audit_count)
+  end
+
+  it 'reports command-specific usage for extra or invalid arguments' do
+    actual = run_console("host one two\ntags host\naudit nope\naudit 0\nhelp extra\nquit\n")
+
+    expect(actual[:unexpected]).to eq(false)
+    expect(actual[:STDOUT]).to include('Usage: host NAME')
+    expect(actual[:STDOUT]).to include('Usage: tags host|group NAME')
+    expect(actual[:STDOUT].scan('Usage: audit [LIMIT]').length).to eq(2)
+    expect(actual[:STDOUT]).to include('Usage: help')
+  end
+
+  it 'reports unclosed quoted input without leaving read-only mode' do
+    before_audit_count = @db.models[:audit_event].count
+
+    actual = run_console("host \"unterminated\nquit\n")
+
+    expect(actual[:unexpected]).to eq(false)
+    expect(actual[:STDOUT]).to include('Invalid command syntax:')
+    expect(actual[:STDOUT]).to include('Goodbye.')
+    expect(@db.models[:audit_event].count).to eq(before_audit_count)
+  end
 end
 # rubocop:enable Metrics/BlockLength
