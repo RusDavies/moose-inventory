@@ -2,9 +2,9 @@
 
 ## Approval status
 
-Status: **Draft - not approved**
+Status: **Approved architecture and trust-boundary baseline**
 
-This document captures the current architecture, trust boundaries, and data flows for Moose Inventory. It is prepared from the approved product brief, requirements baseline, CLI UX/workflow baseline, README, release docs, GitHub workflows, gemspec, and current source layout.
+Approval reference: `GOV-ARCH-001` in `docs/governance/approval-register.md` approves this document as the architecture and trust-boundary baseline for Moose Inventory.
 
 Approved references:
 
@@ -13,9 +13,7 @@ Approved references:
 - `GOV-REQ-001`: `docs/product/requirements-baseline.md` is approved as the requirements and acceptance criteria baseline.
 - `GOV-UX-001`: `docs/ux/cli-workflow-notes.md` is approved as the CLI UX/workflow baseline.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this architecture and trust-boundary baseline before it becomes approved architecture evidence.
-
-Scope limit: this document covers architecture and trust boundaries only. It is not security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, or RubyGems publishing approval.
+Scope limit: this approval covers architecture and trust boundaries only. It is not security/privacy design approval, release approval, accepted-risk approval, public/compliance-claim approval, RubyGems publishing approval, implementation approval for architecture follow-up backlog items, or repository/package account-management design approval.
 
 ## System summary
 
