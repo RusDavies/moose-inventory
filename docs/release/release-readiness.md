@@ -4,6 +4,8 @@ This project now has a small release-readiness gate intended to catch the regres
 
 Reusable QA, documentation-QA, release, security, accepted-risk, rollback, and post-release templates live in `docs/qa/qa-documentation-and-release-gates.md`.
 
+Routine package maintenance and AI-agent operation boundaries live in `docs/maintenance/package-maintenance-and-agent-boundaries.md`.
+
 ## Local gate
 
 Run:

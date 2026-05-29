@@ -1,13 +1,17 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 14 done / 1 open.
+Process conformance status counts: 15 done / 0 open.
 
 ## Open
 
-1. Add package maintenance runbook and AI-agent operation boundaries.
-   - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
+_No open process conformance items._
 
 ## Done
+
+1. Add package maintenance runbook and AI-agent operation boundaries.
+   - Added `docs/maintenance/package-maintenance-and-agent-boundaries.md` with routine maintenance cadence, standard maintenance workflow, dependency/Ruby/CI action update runbooks, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, AI-agent permitted actions, approval-required actions, no-go zones, report template, and current operational follow-ups.
+   - Linked the maintenance runbook from release-readiness and publishing docs.
+   - Process conformance backlog is now fully burned down; follow-up implementation work remains in the architecture, UX, and code-improvement backlog sections.
 
 1. Add QA, documentation QA, and release gate templates.
    - Added `docs/qa/qa-documentation-and-release-gates.md` with reusable QA, documentation-QA, release-readiness, release-security, accepted-risk disposition, yank/deprecation/rollback, and post-release review templates.
