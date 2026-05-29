@@ -149,7 +149,8 @@ The CLI must provide documented database backup behavior for SQLite and clear bo
 Acceptance criteria:
 
 - SQLite backup command copies the configured database to the requested destination.
-- MySQL/MariaDB and PostgreSQL backup limitations are documented or reported clearly.
+- MySQL/MariaDB and PostgreSQL backup limitations are documented or reported clearly in `docs/maintenance/database-backup-restore-guidance.md`.
+- Server-backed backup/restore operations remain user-managed through native database tools or hosting-platform controls.
 - Backup commands avoid destructive behavior.
 
 ### Inventory model and mutation behavior

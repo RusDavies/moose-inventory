@@ -317,7 +317,7 @@ SQLite users can create a direct database-file backup:
     $ moose-inventory db backup ./backup/moose-inventory.sqlite3
     Backed up database to /absolute/path/backup/moose-inventory.sqlite3.
 
-`db backup` is currently supported for SQLite only.  For MySQL and PostgreSQL, use native database tools such as `mysqldump` or `pg_dump`, because those engines already have adult supervision built in.
+`db backup` is currently supported for SQLite only.  For MySQL/MariaDB and PostgreSQL, use native database tools such as `mysqldump`, `mariadb-dump`, `pg_dump`, managed-service snapshots, or equivalent backup systems, because those engines already have adult supervision built in.  Moose Inventory does not run server-backed restore commands, manage database users/grants, or implement destructive snapshot sync/restore behavior.  See `docs/maintenance/database-backup-restore-guidance.md` for adapter-specific backup and restore boundaries.
 
 ###Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.

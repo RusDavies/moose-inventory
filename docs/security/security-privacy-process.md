@@ -144,7 +144,7 @@ Security expectations:
 | T-008 | Dependency vulnerability ships in a release | User environment compromise | OSV query, `osv-scanner`, `bundler-audit`, release parity enforcement | Patch according to vulnerability policy below; accept residual risk only through risk register. |
 | T-009 | Secret scanner is unavailable in GitHub repository settings | Missed committed secrets | Local/CI `gitleaks` gate | Track as accepted/monitored residual risk until GitHub secret scanning is available/enabled. |
 | T-010 | Release workflow publishes unreviewed or tampered package | Supply-chain compromise | GitHub Actions release workflow, trusted publishing/OIDC, package sanity, tag/version checks | Document confirmed release environment protections after maintainers verify settings. |
-| T-011 | Database server backups/restores are assumed to be handled by Moose Inventory | Data loss or false assurance | Architecture says server-backed DB operations remain user-managed | Expand MySQL/MariaDB/PostgreSQL backup/restore guidance. |
+| T-011 | Database server backups/restores are assumed to be handled by Moose Inventory | Data loss or false assurance | Architecture says server-backed DB operations remain user-managed; `docs/maintenance/database-backup-restore-guidance.md` documents native-tool backup/restore boundaries for SQLite, MySQL/MariaDB, and PostgreSQL | Keep backup/restore guidance current when database lifecycle commands change. |
 | T-012 | AI-assisted maintenance performs external or irreversible actions without approval | Governance/security failure | Workspace process and approval register | Repo-local AI-agent boundaries remain a separate process item. |
 
 ## Authentication and authorization model
@@ -268,7 +268,7 @@ Rules:
 | Limitation | Current posture | Compensating control / next action |
 | --- | --- | --- |
 | GitHub secret scanning is unavailable/disabled for this repository in current evidence | Not accepted as a permanent claim; tracked as residual posture | Local/CI `gitleaks` gate remains required. Revisit if GitHub secret scanning becomes available. |
-| MySQL/MariaDB/PostgreSQL backups/restores are user-managed | Architecture scope boundary | Add expanded backup/restore guidance under architecture follow-up backlog. |
+| MySQL/MariaDB/PostgreSQL backups/restores are user-managed | Architecture scope boundary | Expanded guidance lives in `docs/maintenance/database-backup-restore-guidance.md`; update it when database lifecycle commands change. |
 | Public vulnerability intake is informal | Draft process only | Consider adding `SECURITY.md` or GitHub private vulnerability reporting if maintainers want public intake clarity. |
 | Destructive CLI confirmation is not fully implemented | UX follow-up backlog | Implement explicit confirmation / `--yes` behavior before expanding destructive workflows. |
 | Additional package provenance is not required beyond trusted publishing | Architecture decision | Evaluate signed provenance/artifact attestations as future hardening if justified. |
