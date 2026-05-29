@@ -53,6 +53,34 @@ RSpec.describe Moose::Inventory::Cli::Application do
     end
   end
 
+  it 'previews an inventory snapshot import without writing' do
+    runner { @app.start(%w[group add web]) }
+
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'inventory.yml')
+      File.write(
+        path,
+        {
+          'version' => 1,
+          'hosts' => { 'web01' => { 'groups' => ['web'], 'tags' => [], 'vars' => { 'env' => 'prod' } } },
+          'groups' => { 'web' => { 'children' => [], 'tags' => [], 'vars' => {} } }
+        }.to_yaml
+      )
+
+      actual = runner { @app.start(['import', path, '--preview', '--preview-format', 'json']) }
+
+      expect(actual[:unexpected]).to eq(false)
+      expect(actual[:aborted]).to eq(false)
+      expect(actual[:STDERR]).to eq('')
+      preview = JSON.parse(actual[:STDOUT])
+      expect(preview['schema_version']).to eq('snapshot-import-preview-v1')
+      expect(preview['changes_applied']).to eq(false)
+      expect(preview.dig('summary', 'hosts_created')).to eq(1)
+      expect(preview.dig('creates', 'hosts')).to eq(['web01'])
+      expect(@db.models[:host].find(name: 'web01')).to be_nil
+    end
+  end
+
   it 'aborts on invalid snapshot input without writing' do
     Dir.mktmpdir do |dir|
       path = File.join(dir, 'inventory.yml')

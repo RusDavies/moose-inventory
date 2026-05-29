@@ -220,12 +220,16 @@ The full inventory can be exported as a portable snapshot.  The snapshot contain
 
 Snapshots can be imported from YAML or JSON.  Import validates the file before writing anything.  It rejects malformed snapshots, unknown host/group references, unsupported fields, invalid variable shapes, and circular child-group hierarchies.
 
+Use `--preview` to validate a snapshot and review its additive import diff without writing to the database.  For automation/review gates, add `--preview-format yaml|json|pjson`; the preview uses `snapshot-import-preview-v1`, reports creates, variable updates, association additions, unchanged items, existing records that are absent from the snapshot and therefore ignored, and confirms that destructive changes are not part of normal import.
+
     $ moose-inventory import inventory.yml
     Imported inventory snapshot from inventory.yml.
     Created hosts: 1
     Created groups: 1
     Variables changed: 2
     Associations added: 1
+
+    $ moose-inventory import inventory.yml --preview --preview-format pjson
 
 Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations and tags, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
 
@@ -674,7 +678,6 @@ That installs `gitleaks` and `osv-scanner` into `tmp/security-tools/bin` unless 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
-
 
 
 

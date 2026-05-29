@@ -140,16 +140,20 @@ Architecture follow-up status counts: 4 done / 1 open.
 
 # Moose Inventory UX Implementation Backlog
 
-UX implementation status counts: 3 done / 1 open.
+UX implementation status counts: 4 done / 0 open.
 
 ## Open
 
-1. Add snapshot import preview/diff mode.
-   - Future snapshot import should offer a formal preview/diff mode distinct from command-level dry-run planning.
-   - Show creates, updates, unchanged/skipped records, conflicts, validation failures, and any unsupported/destructive implications before DB writes.
-   - This is future work and does not block approval of the current CLI UX baseline.
+_No open UX implementation items._
 
 ## Done
+
+1. Add snapshot import preview/diff mode.
+   - Added `import FILE --preview` for non-mutating validated snapshot import previews.
+   - Added `--preview-format yaml|json|pjson` machine-readable output using `snapshot-import-preview-v1`.
+   - Preview reports creates, variable updates, association additions, unchanged items, ignored existing records absent from the snapshot, and destructive-change count while preserving additive import semantics.
+   - Added operation and CLI coverage, plus README, requirements, and UX notes.
+
 
 1. Define and document output compatibility versioning.
    - Added `docs/compatibility/cli-output-compatibility.md` defining the `CLI-OUTPUT-v1` baseline for Moose Inventory 2.x.

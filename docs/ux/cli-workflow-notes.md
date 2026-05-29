@@ -160,12 +160,15 @@ UX expectations:
 Workflow:
 
 1. User exports inventory for review, backup, migration, or automation.
-2. User imports a YAML/JSON snapshot.
-3. CLI validates before writing and applies additive/update-oriented changes only.
+2. User previews a YAML/JSON snapshot with `import FILE --preview` or `--preview --preview-format yaml|json|pjson` when reviewing a proposed change.
+3. User imports a YAML/JSON snapshot.
+4. CLI validates before writing and applies additive/update-oriented changes only.
 
 UX expectations:
 
 - Export should be read-only.
+- Import preview should be read-only and distinct from command-level dry-run planning.
+- Preview output should show creates, variable updates, association additions, unchanged items, ignored existing records, and destructive-change count.
 - Import validation failures should avoid partial writes.
 - Additive import semantics must be documented clearly.
 - Destructive sync/restore semantics must not be introduced without separate requirements, UX, recovery, and approval records.

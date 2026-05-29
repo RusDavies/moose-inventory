@@ -258,6 +258,17 @@ Acceptance criteria:
 - Import does not delete existing inventory records absent from the file.
 - Any future destructive import mode requires explicit requirements, UX, recovery, and approval records.
 
+#### SNAP-004: Snapshot import preview
+
+Snapshot import must support a non-mutating preview/diff mode for review before writes.
+
+Acceptance criteria:
+
+- `import FILE --preview` validates the snapshot and reports the additive changes without writing.
+- `--preview-format yaml|json|pjson` emits parseable machine-readable preview output.
+- Preview output shows creates, variable updates, association additions, unchanged items, ignored existing records, and destructive-change count.
+- Validation failures still leave the database unchanged.
+
 ### Inventory doctor/lint behavior
 
 #### DOC-001: Read-only health checks

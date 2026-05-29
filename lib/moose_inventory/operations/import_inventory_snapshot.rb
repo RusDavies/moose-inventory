@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'inventory_snapshot_applier'
+require_relative 'inventory_snapshot_preview'
 require_relative 'inventory_snapshot_validator'
 
 module Moose
@@ -14,6 +15,7 @@ module Moose
           @context = context
           @validator = InventorySnapshotValidator.new(context: context)
           @applier = InventorySnapshotApplier.new(context: context)
+          @previewer = InventorySnapshotPreview.new(context: context)
         end
 
         def call(snapshot:)
@@ -24,9 +26,15 @@ module Moose
           end
         end
 
+        def preview(snapshot:)
+          normalized = validator.call(snapshot: snapshot)
+
+          previewer.call(snapshot: normalized)
+        end
+
         private
 
-        attr_reader :context, :validator, :applier
+        attr_reader :context, :validator, :applier, :previewer
       end
     end
   end
