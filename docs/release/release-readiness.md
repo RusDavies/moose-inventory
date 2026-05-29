@@ -54,6 +54,8 @@ Current GitHub `release` environment protection evidence is recorded in `docs/re
 
 This path was verified with release `v2.0` / gem `2.0`: RubyGems trusted publishing succeeded and the published gem was installable afterward. The release workflow now disables `rubygems/release-gem`'s post-publish await step (`await-release: false`) because RubyGems full-index propagation lag produced false-negative workflow failures even after successful publishes.
 
+Package provenance hardening beyond trusted publishing is evaluated in `docs/release/package-provenance-hardening.md`. The current release-readiness gate does not require additional checksums, GitHub artifact attestations, detached signatures, RubyGems certificate signing, or SBOM publication unless a future consumer or policy requirement explicitly adds that work.
+
 ## Package sanity expectations
 
 `package_sanity.sh` validates that the built gem includes at least:

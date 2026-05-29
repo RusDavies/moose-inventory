@@ -22,6 +22,8 @@ The release workflow requires the GitHub environment name `release`. Current env
 
 As of 2026-05-29, the GitHub `release` environment has required reviewer protection for `RusDavies`, self-review prevention disabled, admin bypass disabled, and a custom deployment policy named `v*`. Self-review prevention is disabled because OpenClaw/automation pushes use Russ's GitHub account; with `RusDavies` as the only required reviewer, enabling self-review prevention could prevent Russ from approving the deployment. The workflow itself still runs only for pushed `v*` tags and verifies tag/version alignment before publishing. Because GitHub reports the custom deployment policy object as `type: branch`, verify tag-deployment behavior on the next real release and adjust the environment policy if needed.
 
+Package provenance hardening beyond RubyGems trusted publishing is evaluated in `docs/release/package-provenance-hardening.md`. Additional checksums, GitHub artifact attestations, signatures, or SBOM publication are future hardening options, not current release blockers.
+
 ## Trusted publishing release checklist
 
 1. Start from a clean `master` branch.

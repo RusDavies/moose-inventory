@@ -435,7 +435,7 @@ These decisions were provided by Russ during review on 2026-05-28. They are capt
 
 1. Architecture baseline approval requires lightweight text diagram review only; richer diagrams are not required by default.
 2. Release environment protection rules were confirmed, configured, and documented on 2026-05-29 in `docs/release/release-environment-protection.md`. The GitHub `release` environment now requires review by `RusDavies`, has self-review prevention disabled because OpenClaw/automation pushes use Russ's GitHub account, disables admin bypass, and has a custom deployment policy named `v*`. Because GitHub reports the custom deployment policy object as `type: branch`, tag-deployment behavior should be verified on the next real release and the environment policy adjusted if needed.
-3. Additional package provenance beyond RubyGems trusted publishing is not a current architectural requirement. Trusted publishing remains the baseline; signed provenance/artifact attestations can be evaluated later as future hardening.
+3. Additional package provenance beyond RubyGems trusted publishing is not a current architectural requirement. Trusted publishing remains the baseline. `docs/release/package-provenance-hardening.md` evaluates checksums, GitHub artifact attestations, detached signatures, RubyGems certificate signing, and SBOM publication as future hardening options. The preferred first step, if a consumer or policy later requires stronger provenance, is GitHub artifact attestation plus a published SHA-256 checksum for the exact built `.gem`.
 4. User database backup/restore guidance should be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL.
 
 ## Open architecture questions
