@@ -4,6 +4,8 @@ This project is published to RubyGems as [`moose-inventory`](https://rubygems.or
 
 The preferred publishing path is GitHub Actions trusted publishing from reviewed `v*` tags. Manual publishing remains documented as a fallback only.
 
+Routine release-infrastructure stewardship and AI-agent boundaries are documented in `docs/maintenance/package-maintenance-and-agent-boundaries.md`.
+
 ## Trusted publishing setup
 
 The repository side is `.github/workflows/release.yml`.
