@@ -2,7 +2,9 @@
 
 ## Approval status
 
-Status: **Draft - no accepted risks currently approved here**
+Status: **Approved register - no accepted risks currently approved here**
+
+Russ / Rusty Frink Desiato approved this register's structure and use as part of the Moose Inventory security/privacy process baseline on 2026-05-29. Approval reference: `GOV-SEC-001`.
 
 This register records security, privacy, release, and supply-chain risks that are intentionally accepted rather than fixed before a defined milestone. A proposed risk is not accepted until an approver records an explicit approval decision.
 
@@ -13,8 +15,9 @@ Approved references:
 - `GOV-REQ-001`: `docs/product/requirements-baseline.md` is approved as the requirements and acceptance criteria baseline.
 - `GOV-UX-001`: `docs/ux/cli-workflow-notes.md` is approved as the CLI UX/workflow baseline.
 - `GOV-ARCH-001`: `docs/architecture/architecture-and-trust-boundaries.md` is approved as the architecture and trust-boundary baseline.
+- `GOV-SEC-001`: this register's structure and use are approved as part of the security/privacy process baseline.
 
-Scope limit: this register records accepted-risk decisions only. It does not approve a release, compliance claim, public advisory, RubyGems publishing, or future architecture/security changes.
+Scope limit: this register records accepted-risk decisions only. It does not approve a release, compliance claim, public advisory, RubyGems publishing, future architecture/security changes, or acceptance of any proposed/monitored risk listed below.
 
 ## Acceptance rules
 
