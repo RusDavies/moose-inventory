@@ -2,7 +2,9 @@
 
 ## Approval status
 
-Status: **Draft - not approved**
+Status: **Approved**
+
+Russ / Rusty Frink Desiato approved this document as the Moose Inventory security and privacy process baseline on 2026-05-29. Approval reference: `GOV-SEC-001`.
 
 This document captures the maintained security and privacy process baseline for Moose Inventory. It is prepared from the approved product, requirements, CLI UX, and architecture baselines, plus current security-audit evidence and verification scripts.
 
@@ -13,10 +15,9 @@ Approved references:
 - `GOV-REQ-001`: `docs/product/requirements-baseline.md` is approved as the requirements and acceptance criteria baseline.
 - `GOV-UX-001`: `docs/ux/cli-workflow-notes.md` is approved as the CLI UX/workflow baseline.
 - `GOV-ARCH-001`: `docs/architecture/architecture-and-trust-boundaries.md` is approved as the architecture and trust-boundary baseline.
+- `GOV-SEC-001`: this document is approved as the security and privacy process baseline.
 
-Pending approval: Russ or a delegated product owner must approve, revise, or reject this security and privacy process baseline before it becomes approved security/privacy evidence.
-
-Scope limit: this document covers security and privacy process expectations for a Ruby CLI/RubyGem package. It is not release approval, accepted-risk approval, public/compliance-claim approval, RubyGems publishing approval, or approval to operate Moose Inventory as a hosted service.
+Scope limit: this document covers security and privacy process expectations for a Ruby CLI/RubyGem package. It is not release approval, accepted-risk approval, public/compliance-claim approval, RubyGems publishing approval, or approval to operate Moose Inventory as a hosted service. Approval of this baseline does not approve any proposed or monitored risk in the accepted-risk register.
 
 ## Security posture summary
 

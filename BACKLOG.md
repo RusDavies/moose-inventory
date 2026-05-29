@@ -1,14 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 11 done / 3 open.
+Process conformance status counts: 12 done / 2 open.
 
 ## Open
-
-1. Review and approve, revise, or reject the draft security and privacy process baseline.
-   - Draft is in `docs/security/security-privacy-process.md`.
-   - Accepted-risk register is in `docs/security/accepted-risk-register.md`.
-   - Pending approval is recorded as `GOV-SEC-001` in `docs/governance/approval-register.md`.
-   - Do not treat the draft as approved security/privacy process evidence or risk acceptance until a human approver records a durable decision.
 
 1. Add QA, documentation QA, and release gate templates.
    - Map `scripts/check.sh` gates to requirements/release criteria.
@@ -18,6 +12,13 @@ Process conformance status counts: 11 done / 3 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Review and approve, revise, or reject the draft security and privacy process baseline.
+   - Russ approved `docs/security/security-privacy-process.md` as the security and privacy process baseline on 2026-05-29.
+   - Recorded approval as `GOV-SEC-001` in `docs/governance/approval-register.md`.
+   - Approval includes the accepted-risk register structure/evidence location, but does not approve any proposed/monitored accepted risk.
+   - Current accepted-risk register still records no approved accepted risks.
+   - Approval does not approve release, public/compliance claims, future RubyGems publishing, or hosted-service operation.
 
 1. Add maintained security/privacy process docs.
    - Added `docs/security/security-privacy-process.md` as a draft security and privacy process baseline.
