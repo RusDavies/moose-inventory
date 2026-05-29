@@ -18,7 +18,9 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 
 ## Pending approvals
 
-_No pending approvals recorded._
+| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
+| --- | --- | --- | --- | --- | --- | --- |
+| GOV-SEC-001 | Approve, revise, or reject `docs/security/security-privacy-process.md` as the security and privacy process baseline | Pending | TBD | TBD | Security and privacy process for Moose Inventory | Draft prepared after architecture approval; accepted risks remain unapproved unless explicitly recorded in `docs/security/accepted-risk-register.md`; document existence is not approval. |
 
 ## Approval rules
 

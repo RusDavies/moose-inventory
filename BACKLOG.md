@@ -1,12 +1,14 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 10 done / 3 open.
+Process conformance status counts: 11 done / 3 open.
 
 ## Open
 
-1. Add maintained security/privacy process docs.
-   - Add threat model or abuse cases, data classification/flows for local DB/config/audit logs/artifacts, secrets/logging model, vulnerability intake/security patch policy, and accepted-risk register.
-   - Track GitHub secret-scanning limitation vs local `gitleaks` compensation.
+1. Review and approve, revise, or reject the draft security and privacy process baseline.
+   - Draft is in `docs/security/security-privacy-process.md`.
+   - Accepted-risk register is in `docs/security/accepted-risk-register.md`.
+   - Pending approval is recorded as `GOV-SEC-001` in `docs/governance/approval-register.md`.
+   - Do not treat the draft as approved security/privacy process evidence or risk acceptance until a human approver records a durable decision.
 
 1. Add QA, documentation QA, and release gate templates.
    - Map `scripts/check.sh` gates to requirements/release criteria.
@@ -16,6 +18,12 @@ Process conformance status counts: 10 done / 3 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Add maintained security/privacy process docs.
+   - Added `docs/security/security-privacy-process.md` as a draft security and privacy process baseline.
+   - Covered data classification and flows for local DB/config/audit logs/snapshots/artifacts, threat and abuse cases, authentication/access boundaries, secrets handling, logging/audit expectations, privacy posture, vulnerability intake/security patch policy, security acceptance criteria, current limitations, and review cadence.
+   - Added `docs/security/accepted-risk-register.md` with no currently approved accepted risks, monitored/proposed risks for GitHub secret-scanning limitation, signed provenance hardening, vulnerability intake formality, and destructive-command confirmation.
+   - Recorded pending approval as `GOV-SEC-001`; the security/privacy baseline and accepted risks remain draft/unapproved until explicitly approved.
 
 1. Review and approve, revise, or reject the draft architecture and trust-boundary baseline.
    - Russ approved `docs/architecture/architecture-and-trust-boundaries.md` as the architecture and trust-boundary baseline on 2026-05-28.
