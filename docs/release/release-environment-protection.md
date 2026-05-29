@@ -8,6 +8,7 @@ This document records the current GitHub `release` environment protection settin
 
 Initial confirmation date: 2026-05-29
 Protection configuration date: 2026-05-29
+Self-review adjustment date: 2026-05-29
 
 Confirmation/configuration commands:
 
@@ -33,7 +34,7 @@ Confirmed repository/environment:
 | Setting | Configured value | Release-process interpretation |
 | --- | --- | --- |
 | Required deployment reviewers | `RusDavies` | The `release` environment now requires deployment approval by Russ before the release job can proceed. |
-| Prevent self-review | Enabled (`prevent_self_review: true`) | The actor triggering the deployment cannot approve their own deployment when GitHub enforces this rule. |
+| Prevent self-review | Disabled (`prevent_self_review: false`) | Disabled because OpenClaw/automation pushes use Russ's GitHub account. With `RusDavies` as the only required reviewer, self-review prevention could block Russ from approving a release deployment triggered through his own account. |
 | Wait timer | `0` / none | No arbitrary delay is configured. Human review is the intended release friction. |
 | Deployment branch/tag policy mode | Custom branch policies enabled (`protected_branches: false`, `custom_branch_policies: true`) | The environment uses an explicit allow-list rather than all branches/tags. |
 | Custom deployment policy | `v*` | Intended to align environment deployment eligibility with the release workflow's `v*` tag trigger. GitHub API reports this policy object with `type: branch`; verify behavior on the next real release tag and adjust if GitHub does not apply it to tag deployments as expected. |
@@ -45,7 +46,7 @@ The current release path relies on these controls:
 
 1. The release workflow only runs on pushed tags matching `v*`.
 2. The GitHub `release` environment requires review by `RusDavies` before the release job can proceed.
-3. Self-review prevention is enabled for the required-reviewer protection rule.
+3. Self-review prevention is disabled so `RusDavies` can approve deployments triggered by automation authenticated as Russ's GitHub account.
 4. Admin bypass is disabled for the `release` environment.
 5. The environment has a custom deployment policy named `v*`.
 6. The release workflow verifies that the tag version matches `Moose::Inventory::VERSION`.
