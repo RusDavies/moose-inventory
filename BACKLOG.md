@@ -99,7 +99,7 @@ _No open process conformance items._
 
 # Moose Inventory Architecture Follow-up Backlog
 
-Architecture follow-up status counts: 3 done / 2 open.
+Architecture follow-up status counts: 4 done / 1 open.
 
 ## Open
 
@@ -108,12 +108,13 @@ Architecture follow-up status counts: 3 done / 2 open.
    - On the next intentional `v*` tag release, verify that the release job can deploy to the `release` environment after required approval.
    - If GitHub treats the policy as branch-only and blocks tag deployments, adjust the environment policy or document the limitation and rely on the workflow trigger plus tag/version check for tag control.
 
-1. Expand user database backup/restore guidance beyond SQLite.
-   - Add guidance boundaries for MySQL/MariaDB and PostgreSQL backups/restores.
-   - Clarify what Moose Inventory can and cannot safely do itself.
-   - Avoid introducing destructive restore behavior without separate requirements, UX, recovery, and approval records.
-
 ## Done
+
+1. Expand user database backup/restore guidance beyond SQLite.
+   - Added `docs/maintenance/database-backup-restore-guidance.md` documenting SQLite, MySQL/MariaDB, and PostgreSQL backup/restore boundaries.
+   - Clarified that Moose Inventory can inspect status, run migrations, run doctor checks, back up SQLite files, and export snapshots, but does not run server-backed dump/restore commands, manage grants/users, or implement destructive restore/sync semantics.
+   - Documented native-tool guidance for `mysqldump`/`mariadb-dump`, `pg_dump`/`pg_restore`, managed-service snapshots, disposable restore verification, and explicit approval boundaries for destructive or credentialed restore work.
+   - Updated README, requirements, architecture, and security/privacy process evidence.
 
 1. Evaluate signed package provenance as future hardening.
    - Added `docs/release/package-provenance-hardening.md` evaluating checksums, GitHub artifact attestations, Sigstore/cosign-style signatures, RubyGems certificate signing, and SBOM publication.

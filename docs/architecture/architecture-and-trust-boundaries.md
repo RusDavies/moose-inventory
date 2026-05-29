@@ -424,10 +424,11 @@ Current notable architecture decisions:
 1. Keep Moose Inventory as a Ruby CLI/RubyGem rather than a hosted service.
 2. Keep Ansible plugin material as examples rather than adding a Python/Ansible runtime dependency to the gem.
 3. Keep snapshot import additive/update-oriented; destructive restore/sync requires separate design and approval.
-4. Keep audit history as evidence only, not rollback/change-set UX.
+4. Keep server-backed MySQL/MariaDB and PostgreSQL backup/restore operations user-managed through native database tooling or hosting-platform controls; Moose Inventory documents boundaries but does not run destructive restore commands.
+5. Keep audit history as evidence only, not rollback/change-set UX.
 5. Use explicit ordered schema migrations and refuse future schemas.
-6. Use RubyGems trusted publishing/OIDC as the preferred publishing path.
-7. Preserve CLI output compatibility unless breaking changes are explicitly approved.
+7. Use RubyGems trusted publishing/OIDC as the preferred publishing path.
+8. Preserve CLI output compatibility unless breaking changes are explicitly approved.
 
 ## Architecture decisions recorded from review
 
@@ -436,7 +437,7 @@ These decisions were provided by Russ during review on 2026-05-28. They are capt
 1. Architecture baseline approval requires lightweight text diagram review only; richer diagrams are not required by default.
 2. Release environment protection rules were confirmed, configured, and documented on 2026-05-29 in `docs/release/release-environment-protection.md`. The GitHub `release` environment now requires review by `RusDavies`, has self-review prevention disabled because OpenClaw/automation pushes use Russ's GitHub account, disables admin bypass, and has a custom deployment policy named `v*`. Because GitHub reports the custom deployment policy object as `type: branch`, tag-deployment behavior should be verified on the next real release and the environment policy adjusted if needed.
 3. Additional package provenance beyond RubyGems trusted publishing is not a current architectural requirement. Trusted publishing remains the baseline. `docs/release/package-provenance-hardening.md` evaluates checksums, GitHub artifact attestations, detached signatures, RubyGems certificate signing, and SBOM publication as future hardening options. The preferred first step, if a consumer or policy later requires stronger provenance, is GitHub artifact attestation plus a published SHA-256 checksum for the exact built `.gem`.
-4. User database backup/restore guidance should be expanded beyond SQLite backup behavior for MySQL/MariaDB and PostgreSQL.
+4. User database backup/restore guidance is expanded in `docs/maintenance/database-backup-restore-guidance.md`: SQLite has a direct file-copy helper, while MySQL/MariaDB and PostgreSQL remain user-managed through native database tools or hosting-platform backups.
 
 ## Open architecture questions
 
