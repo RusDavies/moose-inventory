@@ -1,12 +1,18 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 15 done / 0 open.
+Process conformance status counts: 16 done / 0 open.
 
 ## Open
 
 _No open process conformance items._
 
 ## Done
+
+1. Approve the package maintenance and AI-agent operation-boundary baseline.
+   - Russ approved `docs/maintenance/package-maintenance-and-agent-boundaries.md` as the package maintenance and AI-agent operation-boundary baseline on 2026-05-29.
+   - Recorded approval as `GOV-MAINT-001` in `docs/governance/approval-register.md`.
+   - Approval covers routine package-maintenance process, release-readiness stewardship, and AI-agent boundaries only.
+   - Approval does not approve publishing, yanking/deprecating RubyGems versions, changing GitHub/RubyGems settings, accepting risk, public/compliance claims, external disclosures, or future RubyGems publishing.
 
 1. Add package maintenance runbook and AI-agent operation boundaries.
    - Added `docs/maintenance/package-maintenance-and-agent-boundaries.md` with routine maintenance cadence, standard maintenance workflow, dependency/Ruby/CI action update runbooks, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, AI-agent permitted actions, approval-required actions, no-go zones, report template, and current operational follow-ups.
