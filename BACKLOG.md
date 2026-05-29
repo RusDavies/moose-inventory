@@ -140,7 +140,7 @@ Architecture follow-up status counts: 4 done / 1 open.
 
 # Moose Inventory UX Implementation Backlog
 
-UX implementation status counts: 0 done / 4 open.
+UX implementation status counts: 1 done / 3 open.
 
 ## Open
 
@@ -153,11 +153,6 @@ UX implementation status counts: 0 done / 4 open.
    - Human-readable output compatibility should be formally versioned alongside machine-readable output compatibility.
    - Decide where version identifiers live and how breaking output changes are approved, tested, and communicated.
 
-1. Prioritize read-only console quoted-name parsing and richer validation.
-   - Implement `Shellwords.split` or equivalent parsing for quoted names.
-   - Add command-specific validation and regression tests while keeping the console read-only.
-   - This overlaps the existing code-improvement backlog item and should satisfy or narrow that item when implemented.
-
 1. Add snapshot import preview/diff mode.
    - Future snapshot import should offer a formal preview/diff mode distinct from command-level dry-run planning.
    - Show creates, updates, unchanged/skipped records, conflicts, validation failures, and any unsupported/destructive implications before DB writes.
@@ -165,20 +160,19 @@ UX implementation status counts: 0 done / 4 open.
 
 ## Done
 
-_No completed UX implementation items._
+1. Prioritize read-only console quoted-name parsing and richer validation.
+   - Replaced whitespace splitting with `Shellwords.split` so quoted host/group names work in the read-only console.
+   - Added command-specific usage validation for extra arguments, invalid tag commands, invalid audit limits, and malformed quotes.
+   - Added regression coverage for quoted names and validation behavior while preserving the console's read-only boundary.
+
 
 ---
 
 # Moose Inventory Code Improvement Analysis Backlog
 
-Code improvement analysis status counts: 7 done / 3 open.
+Code improvement analysis status counts: 8 done / 2 open.
 
 ## Open
-
-1. Improve read-only console parsing and validation.
-   - The console currently splits commands on whitespace, which prevents quoted names and makes usage errors fairly blunt.
-   - Consider `Shellwords.split`, explicit audit-limit validation, clearer command-specific usage messages, and regression tests for quoted names.
-   - Keep the console read-only unless future mutation flows preserve confirmation, dry-run, and audit behavior.
 
 1. Normalize tag casing consistently across snapshot import and CLI tag commands.
    - CLI tag commands normalize tags to lowercase, but snapshot import currently uses tag strings as supplied.
@@ -190,6 +184,13 @@ Code improvement analysis status counts: 7 done / 3 open.
    - Confirm ignore rules and cleanup behavior so file discovery, review, and packaging checks do not treat generated reports as source.
 
 ## Done
+
+1. Improve read-only console parsing and validation.
+   - Replaced blunt whitespace splitting with `Shellwords.split` for shell-style quoted names.
+   - Added command-specific usage validation for `help`, `hosts`, `groups`, `host`, `group`, `tags`, and `audit` commands.
+   - Invalid audit limits now report usage instead of silently defaulting to 10.
+   - Malformed quoted input is reported safely and the console remains read-only.
+   - Added regression coverage for quoted host/group names, invalid arguments, invalid audit limits, malformed quotes, and no audit mutation.
 
 1. Push host list filters into database-backed queries when inventory size justifies it.
    - Reworked `HostQueries#list_hosts` to build a filtered Sequel dataset instead of loading every host and checking group/tag/variable filters in Ruby.

@@ -527,7 +527,12 @@ Useful console commands include:
     audit 10
     quit
 
-Use the normal CLI commands for edits.  Future interactive mutation can be added with confirmation, dry-run, and audit semantics instead of improvising a tiny foot-gun in a prompt loop.
+Console parsing uses shell-style quoting for read-only lookups, so names containing spaces can be inspected without turning the prompt into confetti:
+
+    host "web 01"
+    tags group 'production web'
+
+The console reports command-specific usage for extra arguments, invalid tag targets, invalid audit limits, and malformed quotes.  Use the normal CLI commands for edits.  Future interactive mutation can be added with confirmation, dry-run, and audit semantics instead of improvising a tiny foot-gun in a prompt loop.
 
 Removing variables, groups, and hosts is just as easy.  In the following examples, the output is again omitted for compactness; the reader is encouraged to work along to experience the tool.  Note, that although we show how to remove the variables, it is not strictly necessary to do so in this example, since deleting hosts and groups would delete all associated variables anyway.
 
