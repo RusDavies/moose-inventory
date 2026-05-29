@@ -14,6 +14,8 @@ mkmf.log
 .buildpath
 .project
 *.gem
+*.py[cod]
+__pycache__/
 /gems/
 moose-inventory.spec
 /.openclaw-security-audit/

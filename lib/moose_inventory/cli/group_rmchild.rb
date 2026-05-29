@@ -20,6 +20,7 @@ module Moose
         desc 'rmchild PARENTGROUP CHILDGROUP_1 [CHILDGROUP_2 ... ]',
              'Dissociate one or more child-groups CHILDGROUP_n from PARENTGROUP'
         option :dry_run, type: :boolean
+        option :yes, type: :boolean, desc: 'Confirm destructive dissociation without prompting'
         option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         def rmchild(*argv)
           abort_if_missing_args(argv, 2, '2 or more')
@@ -29,6 +30,7 @@ module Moose
           cnames = normalize_names(argv.slice(1, argv.length - 1))
 
           abort_if_automatic_group([pname] + cnames)
+          confirm_destructive_action!("group rmchild #{pname} #{cnames.join(',')}")
 
           result = remove_children_from_group(pname, cnames)
           return if machine_plan_output_rendered?(result, command: 'group rmchild')

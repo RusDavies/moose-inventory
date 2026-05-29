@@ -158,6 +158,12 @@ The following mutating command families support `--dry-run`:
 
 For automation and review workflows, dry-run events can also be emitted as YAML, JSON, or pretty JSON with `--plan-format`.  This option requires `--dry-run`; without it, the command aborts before making changes.
 
+Destructive removal commands require an explicit acknowledgement before they write. Use `--dry-run` to preview, or add `--yes` when you intentionally want to apply a removal non-interactively. This applies to host/group deletion, variable removal, association removal, child-group dissociation, and metadata tag removal commands.
+
+    $ moose-inventory host rm old-web01 --dry-run
+    $ moose-inventory host rm old-web01 --yes
+    $ moose-inventory group rm --recursive old_parent_group --yes
+
     $ moose-inventory host add web01 --groups web --dry-run --plan-format pjson
     {
       "command": "host add",
@@ -666,7 +672,6 @@ That installs `gitleaks` and `osv-scanner` into `tmp/security-tools/bin` unless 
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
-
 
 
 

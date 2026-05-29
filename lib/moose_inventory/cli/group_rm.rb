@@ -17,6 +17,7 @@ module Moose
                default: false,
                desc: 'Also delete child groups that become orphaned'
         option :dry_run, type: :boolean
+        option :yes, type: :boolean, desc: 'Confirm destructive removal without prompting'
         option :plan_format, type: :string, desc: 'Emit dry-run plan events as yaml|json|pjson'
         desc 'rm NAME',
              'Remove a group NAME from the inventory'
@@ -30,6 +31,7 @@ module Moose
             names,
             "Cannot manually manipulate the automatic group 'ungrouped'\n"
           )
+          confirm_destructive_action!("group rm #{names.join(',')}")
 
           result = remove_groups(names)
           record_audit({ command: 'group rm', action: 'remove', entity_type: 'group',

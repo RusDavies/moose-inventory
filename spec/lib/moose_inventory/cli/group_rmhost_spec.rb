@@ -45,7 +45,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       group_name = 'not-a-group'
       host_name = 'example'
       actual = runner do
-        @app.start(%W[group rmhost #{group_name} #{host_name}])
+        @app.start(%W[group rmhost #{group_name} #{host_name} --yes])
       end
 
       # Check output
@@ -74,7 +74,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       # 2. expect that no association with ungrouped is made.
 
       actual = runner do
-        @app.start(%W[group rmhost #{group_name} #{host_name}])
+        @app.start(%W[group rmhost #{group_name} #{host_name} --yes])
       end
 
       # @console.dump(actual, 'y')
@@ -128,7 +128,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%W[group addhost #{host_name}]) }
 
       actual = runner do
-        @app.start(%W[group rmhost #{group_name} #{host_name}])
+        @app.start(%W[group rmhost #{group_name} #{host_name} --yes])
       end
 
       desired = { aborted: false }
@@ -155,7 +155,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
 
       runner { @app.start(%W[host add #{name}]) } # <- auto creates the association with ungrouped
 
-      actual = runner { @app.start(%W[group rmhost #{group_name} #{host_name}]) }
+      actual = runner { @app.start(%W[group rmhost #{group_name} #{host_name} --yes]) }
 
       desired = { aborted: true }
       desired[:STDERR] =
@@ -177,7 +177,7 @@ RSpec.describe Moose::Inventory::Cli::Group do
       runner { @app.start(%W[group addhost #{group_name}] + host_names) }
 
       actual = runner do
-        @app.start(%W[group rmhost #{group_name}] + host_names)
+        @app.start(%W[group rmhost #{group_name} --yes] + host_names)
       end
 
       # @console.out(actual, 'y')

@@ -12,8 +12,10 @@ module Moose
         end
 
         desc 'rmtag HOST TAG_1 [TAG_2 ...]', 'Remove metadata tags from a host'
+        option :yes, type: :boolean, desc: 'Confirm destructive tag removal without prompting'
         def rmtag(*args)
           abort_if_missing_args(args, 2, '2 or more')
+          confirm_destructive_action!("host rmtag #{args[0].downcase} #{args.slice(1, args.length - 1).join(',')}")
 
           remove_tags('host', args[0].downcase, args.slice(1, args.length - 1))
         end
