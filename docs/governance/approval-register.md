@@ -14,12 +14,11 @@ The process tailoring baseline is approved as Class 4 with target profile Softwa
 | GOV-PRODUCT-001 | Approve `docs/product/product-brief.md` as the product-framing baseline | Russ / Rusty Frink Desiato | 2026-05-28 | Product framing for Moose Inventory | Approval covers the product brief as product-framing baseline only. It does not approve detailed requirements, CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, or future RubyGems publishing. Open product questions remain unresolved until separately decided. |
 | GOV-REQ-001 | Approve `docs/product/requirements-baseline.md` as the requirements and acceptance criteria baseline | Russ / Rusty Frink Desiato | 2026-05-28 | Requirements and acceptance criteria for Moose Inventory | Approval covers the requirements and acceptance criteria baseline only. It does not approve CLI UX, architecture, security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, or answers to open requirements questions that require separate decisions. |
 | GOV-UX-001 | Approve `docs/ux/cli-workflow-notes.md` as the CLI UX/workflow baseline | Russ / Rusty Frink Desiato | 2026-05-28 | CLI UX/workflow baseline for Moose Inventory | Approval covers command-line workflows and interaction conventions only. It does not approve architecture, security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, or implementation of the UX follow-up backlog items. |
+| GOV-ARCH-001 | Approve `docs/architecture/architecture-and-trust-boundaries.md` as the architecture and trust-boundary baseline | Russ / Rusty Frink Desiato | 2026-05-28 | Architecture and trust boundaries for Moose Inventory | Approval covers architecture and trust boundaries only. It does not approve security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, implementation of architecture follow-up backlog items, or repository/package account-management design. |
 
 ## Pending approvals
 
-| ID | Decision | Proposed status | Approver | Date | Scope | Notes |
-| --- | --- | --- | --- | --- | --- | --- |
-| GOV-ARCH-001 | Approve, revise, or reject `docs/architecture/architecture-and-trust-boundaries.md` as the architecture and trust-boundary baseline | Pending | TBD | TBD | Architecture and trust boundaries for Moose Inventory | Draft prepared after CLI UX approval; repository/package account-management design is explicitly out of scope for this product; document existence is not approval. |
+_No pending approvals recorded._
 
 ## Approval rules
 

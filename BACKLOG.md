@@ -1,14 +1,8 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 9 done / 4 open.
+Process conformance status counts: 10 done / 3 open.
 
 ## Open
-
-1. Review and approve, revise, or reject the draft architecture and trust-boundary baseline.
-   - Draft is in `docs/architecture/architecture-and-trust-boundaries.md`.
-   - Pending approval is recorded as `GOV-ARCH-001` in `docs/governance/approval-register.md`.
-   - Russ answered the original open architecture questions on 2026-05-28; the resulting follow-ups are tracked in the architecture follow-up backlog below.
-   - Do not treat the draft as approved architecture evidence until a human approver records a durable decision.
 
 1. Add maintained security/privacy process docs.
    - Add threat model or abuse cases, data classification/flows for local DB/config/audit logs/artifacts, secrets/logging model, vulnerability intake/security patch policy, and accepted-risk register.
@@ -22,6 +16,11 @@ Process conformance status counts: 9 done / 4 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Review and approve, revise, or reject the draft architecture and trust-boundary baseline.
+   - Russ approved `docs/architecture/architecture-and-trust-boundaries.md` as the architecture and trust-boundary baseline on 2026-05-28.
+   - Recorded approval as `GOV-ARCH-001` in `docs/governance/approval-register.md`.
+   - Approval covers architecture and trust boundaries only; security/privacy design, release, accepted risk, public/compliance claims, future RubyGems publishing, architecture follow-up implementation, and repository/package account-management design remain separate/non-approved scopes.
 
 1. Add architecture and trust-boundary documentation.
    - Added `docs/architecture/architecture-and-trust-boundaries.md` as a draft architecture and trust-boundary baseline.
