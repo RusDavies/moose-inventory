@@ -34,7 +34,7 @@ Approval status: **not approved**. This is a recommendation prepared for Russ or
 | Requirements | README, CLI behavior, tests, backlog | Not approved as requirements baseline | Need requirements/acceptance baseline covering CLI, DB, Ansible integration, package/release, security, compatibility |
 | UX/product design | CLI help/README/tests | No UX approval | For CLI package, need lightweight CLI workflow/UX notes rather than wireframes |
 | Architecture | Code and README describe behavior; release docs cover publishing | Not approved | Need architecture overview for CLI/package, DB adapters, schema migrations, Ansible integration, trust boundaries, and release pipeline |
-| Security/privacy | Security audit reports, gitleaks/OSV/bundler-audit gates, README secret guidance | Audit evidence exists, not release/security approval | Need maintained threat model, data classification, secrets/logging model, vulnerability-intake/security patch policy, accepted-risk register |
+| Security/privacy | Security audit reports, gitleaks/OSV/bundler-audit gates, README secret guidance, draft `docs/security/security-privacy-process.md`, draft `docs/security/accepted-risk-register.md` | Draft process evidence exists, not approved security/privacy baseline or risk acceptance | Need explicit review/approval of security/privacy baseline; future releases still need release-specific accepted-risk disposition |
 | Compliance readiness | Not applicable as enterprise product claim today | No compliance claims approved | Need explicit non-goal/claim boundary so no SOC 2/ISO/ISO-style readiness is implied |
 | Documentation planning | README and release docs exist | No documentation QA/sign-off record | Need documentation plan/checklist for user/developer/release/security docs |
 | QA/test evidence | `scripts/check.sh`, RSpec, SimpleCov, RuboCop, permission check, OSV, bundler-audit, gitleaks, package sanity, CI matrix | Test evidence exists per run, not process approval | Need QA plan mapping gates to requirements and release criteria |
@@ -98,11 +98,10 @@ Security audit evidence is strong for recent work. The missing piece is not “d
 
 Gaps:
 
-- No maintained threat model/abuse-case document.
-- No data classification/data-flow note for local inventory DBs, config files, environment passwords, audit logs, and package artifacts.
-- No vulnerability intake/security patch policy.
-- No explicit release accepted-risk register/disposition model.
-- Secret scanning on GitHub is documented as unavailable/disabled in audit evidence; local gitleaks compensates, but the residual posture should be tracked.
+- Draft threat model/abuse-case, data classification/data-flow, secrets/logging, vulnerability intake/security patch policy, and accepted-risk register now exist under `docs/security/`.
+- These drafts are evidence, not approval. `GOV-SEC-001` must be approved, revised, or rejected before they become approved security/privacy process baseline.
+- Future releases still need release-specific accepted-risk disposition and release approval.
+- Secret scanning on GitHub is documented as unavailable/disabled in audit evidence; local gitleaks compensates, and the residual posture is tracked as a monitored proposed risk.
 
 Impact: current gates are good, but future security decisions lack durable process scaffolding.
 
