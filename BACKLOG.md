@@ -1,6 +1,6 @@
 # Moose Inventory Process Conformance Backlog
 
-Process conformance status counts: 12 done / 2 open.
+Process conformance status counts: 13 done / 2 open.
 
 ## Open
 
@@ -12,6 +12,12 @@ Process conformance status counts: 12 done / 2 open.
    - Cover dependency/Ruby/CI action update cadence, vulnerability triage, GitHub/RubyGems release-infrastructure stewardship, release recovery, agent-permitted maintenance actions, and no-go zones requiring human approval.
 
 ## Done
+
+1. Approve the accepted-risk register baseline.
+   - Russ approved `docs/security/accepted-risk-register.md` as the maintained accepted-risk register baseline on 2026-05-29.
+   - Recorded approval as `GOV-RISK-REG-001` in `docs/governance/approval-register.md`.
+   - Approval covers the risk-register document, structure, rules, review cadence, and current proposed/monitored-risk evidence.
+   - Approval does not accept any proposed/monitored risk; current accepted-risk register still records no approved accepted risks.
 
 1. Review and approve, revise, or reject the draft security and privacy process baseline.
    - Russ approved `docs/security/security-privacy-process.md` as the security and privacy process baseline on 2026-05-29.
