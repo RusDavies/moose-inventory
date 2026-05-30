@@ -99,16 +99,19 @@ _No open process conformance items._
 
 # Moose Inventory Architecture Follow-up Backlog
 
-Architecture follow-up status counts: 4 done / 1 open.
+Architecture follow-up status counts: 5 done / 0 open.
 
 ## Open
 
-1. Verify GitHub `release` environment custom `v*` policy behavior on the next real release.
-   - GitHub accepted a custom deployment policy named `v*`, but the API reports the policy object as `type: branch`.
-   - On the next intentional `v*` tag release, verify that the release job can deploy to the `release` environment after required approval.
-   - If GitHub treats the policy as branch-only and blocks tag deployments, adjust the environment policy or document the limitation and rely on the workflow trigger plus tag/version check for tag control.
+_No open architecture follow-up items._
 
 ## Done
+
+1. Verify GitHub `release` environment custom `v*` policy behavior on the next real release.
+   - Verified during the intentional `v2.1` release.
+   - Initial release workflow run `26670139178` was rejected because GitHub treated the existing `v*` deployment policy as `type: branch`, which did not allow tag deployments.
+   - After explicit Russ approval, replaced the branch-typed policy with `v*` `type: tag`, reran and approved the release deployment, and published `moose-inventory` 2.1 successfully.
+   - Documented the verified tag-policy behavior in `docs/release/release-environment-protection.md` and `docs/release/publishing.md`.
 
 1. Expand user database backup/restore guidance beyond SQLite.
    - Added `docs/maintenance/database-backup-restore-guidance.md` documenting SQLite, MySQL/MariaDB, and PostgreSQL backup/restore boundaries.
@@ -595,11 +598,15 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 66 done / 0 open.
+Code quality status counts: 66 done / 1 open.
 
 ## Open
 
-_No open code-quality items._
+1. Sanitize non-syntax Psych safe-load failures during snapshot import.
+   - Snapshot import currently rescues `Psych::SyntaxError`, but fuzzing showed `Psych::AliasesNotEnabled` and `Psych::DisallowedClass` can still emit Ruby/Psych stack traces before project-level validation.
+   - Unsafe YAML aliases and disallowed classes are rejected, so this is not unsafe deserialization; treat it as low-priority availability/UX hardening and minor local information-disclosure cleanup.
+   - Add focused regression coverage for alias/disallowed-class payloads and report them through the same sanitized `ERROR: Could not parse inventory snapshot ...` path.
+   - Evidence: `docs/security-audit-2026-05-29-snapshot-import-fuzz.md`.
 
 ## Done
 
