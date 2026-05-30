@@ -72,6 +72,8 @@ module Moose
           puts "Associations added: #{result.associations}"
         rescue Psych::SyntaxError => e
           abort("ERROR: Could not parse inventory snapshot '#{file}': #{e.message}")
+        rescue Psych::Exception => e
+          abort("ERROR: Could not load inventory snapshot '#{file}': #{e.message}")
         rescue db.exceptions[:moose] => e
           abort("ERROR: #{e.message}")
         end

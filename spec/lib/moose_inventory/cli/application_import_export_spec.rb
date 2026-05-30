@@ -96,5 +96,37 @@ RSpec.describe Moose::Inventory::Cli::Application do
       expect(@db.models[:host].count).to eq(0)
     end
   end
+
+  it 'sanitizes alias rejection errors while previewing snapshot import' do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'inventory.yml')
+      File.write(path, "---\nversion: 1\ngroups: &groups {}\nhosts: *groups\n")
+
+      actual = runner { @app.start(['import', path, '--preview']) }
+
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to include("ERROR: Could not load inventory snapshot '#{path}':")
+      expect(actual[:STDERR]).to include('Alias parsing was not enabled')
+      expect(actual[:STDERR]).not_to include('/psych/')
+      expect(actual[:STDERR]).not_to include('from ')
+      expect(@db.models[:host].count).to eq(0)
+    end
+  end
+
+  it 'sanitizes disallowed class errors while previewing snapshot import' do
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'inventory.yml')
+      File.write(path, "---\nversion: 1\ngroups:\n  g: {}\n  :g: {}\nhosts: {}\n")
+
+      actual = runner { @app.start(['import', path, '--preview']) }
+
+      expect(actual[:aborted]).to eq(true)
+      expect(actual[:STDERR]).to include("ERROR: Could not load inventory snapshot '#{path}':")
+      expect(actual[:STDERR]).to include('Tried to load unspecified class: Symbol')
+      expect(actual[:STDERR]).not_to include('/psych/')
+      expect(actual[:STDERR]).not_to include('from ')
+      expect(@db.models[:host].count).to eq(0)
+    end
+  end
 end
 # rubocop:enable Metrics/BlockLength
