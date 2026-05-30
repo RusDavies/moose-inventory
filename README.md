@@ -28,7 +28,7 @@ gem 'moose-inventory'
 The [moose-inventory](https://github.com/RusDavies/moose-inventory) tool makes use of a simple YAML configuration file.
 
 
-###File Location
+### File Location
 
 The following locations, in descending order of precedence, are  searched for a configuration file:
 
@@ -38,7 +38,7 @@ The following locations, in descending order of precedence, are  searched for a 
  5. ~/local/etc/moose-tools/inventory/config
  6. /etc/moose-tools/inventory/config
 
-###Format
+### Format
 The file consists of a mandatory *general* section, and at least one *environment* section. For example:
 ```yaml
 ---
@@ -68,10 +68,10 @@ another_example_section:
 
 ```
 
-###The *general* section
+### The *general* section
 The general section is mandatory, and contains a single parameter **defaultenv**, which points to the name of the default environment section.
 
-###Environment sections
+### Environment sections
 You may add as many environment sections as you desire. The intention is to enable the user to easily manage multiple environments, such as development, staging, production, etc., via a single configuration file.  The name of each environment section must be unique, but can otherwise be any valid YAML tag.
 
 At present,  each environment section contains only a **db** subsection, describing database connection parameters.  Additional subsections may be added in the future, as functionality increases.
@@ -98,7 +98,7 @@ The tool itself provides a convenient help feature.  For example, try each of th
     $ moose-inventory help group
     $ moose-inventory group help add
 
-###Global switches
+### Global switches
 
 #### Option `--config <FILE>`
 The `--config` flag sets the configuration file to be used.  If specified, then the file must exist. This takes precedence over all other config files in other locations.  If not provided, then the default is to search the locations previously mentioned.
@@ -125,10 +125,10 @@ For example,
       :groups:
         - ungrouped
 
-###Transactional Behaviour
+### Transactional Behaviour
 The *moose-inventory* tool performs database operations in a transactional manner.  That is to say, either all operations of a command succeed, or they are all rolled back.
 
-###Dry-run and plan output
+### Dry-run and plan output
 Mutating commands support a `--dry-run` option.  This renders the same kind of progress output as the real command, but does not write anything to the database.  This is useful when checking inventory surgery before applying it, particularly for operations that affect automatic `ungrouped` associations or child-group cleanup.
 
 Examples:
@@ -183,7 +183,7 @@ The actual `events` array includes the full ordered plan for the command.  Each 
 
 CLI output compatibility is governed by `CLI-OUTPUT-v1` in `docs/compatibility/cli-output-compatibility.md`. Machine-readable JSON/YAML/pjson structures are the supported automation interface. Documented human-readable output is also compatibility-protected when tests, README examples, or release notes rely on it, but scripts should prefer machine-readable formats.
 
-###Import and export snapshots
+### Import and export snapshots
 The full inventory can be exported as a portable snapshot.  The snapshot contains a version number, hosts, host variables, host-to-group memberships, host/group tags, groups, group variables, and child-group relationships.  It is intended for review, backup, migration, and automation workflows.
 
     $ moose-inventory --format yaml export inventory.yml
@@ -233,7 +233,7 @@ Use `--preview` to validate a snapshot and review its additive import diff witho
 
 Import is additive and update-oriented: it creates missing hosts and groups, adds missing associations and tags, and creates or updates variables found in the snapshot.  It does not delete existing inventory records that are absent from the file.  Use a fresh database when you want the imported snapshot to be the whole world, because databases are notoriously bad at guessing intent.
 
-###Inventory doctor
+### Inventory doctor
 The `doctor` command runs read-only inventory health checks and exits with a non-zero status if it finds issues.  This makes it suitable for CI checks, release gates, and pre-change reviews.
 
     $ moose-inventory doctor
@@ -264,7 +264,7 @@ For automation, use `--format yaml`, `--format json`, or `--format pjson` on the
 
 Current doctor checks include missing database configuration, plaintext database passwords, hosts only in `ungrouped`, orphaned groups, empty groups, duplicate-ish names, invalid variable records, and circular child-group relationships.
 
-###Metadata tags
+### Metadata tags
 Hosts and groups can carry metadata tags that are separate from Ansible variables.  Use tags for operational labels such as environment, owner, lifecycle, location, role, or criticality when you want metadata without exposing it as inventory variables.
 
     $ moose-inventory host addtag web01 prod critical owner-platform
@@ -283,7 +283,7 @@ Groups support the same tag commands:
 
 Tag names are case-insensitive operational metadata: CLI tag commands and snapshot imports normalize them to lowercase, strip surrounding whitespace, deduplicate repeated values, and store them in portable join tables.  Tag add/remove operations are audited when they change state.
 
-###Audit log / change history
+### Audit log / change history
 Moose Inventory records append-only audit events for successful mutating CLI commands.  Dry-run commands are intentionally excluded, because planned changes are already available through `--plan-format` and did not actually mutate inventory state.
 
 Audit events record when the change happened, the local actor from `USER`, the command/action, the entity type/name, and structured operation details.  The audit log is deliberately small: it is for debugging and accountability, not yet a full rollback system.
@@ -303,7 +303,7 @@ The default limit is 20 events; use `--limit` to inspect more history:
 
     $ moose-inventory audit list --limit 100
 
-###Database lifecycle commands
+### Database lifecycle commands
 Moose Inventory records a small schema metadata table and exposes database lifecycle commands under `db`.  These commands are intentionally conservative: they inspect, create missing schema metadata, and back up SQLite databases, but they do not silently rewrite production databases into a modern art installation.
 
     $ moose-inventory db status
@@ -331,7 +331,7 @@ SQLite users can create a direct database-file backup:
 
 `db backup` is currently supported for SQLite only.  For MySQL/MariaDB and PostgreSQL, use native database tools such as `mysqldump`, `mariadb-dump`, `pg_dump`, managed-service snapshots, or equivalent backup systems, because those engines already have adult supervision built in.  Moose Inventory does not run server-backed restore commands, manage database users/grants, or implement destructive snapshot sync/restore behavior.  See `docs/maintenance/database-backup-restore-guidance.md` for adapter-specific backup and restore boundaries.
 
-###Walk-through example
+### Walk-through example
 This walk-through goes through the process of creating three hosts and three groups, assigning variables to some of each, and then associating hosts with groups.  Once done, each association, variable, group, and host are removed.
 
 We start by creating three hosts, in this case named *host1*,  *host2*, and *host3*.  Note, we can add as many hosts as we desire via this single command.  Also, although we have used short names here, we could equally have used fully qualified names.
@@ -521,7 +521,7 @@ We can also list hosts, to get the host-centric view.
       - group2
       - group3
 
-###Read-only console
+### Read-only console
 For human browsing, Moose Inventory includes a small read-only console.  It is intentionally conservative: the first console slice lets operators inspect inventory state, tags, and recent audit events, but does not mutate records.
 
     $ moose-inventory console
@@ -558,7 +558,7 @@ By default, deleting a group preserves its child groups as root groups. Use `gro
     $ moose-inventory host rmvar host1 owner id
     $ moose-inventory host rm host1 host2 host3
 
-###CI/CD integration examples
+### CI/CD integration examples
 The `examples/ci/` directory contains a pull-request review pattern for inventory changes that does not require production database credentials.  It imports a proposed snapshot into a temporary SQLite database, runs `doctor`, exports a canonical snapshot, lists hosts, and writes an Ansible-compatible inventory artifact.
 
 Run the example locally with:
