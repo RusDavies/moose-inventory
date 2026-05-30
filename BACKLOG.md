@@ -598,17 +598,17 @@ _No open modernization items._
 
 # Moose Inventory Code Quality Backlog
 
-Code quality status counts: 66 done / 1 open.
+Code quality status counts: 67 done / 0 open.
 
 ## Open
 
-1. Sanitize non-syntax Psych safe-load failures during snapshot import.
-   - Snapshot import currently rescues `Psych::SyntaxError`, but fuzzing showed `Psych::AliasesNotEnabled` and `Psych::DisallowedClass` can still emit Ruby/Psych stack traces before project-level validation.
-   - Unsafe YAML aliases and disallowed classes are rejected, so this is not unsafe deserialization; treat it as low-priority availability/UX hardening and minor local information-disclosure cleanup.
-   - Add focused regression coverage for alias/disallowed-class payloads and report them through the same sanitized `ERROR: Could not parse inventory snapshot ...` path.
-   - Evidence: `docs/security-audit-2026-05-29-snapshot-import-fuzz.md`.
-
 ## Done
+
+1. Sanitize non-syntax Psych safe-load failures during snapshot import.
+   - Added a `Psych::Exception` rescue after the syntax-specific parse handler so aliases and disallowed classes are rejected with a single sanitized `ERROR:` line instead of Ruby/Psych stack traces.
+   - Added focused CLI regression coverage for alias and disallowed-class payloads during non-mutating `import --preview`.
+   - Verified with targeted snapshot-import fuzzing and `MOOSE_INVENTORY_REQUIRE_SECURITY_TOOLS=1 ./scripts/check.sh` on 2026-05-30.
+   - Evidence: `.openclaw-security-audit/fuzz_snapshot_import_availability_run_2026-05-30T0208Z-after-fix.json`.
 
 1. Add focused specs for `OperationEventSupport` result defaults and event construction.
    - Added direct unit coverage for default empty event payloads, explicit payload preservation, event emission, default `warning_count: 0`, and explicit warning counts.
