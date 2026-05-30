@@ -9,14 +9,18 @@ This document records the current GitHub `release` environment protection settin
 Initial confirmation date: 2026-05-29
 Protection configuration date: 2026-05-29
 Self-review adjustment date: 2026-05-29
+Tag policy correction/verification date: 2026-05-29
 
 Confirmation/configuration commands:
 
 ```bash
 gh api repos/RusDavies/moose-inventory/environments/release --jq '.'
 gh api -X PUT repos/RusDavies/moose-inventory/environments/release --input /tmp/moose-env-release.json
-gh api -X POST repos/RusDavies/moose-inventory/environments/release/deployment-branch-policies -f name='v*'
+gh api -X POST repos/RusDavies/moose-inventory/environments/release/deployment-branch-policies -f name='v*' -f type='tag'
+gh api -X DELETE repos/RusDavies/moose-inventory/environments/release/deployment-branch-policies/50646877
 gh api repos/RusDavies/moose-inventory/environments/release/deployment-branch-policies --jq '.'
+gh run rerun 26670139178
+gh api -X POST repos/RusDavies/moose-inventory/actions/runs/26670139178/pending_deployments --input /tmp/moose-approve-deployment.json
 ```
 
 Confirmed repository/environment:
@@ -37,7 +41,7 @@ Confirmed repository/environment:
 | Prevent self-review | Disabled (`prevent_self_review: false`) | Disabled because OpenClaw/automation pushes use Russ's GitHub account. With `RusDavies` as the only required reviewer, self-review prevention could block Russ from approving a release deployment triggered through his own account. |
 | Wait timer | `0` / none | No arbitrary delay is configured. Human review is the intended release friction. |
 | Deployment branch/tag policy mode | Custom branch policies enabled (`protected_branches: false`, `custom_branch_policies: true`) | The environment uses an explicit allow-list rather than all branches/tags. |
-| Custom deployment policy | `v*` | Intended to align environment deployment eligibility with the release workflow's `v*` tag trigger. GitHub API reports this policy object with `type: branch`; verify behavior on the next real release tag and adjust if GitHub does not apply it to tag deployments as expected. |
+| Custom deployment policy | `v*` with `type: tag` | Aligns environment deployment eligibility with the release workflow's `v*` tag trigger. An earlier `type: branch` policy rejected tag `v2.1`; after explicit human approval, it was replaced with a tag policy and verified by the successful `v2.1` release workflow. |
 | Admin bypass | Disabled (`can_admins_bypass: false`) | Admins should not be able to bypass environment protection for this environment through the normal bypass setting. |
 
 ## Current trusted-publishing path
@@ -48,7 +52,7 @@ The current release path relies on these controls:
 2. The GitHub `release` environment requires review by `RusDavies` before the release job can proceed.
 3. Self-review prevention is disabled so `RusDavies` can approve deployments triggered by automation authenticated as Russ's GitHub account.
 4. Admin bypass is disabled for the `release` environment.
-5. The environment has a custom deployment policy named `v*`.
+5. The environment has a custom tag deployment policy named `v*`.
 6. The release workflow verifies that the tag version matches `Moose::Inventory::VERSION`.
 7. The release workflow installs security tools and runs:
 
@@ -59,11 +63,15 @@ The current release path relies on these controls:
 8. RubyGems trusted publishing/OIDC is scoped to repository `RusDavies/moose-inventory`, workflow `release.yml`, and environment `release`.
 9. The package sanity gate verifies the gem payload and executable metadata before publishing.
 
-## Residual verification note
+## Tag-policy verification note
 
-GitHub accepted the custom deployment policy name `v*`, but the deployment-branch-policy API response reports the policy object as `type: branch`. The next real release should verify that a pushed `v*` tag can still deploy to the `release` environment after human approval.
+The first `v2.1` workflow attempt proved that a custom deployment policy named `v*` with API `type: branch` does not permit tag deployments. GitHub rejected the run before any workflow steps executed with:
 
-If GitHub treats the custom policy as branch-only and blocks tag deployments, maintainers should either adjust the environment policy to the supported tag pattern mechanism or document the limitation and rely on the workflow's `v*` tag trigger plus tag/version check as the tag-control layer.
+```text
+Tag "v2.1" is not allowed to deploy to release due to environment protection rules.
+```
+
+After explicit human approval, the branch policy was replaced with a custom deployment policy named `v*` and `type: tag`. The rerun of workflow `26670139178` for tag `v2.1` then entered the required-review gate, was approved by `RusDavies`, completed the full release workflow successfully, and published `moose-inventory` version `2.1` to RubyGems.
 
 ## Change-control note
 
