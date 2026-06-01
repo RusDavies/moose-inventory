@@ -19,3 +19,7 @@ __pycache__/
 /gems/
 moose-inventory.spec
 /.openclaw-security-audit/
+
+# Local inventory databases and SQLite sidecar files
+inventory.db
+inventory.db-*
