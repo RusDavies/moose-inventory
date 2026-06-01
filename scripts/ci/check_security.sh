@@ -65,4 +65,7 @@ else
   exit 0
 fi
 
-"${OSV_SCANNER[@]}" scan source --lockfile Gemfile.lock .
+# osv-scanner 2.x treats --lockfile as an explicit scan target; adding the
+# repository path as a positional source makes it try to infer an extractor for
+# Gemfile.lock through the directory scanner and fail with exit 127.
+"${OSV_SCANNER[@]}" scan source --lockfile Gemfile.lock
