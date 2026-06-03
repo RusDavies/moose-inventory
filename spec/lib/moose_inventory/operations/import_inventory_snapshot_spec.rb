@@ -222,5 +222,18 @@ RSpec.describe Moose::Inventory::Operations::ImportInventorySnapshot, '#preview'
     expect(@db.models[:group].where(name: 'blue').count).to eq(0)
     expect(group.groupvars_dataset[name: 'role'][:value]).to eq('old')
   end
+
+  it 'previews deep acyclic group chains without recursive validator stack exhaustion' do
+    groups = (1..5_000).to_h do |index|
+      child = index < 5_000 ? ["group#{index + 1}"] : []
+      ["group#{index}", { children: child, vars: {} }]
+    end
+
+    preview = operation.preview(snapshot: { version: 1, hosts: {}, groups: groups })
+
+    expect(preview['changes_applied']).to eq(false)
+    expect(preview.dig('summary', 'groups_created')).to eq(5_000)
+    expect(@db.models[:group].count).to eq(0)
+  end
 end
 # rubocop:enable Metrics/BlockLength

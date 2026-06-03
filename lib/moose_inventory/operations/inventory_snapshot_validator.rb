@@ -3,6 +3,64 @@
 module Moose
   module Inventory
     module Operations
+      # Validates group hierarchy cycle safety without recursive traversal.
+      class GroupCycleValidator
+        def initialize(context:)
+          @context = context
+        end
+
+        def call(groups)
+          visiting = {}
+          visited = {}
+
+          groups.each_key do |root|
+            validate_from_root!(root, groups, visiting, visited)
+          end
+        end
+
+        private
+
+        attr_reader :context
+
+        def validate_from_root!(root, groups, visiting, visited)
+          stack = [[root, false]]
+          until stack.empty?
+            name, expanded = stack.pop
+            next if visited[name]
+
+            if expanded
+              visiting.delete(name)
+              visited[name] = true
+            else
+              queue_group_children!(name, groups, visiting, stack)
+            end
+          end
+        end
+
+        def queue_group_children!(name, groups, visiting, stack)
+          raise_invalid("group hierarchy contains a cycle at '#{name}'") if visiting[name]
+
+          visiting[name] = true
+          stack << [name, true]
+          array_value(groups[name], 'children', label: "group '#{name}' children").reverse_each do |child_name|
+            raise_invalid("group hierarchy contains a cycle at '#{child_name}'") if visiting[child_name]
+
+            stack << [child_name, false]
+          end
+        end
+
+        def array_value(payload, key, label:)
+          value = payload.fetch(key, [])
+          raise_invalid("#{label} must be a list") unless value.is_a?(Array)
+
+          value.map(&:to_s)
+        end
+
+        def raise_invalid(message)
+          raise context.moose_exception_class, "Invalid inventory snapshot: #{message}."
+        end
+      end
+
       # Normalizes and validates portable inventory snapshot input before import.
       class InventorySnapshotValidator
         def initialize(context:)
@@ -73,25 +131,7 @@ module Moose
         end
 
         def validate_group_cycles!(groups)
-          visiting = {}
-          visited = {}
-
-          groups.each_key do |name|
-            visit_group!(name, groups, visiting, visited)
-          end
-        end
-
-        def visit_group!(name, groups, visiting, visited)
-          return if visited[name]
-
-          raise_invalid("group hierarchy contains a cycle at '#{name}'") if visiting[name]
-
-          visiting[name] = true
-          array_value(groups[name], 'children', label: "group '#{name}' children").each do |child_name|
-            visit_group!(child_name, groups, visiting, visited)
-          end
-          visiting.delete(name)
-          visited[name] = true
+          GroupCycleValidator.new(context: context).call(groups)
         end
 
         def array_value(payload, key, label:)
