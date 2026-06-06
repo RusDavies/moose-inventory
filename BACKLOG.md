@@ -339,11 +339,14 @@ _No open feature-value items._
 
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 14 done / 0 open.
+Release readiness status counts: 14 done / 1 open.
 
 ## Open
 
-_No open release-readiness items._
+1. Pin GitHub Actions workflow `uses:` entries to immutable SHAs and add a policy check.
+   - AW-025 bounded check found `.github/workflows/ci.yml` and `.github/workflows/release.yml` use moving action refs instead of full 40-character commit SHAs.
+   - Affected entries: `actions/checkout@v5`, `ruby/setup-ruby@v1`, `actions/setup-go@v6`, and trusted-publishing action `rubygems/release-gem@v1`.
+   - Follow-up should pin each external action to a reviewed full commit SHA while keeping readable version comments, then add a CI/policy check that rejects non-SHA `uses:` entries.
 
 ## Done
 
