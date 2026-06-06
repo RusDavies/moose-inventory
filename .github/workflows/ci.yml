@@ -20,16 +20,19 @@ jobs:
         ruby-version: ['3.2', '3.3', '3.4']
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        # actions/checkout v5 pinned for workflow supply-chain integrity.
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        # ruby/setup-ruby v1 pinned for workflow supply-chain integrity.
+        uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
 
       - name: Set up Go for security tools
-        uses: actions/setup-go@v6
+        # actions/setup-go v6 pinned for workflow supply-chain integrity.
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
         with:
           go-version: '1.25.x'
           cache: false
