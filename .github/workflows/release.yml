@@ -15,18 +15,21 @@ jobs:
     environment: release
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        # actions/checkout v5 pinned for workflow supply-chain integrity.
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
         with:
           persist-credentials: false
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+        # ruby/setup-ruby v1 pinned for workflow supply-chain integrity.
+        uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f
         with:
           ruby-version: '3.4'
           bundler-cache: true
 
       - name: Set up Go for security tools
-        uses: actions/setup-go@v6
+        # actions/setup-go v6 pinned for workflow supply-chain integrity.
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c
         with:
           go-version: '1.25.x'
           cache: false
@@ -55,6 +58,7 @@ jobs:
         run: ./scripts/check.sh
 
       - name: Publish gem to RubyGems
-        uses: rubygems/release-gem@v1
+        # rubygems/release-gem v1 pinned for trusted-publishing supply-chain integrity.
+        uses: rubygems/release-gem@f0d7faff26625599a847d40d9fa28ace24c2aacc
         with:
           await-release: false

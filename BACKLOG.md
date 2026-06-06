@@ -339,16 +339,18 @@ _No open feature-value items._
 
 # Moose Inventory Release Readiness Backlog
 
-Release readiness status counts: 14 done / 1 open.
+Release readiness status counts: 15 done / 0 open.
 
 ## Open
 
-1. Pin GitHub Actions workflow `uses:` entries to immutable SHAs and add a policy check.
-   - AW-025 bounded check found `.github/workflows/ci.yml` and `.github/workflows/release.yml` use moving action refs instead of full 40-character commit SHAs.
-   - Affected entries: `actions/checkout@v5`, `ruby/setup-ruby@v1`, `actions/setup-go@v6`, and trusted-publishing action `rubygems/release-gem@v1`.
-   - Follow-up should pin each external action to a reviewed full commit SHA while keeping readable version comments, then add a CI/policy check that rejects non-SHA `uses:` entries.
+_No open release-readiness items._
 
 ## Done
+
+1. Pin GitHub Actions workflow `uses:` entries to immutable SHAs and add a policy check.
+   - AW-025 bounded check found `.github/workflows/ci.yml` and `.github/workflows/release.yml` used moving action refs instead of full 40-character commit SHAs.
+   - Pinned `actions/checkout@v5`, `ruby/setup-ruby@v1`, `actions/setup-go@v6`, and trusted-publishing action `rubygems/release-gem@v1` to reviewed full commit SHAs with readable comments preserving the upstream major-version context.
+   - Added `scripts/ci/check_workflow_action_pins.sh` and wired it into `scripts/check.sh` so future non-local workflow `uses:` entries must be pinned to full 40-character SHAs.
 
 1. Clean `group_add_spec.rb` RuboCop hygiene.
    - Normalized the large group add CLI spec for frozen string literals, literal style, Thor member checks, legacy line continuations, interpolation style, redundant assignments, and scoped block-length handling.
