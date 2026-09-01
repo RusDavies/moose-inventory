@@ -25,11 +25,11 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'indentation', '~> 0'
-  spec.add_dependency 'json', '>= 2.7', '< 3'
+  spec.add_dependency 'json', '>= 2.19.9', '< 3'
   spec.add_dependency 'mysql2', '>= 0.5.7', '< 0.6'
   spec.add_dependency 'pg', '>= 1.5', '< 2'
   spec.add_dependency 'sequel', '>= 5.80', '< 6'
-  spec.add_dependency 'sqlite3', '>= 1.7', '< 3'
+  spec.add_dependency 'sqlite3', '>= 2.9.5', '< 3'
   spec.add_dependency 'thor', '>= 1.3', '< 2'
 
   # rubocop:disable Gemspec/DevelopmentDependencies

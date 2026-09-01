@@ -3,19 +3,28 @@ set -euo pipefail
 
 python3 - <<'PY'
 import json
+import re
 import sys
 import urllib.error
 import urllib.request
 
 specs = []
+in_gem_specs = False
 for line in open('Gemfile.lock', encoding='utf-8'):
-    item = line.strip()
-    if not item or ' (' not in item:
+    if line.rstrip() == 'GEM':
+        in_gem_specs = True
         continue
-    if item.startswith('moose-inventory'):
+    if in_gem_specs and line and not line.startswith(' '):
+        in_gem_specs = False
+    if not in_gem_specs:
         continue
-    name = item.split(' (', 1)[0]
-    version = item.split(' (', 1)[1].split(')', 1)[0].split('-', 1)[0]
+    match = re.match(r'^    ([A-Za-z][^ ]*) \(([^)]+)\)', line)
+    if not match:
+        continue
+    name = match.group(1)
+    if name == 'moose-inventory':
+        continue
+    version = match.group(2).split('-', 1)[0]
     if name and name[0].isalpha():
         specs.append((name, version))
 
